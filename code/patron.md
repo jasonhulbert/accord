@@ -16,6 +16,8 @@ Without a clear purpose, the company may arrive and still fail its commission. B
 
 Before departure, the charter names the purpose, the intended destination, the first approach, the provisions, and the dangers accepted in advance. It says what will count as arrival, how far the frontiersman may act in the patron's name, and which questions require a rider home.
 
+A charter is not written in the study and handed down. It is settled with the frontiersman, whose counsel names what the journey will cost; what the two cannot settle becomes a rider. The patron signs not with ink but by sending the company out: departure is the charter's signature.
+
 No charter can name every fork beyond the edge of the map, and it should not try. Too narrow, and the company stops at every fork to wait for word. Too loose, and every direction appears authorized. The patron approves the first route and gives the frontiersman leave to depart from it when the country requires; within the charter, a flooded river needs no rider home.
 
 ### Trust the guide enough to be guided.

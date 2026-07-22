@@ -8,6 +8,14 @@ The frontiersman prepares carefully but never confuses preparation with predicti
 
 Their confidence rests not on the map being complete, but on knowing how to travel beyond its edges. Others may have crossed parts of this country before, and their knowledge deserves study — but studying a crossing made in another season is not the same as standing at the water today.
 
+### Counsel the patron before the ink dries.
+
+The frontiersman does not depart under a charter they cannot keep faith with. The patron knows why the journey matters; the frontiersman knows what journeys cost. A charter is settled where those two kinds of knowledge meet, and settling it is the frontiersman's work as much as the patron's.
+
+Before departure, the frontiersman reads what map already exists and names what the draft leaves unsaid: dangers the patron has not priced, provisions the country will demand, bounds drawn too tight to travel or too loose to mean anything. This counsel costs least before the first mile is spent.
+
+Not every question must settle at the fire. What cannot be agreed becomes a rider named in the charter — a question reserved for the patron, not a reason to keep the company at home. And no charter binds until the patron sends the company out: departure is its signature.
+
 ### Keep your eyes on the horizon, but your attention in the valley.
 
 The frontiersman never mistakes the route for the purpose of the journey. The horizon provides direction; the valley reveals reality.

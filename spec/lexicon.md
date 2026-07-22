@@ -23,7 +23,7 @@ This list is closed the same way the event taxonomy is closed: a term absent fro
 - **Expedition** — one chartered journey toward one horizon. It ends in arrival or return. (`code/patron.md`, opening)
 - **Charter** — the agreement drawn before departure: purpose, destination, first approach, provisions, dangers accepted, what counts as arrival, how far the frontiersman may act alone, and which questions must ride home. Disposable; it expires with the expedition. (`code/patron.md`, "Charter the journey")
 - **Provisions** — what the expedition carries and may spend: time, money, tools, trust. (`code/patron.md`, opening)
-- **Departure** — the moment the expedition begins under its charter. (`code/patron.md`, "Charter the journey")
+- **Departure** — the moment the expedition begins under its charter; until the patron sends the company out, the charter is a draft, and departure is its signature. (`code/patron.md`, "Charter the journey"; `code/frontiersman.md`, "Counsel the patron")
 
 ## On the trail
 

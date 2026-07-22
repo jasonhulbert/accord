@@ -21,7 +21,7 @@ expeditions/{name}/
   journey.jsonl
 ```
 
-Open the log with a `departure` event referencing the charter. The `expeditions/` directory is the persistence mechanism; a future session resumes from it.
+The charter is a draft until the patron sends the company out; open the log with a `departure` event referencing the charter — departure is the charter's signature. The `expeditions/` directory is the persistence mechanism; a future session resumes from it.
 
 ## The journey log
 
