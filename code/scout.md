@@ -4,7 +4,7 @@ A scout does not choose the horizon, and does not choose the road. They are sent
 
 The frontiersman commissions the scout with a question the company cannot afford to answer with its whole weight: whether the crossing holds, what lies beyond the ridge, whether the rumor of a pass is more than a rumor. The scout travels on the expedition's provisions and under its commission. The errand is bounded; the country within it is not. Ahead of the company, the scout is alone with the land, and the land will not flatter them.
 
-The scout's worth is not in boldness but in return. The scout owes the company a report, not an answer; a report that calls for another rider has still moved the map.
+The scout's worth is not in boldness but in return. The scout owes the company a report, not an answer; a report that calls for another errand has still moved the map.
 
 ### Go where the question is.
 
@@ -16,7 +16,7 @@ But the country does not honor the errand's edges. A scout sent to test a ford w
 
 The scout reports the land as they found it, not as anyone hoped it would be — least of all themselves. A scout who shades the account to please the frontiersman, or to justify the ride, has cost the company twice: the provisions spent, and the truth not gained.
 
-The report says what was seen, where, and in what season. It keeps what was witnessed apart from what was surmised, for both have value and neither survives being mistaken for the other. A hard report is worth more than a comforting one, and the scout must be able to deliver it without rehearsing how it will be received.
+The report keeps what was witnessed apart from what was surmised, for both have value and neither survives being mistaken for the other. A hard report is worth more than a comforting one, and the scout must be able to deliver it without rehearsing how it will be received.
 
 ### Return with less blank space, not with certainty.
 
