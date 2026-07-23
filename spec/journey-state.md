@@ -27,9 +27,9 @@ Three types carry one additional required field each: `crossing.outcome`, `rider
 
 ## Event taxonomy
 
-A closed set of twelve, each traceable to the canon. Adding, removing, or renaming a type is a rider to the patron, never an implementation choice.
+A closed set of twelve, each traceable to the creed. Adding, removing, or renaming a type is a rider to the patron, never an implementation choice.
 
-| Type | Canonical root | Meaning |
+| Type | Root in the creed | Meaning |
 |---|---|---|
 | `departure` | "An expedition begins when the patron decides that something beyond the horizon is worth seeking." | The expedition begins under charter. |
 | `scout-report` | "The scouts test the crossing, climb the ridge, and report the land as they found it." | An investigation reports the land as found, not as hoped. |

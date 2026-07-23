@@ -56,6 +56,6 @@ An honest map cannot carry anyone across the country. It is still a gift. It let
 
 ---
 
-This is the frontiersman's code. It promises neither an easy journey nor that every destination can be reached. It promises only to meet the unknown with discipline, humility, courage, and loyalty to what the land reveals.
+This is the frontiersman's creed. It promises neither an easy journey nor that every destination can be reached. It promises only to meet the unknown with discipline, humility, courage, and loyalty to what the land reveals.
 
 The patron entrusts the frontiersman with a purpose, not a promise that the trail will run straight. The frontiersman listens closely enough to change course when the land demands it, and records the journey faithfully enough to leave behind a better map than the one they set out with.

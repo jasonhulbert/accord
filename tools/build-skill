@@ -7,8 +7,8 @@ repo=$(cd "$(dirname "$0")/.." && pwd)
 skill="$repo/adapters/claude"
 out="$repo/expedition.skill"
 
-mkdir -p "$skill/code" "$skill/templates" "$skill/spec"
-cp "$repo"/code/*.md "$skill/code/"
+mkdir -p "$skill/creed" "$skill/templates" "$skill/spec"
+cp "$repo"/creed/*.md "$skill/creed/"
 cp "$repo"/templates/*.md "$skill/templates/"
 cp "$repo"/spec/journey-state.md "$repo"/spec/journey.schema.json "$repo"/spec/lexicon.md "$skill/spec/"
 
