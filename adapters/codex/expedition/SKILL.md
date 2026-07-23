@@ -49,7 +49,7 @@ Charters and dispatches are markdown documents with voice. Create them from `tem
 
 - Send dispatches from `templates/dispatch.md` when the patron needs a view of the country. Report miles gained, crossings lost, landmarks found, and the trail ahead. Surface bad news promptly.
 - Send a rider when the charter reserves a question for the patron. Include your counsel. Record the patron's answer as `word`.
-- Treat an unsolicited mid-journey instruction or request from the patron as a missive. Record the patron's words verbatim or near it, survey the camp, and answer with a dispatch. If the missive changes the charter, explain the cost. The patron's word stands, and traveling on signs the amendment. Do not halt unless the missive says to halt.
+- Treat an unsolicited mid-journey instruction or request from the patron as a missive: a request for an account, news, or changed terms. The `expedition-missive` skill is the explicit channel; when the patron speaks first without invoking it, receive the missive per `spec/missive.md` in this skill folder all the same.
 - Write journal entries from `templates/journal-entry.md` after significant stretches and before ending a session at a basecamp. Record what was tried, what failed, what changed in the map, and what remains unseen. Keep entries descriptive, not prescriptive.
 
 The creed requires these ceremonies but does not prescribe their choreography. Judge when they are needed and how the work between them should proceed.

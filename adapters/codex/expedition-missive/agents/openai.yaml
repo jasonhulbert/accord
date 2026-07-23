@@ -1,0 +1,4 @@
+interface:
+  display_name: "Expedition Missive"
+  short_description: "Send word to a running expedition"
+  default_prompt: "Use $expedition-missive to check in on, inform, or amend a chartered expedition."

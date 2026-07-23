@@ -33,7 +33,7 @@ Charters and dispatches are markdown documents with voice, written from `templat
 
 - **Dispatches** keep the patron seeing the country: miles gained, crossings lost, landmarks found, the trail ahead. Bad news gains nothing from delay.
 - **Riders** carry home the questions the charter reserved for the patron. Send counsel with the question; log the patron's `word` when it comes back.
-- **Missives** are the patron speaking first mid-journey. Log a `missive` event with the patron's words verbatim or near it, survey the camp, and answer with a dispatch. If it alters the charter, counsel on the cost; the patron's word stands, and traveling on signs the amendment. No halt unless the missive says halt.
+- **Missives** are the patron speaking first mid-journey — a request for an account, news, or changed terms. The `expedition-missive` skill is the explicit channel; when the patron speaks first without invoking it, the ceremony applies all the same: receive the missive per `spec/missive.md` in this skill folder.
 - **Journal entries** (from `templates/journal-entry.md`) record lessons for the project after significant stretches — maps, not mandates. The camp is not made until the journal is inked: record what was tried, what failed, and what comes next before a session ends.
 
 The creed prescribes that these ceremonies exist, never their choreography. When they happen, how they are phrased, and how the work between them is done are yours to judge against the charter and the land.
