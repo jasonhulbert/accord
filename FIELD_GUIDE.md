@@ -1,6 +1,6 @@
 # Field Guide
 
-A practical reference for working under the expedition framework. The creed (`creed/`) is the authority on how the roles behave; this guide only shows the trail. Where the two disagree, the creed is right.
+A practical reference for working under the expedition framework. The creed (`plugin/creed/`) is the authority on how the roles behave; this guide only shows the trail. Where the two disagree, the creed is right.
 
 ## What this is
 
@@ -49,4 +49,4 @@ Use it for substantial work whose path is not yet known. Do not use it for small
 
 - `.expeditions/{name}/` in the target project — charter, journey log, dispatches. The persistence mechanism; keep it out of version control if the journey is not the project's business, or track it if you want the record to travel with the repo.
 - The journal — dated entries of lessons for the project. Maps, not mandates.
-- `spec/journey-state.md` — the log's format, if you want to read it raw. `tools/validate` checks a log; `tools/render` draws it.
+- `plugin/spec/journey-state.md` — the log's format, if you want to read it raw. `plugin/tools/validate` checks a log; `plugin/tools/render` draws it.

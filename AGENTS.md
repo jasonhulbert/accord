@@ -2,7 +2,7 @@
 
 This directory explores an expedition metaphor as a framework for human-in-the-loop AI work. Its premise is that clear roles, a shared "creed", and reliable communication can align a human and an AI agent while leaving the agent room to exercise judgment and capability. The narratives test whether this shared point of view can sustain trust and alignment without relying on prescriptive plans that manage the agent step by step.
 
-Read the current narratives (in `creed/`) before proposing changes or additions. Treat them as the source of truth for the metaphor.
+Read the current narratives (in `plugin/creed/`) before proposing changes or additions. Treat them as the source of truth for the metaphor.
 
 When contributing:
 
@@ -14,12 +14,14 @@ When contributing:
 
 ## Repository layout
 
-- `creed/` — the creed: `frontiersman.md`, `patron.md`, `scout.md`. Permanent, role-level, amended rarely. Narratives only; reference material belongs in `spec/`.
-- `templates/` — charter, dispatch, and journal-entry templates.
-- `spec/` — journey-state spec (`journey-state.md`), `journey.schema.json`, `examples/`, `analysis.md`.
-- `skills/` — the `expedition` and `expedition-missive` skills, shared by both harnesses. Each SKILL.md references `creed/`, `templates/`, and `spec/` at the plugin root; never vendor copies into skill folders.
-- `.claude-plugin/`, `.codex-plugin/`, `.agents/plugins/` — plugin manifests and marketplace catalogs. The repository root is the plugin root for both Claude Code and Codex.
-- `tools/` — `validate`, `render`.
+- `plugin/` — the plugin root for both Claude Code and Codex; only this subtree is installed into consuming projects. Repo-root files (`AGENTS.md`, `FIELD_GUIDE.md`, `README.md`, `CLAUDE.md`) are contributor-facing and never ship.
+  - `plugin/creed/` — the creed: `frontiersman.md`, `patron.md`, `scout.md`. Permanent, role-level, amended rarely. Narratives only; reference material belongs in `plugin/spec/`.
+  - `plugin/templates/` — charter, dispatch, and journal-entry templates.
+  - `plugin/spec/` — journey-state spec (`journey-state.md`), `journey.schema.json`, `examples/`, `analysis.md`.
+  - `plugin/skills/` — the `expedition` and `expedition-missive` skills, shared by both harnesses. Each SKILL.md references `creed/`, `templates/`, and `spec/` at the plugin root; never vendor copies into skill folders.
+  - `plugin/.claude-plugin/`, `plugin/.codex-plugin/` — plugin manifests.
+  - `plugin/tools/` — `validate`, `render`.
+- `.claude-plugin/marketplace.json`, `.agents/plugins/` — marketplace catalogs at the repo root, pointing at `./plugin`.
 - `.expeditions/` — journeys run *on this repo itself* (dogfooding). Excluded from git, like any project's expedition records. Charters and journals for other projects never live here.
 
 ## Amendment discipline
