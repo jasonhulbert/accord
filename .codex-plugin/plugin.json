@@ -1,0 +1,12 @@
+{
+  "name": "expedition",
+  "version": "0.1.0",
+  "description": "A narrative role framework for human-in-the-loop AI work: chartered, dispatch-driven collaboration under a shared creed.",
+  "keywords": ["workflow", "collaboration", "human-in-the-loop"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Expedition",
+    "shortDescription": "Chartered human-AI work for uncertain paths",
+    "defaultPrompt": ["Use the expedition skill to begin or resume this work under a shared charter."]
+  }
+}

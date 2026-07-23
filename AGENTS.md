@@ -17,9 +17,9 @@ When contributing:
 - `creed/` — the creed: `frontiersman.md`, `patron.md`, `scout.md`. Permanent, role-level, amended rarely. Narratives only; reference material belongs in `spec/`.
 - `templates/` — charter, dispatch, and journal-entry templates.
 - `spec/` — journey-state spec (`journey-state.md`), `journey.schema.json`, `examples/`, `analysis.md`.
-- `adapters/claude/` — self-contained Claude skill (vendored creed, templates, spec essentials). The repo is the source of truth; the skill folder is a build target produced by `tools/build-skill`.
-- `adapters/project-snippet.md` — deterministic fallback for tools without a skill mechanism.
-- `tools/` — `validate`, `render`, `build-skill`.
+- `skills/` — the `expedition` and `expedition-missive` skills, shared by both harnesses. Each SKILL.md references `creed/`, `templates/`, and `spec/` at the plugin root; never vendor copies into skill folders.
+- `.claude-plugin/`, `.codex-plugin/`, `.agents/plugins/` — plugin manifests and marketplace catalogs. The repository root is the plugin root for both Claude Code and Codex.
+- `tools/` — `validate`, `render`.
 - `expeditions/` — journeys run *on this repo itself* (dogfooding). Charters and journals for other projects never live here.
 
 ## Amendment discipline

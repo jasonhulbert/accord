@@ -16,21 +16,28 @@ Updates flow one way. Creed improvements reach projects through package upgrades
 
 ## Repository layout
 
+The repository is itself a plugin for both Claude Code and Codex: one shared tree of framework resources, with both skills referencing it — nothing is vendored or duplicated.
+
 ```
+.claude-plugin/             Claude Code plugin manifest + marketplace catalog
+.codex-plugin/              Codex plugin manifest
+.agents/plugins/            Codex marketplace catalog
+skills/
+  expedition/SKILL.md       the expedition skill (shared by both harnesses)
+  expedition-missive/SKILL.md
 creed/                      the creed (frontiersman.md, patron.md, scout.md)
 templates/                  charter, dispatch, and journal-entry templates
 spec/                       journey-state spec, JSON Schema, examples, analysis notes
-adapters/
-  claude/                   self-contained Claude skill (vendored creed + templates + spec)
-  project-snippet.md        fallback for tools without a skill mechanism
-tools/                      validate, render, and skill-build scripts
+tools/                      validate and render scripts
 ```
 
 ## Adoption
 
-**Skill-first.** Build the skill with `tools/build-skill` and install the resulting `expedition.skill` per-user. It travels across projects and needs no target-project configuration. On invocation it establishes the roles, drafts a charter with the patron, and creates `expeditions/{name}/` in the target project. If an `expeditions/` charter already exists for the work at hand, it resumes under that charter — the `expeditions/` directory is the persistence mechanism.
+**Claude Code.** Add this repository as a marketplace and install the plugin (`/plugin marketplace add <repo>` then `/plugin install expedition`), or load it directly for development with `claude --plugin-dir <path-to-repo>`. Skills are namespaced: `/expedition:expedition`, `/expedition:expedition-missive`. Run `claude plugin validate .` after changes.
 
-**Fallback.** For tools without a skill mechanism, paste `adapters/project-snippet.md` into the project's AGENTS.md or CLAUDE.md.
+**Codex.** Add this repository as a plugin marketplace (`codex plugin marketplace add <repo>`) and install the `expedition` plugin; both skills come with it.
+
+The plugin travels across projects and needs no target-project configuration. On invocation the skills establish the roles, draft a charter with the patron, and create `expeditions/{name}/` in the target project. If an `expeditions/` charter already exists for the work at hand, they resume under that charter. The `expeditions/` directory is the persistence mechanism.
 
 Each expedition keeps an append-only log, `expeditions/{name}/journey.jsonl`, described in `spec/journey-state.md`. Validate a log with `tools/validate`; render it into a visual journey with `tools/render`.
 

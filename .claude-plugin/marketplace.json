@@ -1,0 +1,14 @@
+{
+  "name": "expedition",
+  "owner": {
+    "name": "jasonhulbert"
+  },
+  "description": "The expedition framework: chartered, dispatch-driven human-AI collaboration under a shared creed.",
+  "plugins": [
+    {
+      "name": "expedition",
+      "source": "./",
+      "description": "A narrative role framework for human-in-the-loop AI work: chartered, dispatch-driven collaboration under a shared creed."
+    }
+  ]
+}
