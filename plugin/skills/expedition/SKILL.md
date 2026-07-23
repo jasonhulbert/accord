@@ -31,6 +31,12 @@ Otherwise, draft a charter with the patron using `templates/charter.md`. Counsel
 
 The charter is a draft until the patron sends the company out; open the log with a `departure` event referencing the charter — departure is the charter's signature. The `.expeditions/` directory is the persistence mechanism; a future session resumes from the record, not from memory.
 
+### Departure gate
+
+For a new expedition, the invocation and everything in the same patron message authorize chartering only. Words such as "start," "begin," "proceed," or "go ahead" in that message mean to begin the chartering ceremony, not to depart. Treat supplied context as input to the charter, not as settled terms. Ask about consequential gaps rather than filling in the patron's purpose, provisions, accepted dangers, authority, or arrival judgment. Draft the complete charter, give counsel, and present both for settlement. The patron cannot approve a charter they have not yet seen.
+
+Departure requires a subsequent patron message, after the draft and counsel have been presented, that unambiguously accepts the charter and sends the company out. A revision, question, or acknowledgment continues the settling. If the patron's intent is unclear, ask whether the charter is settled and the company should depart. Do not perform the chartered work or write a `departure` event before this gate is crossed.
+
 ## The journey log
 
 Append events to `.expeditions/{name}/journey.jsonl` as the work proceeds, one JSON object per line, per `spec/journey-state.md`. Read that spec before writing the first event. The log is append-only; corrections are subsequent events. Twelve event types exist — `departure`, `scout-report`, `crossing`, `basecamp`, `dispatch`, `rider`, `word`, `missive`, `course-change`, `arrival`, `return`, `account` — and anything that fits no type is logged as an `account`, never forced or skipped. The log records what happened; nothing here obliges any phase to emit any event.
