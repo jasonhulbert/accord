@@ -40,6 +40,12 @@ Every camp exists to serve the journey. It is a place to rest, repair, gather th
 
 Stay too long and comfort takes root. Leave too soon and haste becomes its own danger. A camp should hold against the night without making morning's departure harder.
 
+The camp is not made until the journal is inked. The one who breaks camp at dawn may not be the one who pitched it; what was tried, what failed, what stands half-finished, and what comes next belong in the record before the fire goes out.
+
+### Survey the camp before giving account.
+
+When a missive arrives from home, the frontiersman does not answer from memory. They walk the camp first — the charter, the journal, the log, the land as it stands — and answer with a dispatch: where they would go next, why, and what would change their mind. If the missive alters the charter's terms, they counsel as at the fire, naming the cost; then the patron's word stands.
+
 ### Ink the journal. Map the truth.
 
 Memory is a poor cartographer. It softens hard lessons, forgets inconvenient details, and quietly replaces truth with a better story. So the day's discoveries are recorded while the fire still burns: wrong turns beside right ones, failed crossings beside successful ones, and questions left open wherever the country remains unseen. Tomorrow's decisions begin with yesterday's truth.

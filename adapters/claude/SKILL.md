@@ -13,7 +13,7 @@ The metaphor is the interface for the ceremonies — charters, dispatches, rider
 
 ## Beginning or resuming
 
-Look for an `expeditions/` directory in the project. If a charter there covers the work at hand, resume under it: read the charter and `journey.jsonl`, and continue the journey — do not draft a new charter. Otherwise, draft a charter with the patron using `templates/charter.md`, settle it together, and create:
+Look for an `expeditions/` directory in the project. If a charter there covers the work at hand, resume under it — do not draft a new charter. A new session inherits the expedition with no memory of the last: survey the camp first (charter, journey log, journal, dispatches, and the actual state of the work), and brief the patron on where the company stands and what it means to try next before pressing on. Otherwise, draft a charter with the patron using `templates/charter.md`, settle it together, and create:
 
 ```
 expeditions/{name}/
@@ -25,7 +25,7 @@ The charter is a draft until the patron sends the company out; open the log with
 
 ## The journey log
 
-Append events to `expeditions/{name}/journey.jsonl` as the work proceeds, one JSON object per line, per `spec/journey-state.md` in this skill folder. The log is append-only; corrections are subsequent events. Eleven event types exist — `departure`, `scout-report`, `crossing`, `basecamp`, `dispatch`, `rider`, `word`, `course-change`, `arrival`, `return`, `account` — and anything that fits no type is logged as an `account`, never forced or skipped. The log records what happened; nothing here obliges any phase to emit any event.
+Append events to `expeditions/{name}/journey.jsonl` as the work proceeds, one JSON object per line, per `spec/journey-state.md` in this skill folder. The log is append-only; corrections are subsequent events. Twelve event types exist — `departure`, `scout-report`, `crossing`, `basecamp`, `dispatch`, `rider`, `word`, `missive`, `course-change`, `arrival`, `return`, `account` — and anything that fits no type is logged as an `account`, never forced or skipped. The log records what happened; nothing here obliges any phase to emit any event.
 
 Charters and dispatches are markdown documents with voice, written from `templates/`, indexed into the log by reference events. Crossings, scout reports, riders, words, basecamps, and course changes live in the log itself.
 
@@ -33,7 +33,8 @@ Charters and dispatches are markdown documents with voice, written from `templat
 
 - **Dispatches** keep the patron seeing the country: miles gained, crossings lost, landmarks found, the trail ahead. Bad news gains nothing from delay.
 - **Riders** carry home the questions the charter reserved for the patron. Send counsel with the question; log the patron's `word` when it comes back.
-- **Journal entries** (from `templates/journal-entry.md`) record lessons for the project after significant stretches — maps, not mandates.
+- **Missives** are the patron speaking first mid-journey. Log a `missive` event with the patron's words verbatim or near it, survey the camp, and answer with a dispatch. If it alters the charter, counsel on the cost; the patron's word stands, and traveling on signs the amendment. No halt unless the missive says halt.
+- **Journal entries** (from `templates/journal-entry.md`) record lessons for the project after significant stretches — maps, not mandates. The camp is not made until the journal is inked: record what was tried, what failed, and what comes next before a session ends.
 
 The canon prescribes that these ceremonies exist, never their choreography. When they happen, how they are phrased, and how the work between them is done are yours to judge against the charter and the land.
 

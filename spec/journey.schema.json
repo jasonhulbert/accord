@@ -13,7 +13,7 @@
     "type": {
       "enum": [
         "departure", "scout-report", "crossing", "basecamp", "dispatch",
-        "rider", "word", "course-change", "arrival", "return", "account"
+        "rider", "word", "missive", "course-change", "arrival", "return", "account"
       ]
     },
     "actor": { "enum": ["patron", "frontiersman", "scout"] },

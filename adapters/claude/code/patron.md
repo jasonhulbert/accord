@@ -32,6 +32,12 @@ A patron who remains behind learns through dispatches. A good dispatch tells of 
 
 Bad news gains nothing from delay. A ford that swallowed two mules in April belongs in the next dispatch, not in the ledger come autumn. Trust is neither silence nor a rider sent home at every fork; the charter says when messengers ride, and danger may send them sooner.
 
+### Send word when home learns what the trail cannot.
+
+When home learns of a danger the charter never priced, when provisions change, when the horizon shifts — or when the patron simply needs to see the country again — a missive goes out. The patron need not wait to be asked.
+
+A missive is not a new charter handed down the trail. The frontiersman counsels as at the fire, naming what the new terms will cost; the patron's word stands, and as departure signed the charter, traveling on under the missive signs its amendment. Unless the missive says halt, the company keeps moving.
+
 ### Answer the questions that ride home.
 
 The frontiersman chooses the trail within the charter. The patron sets the journey's bounds, and some questions can only be answered where the bounds were drawn.

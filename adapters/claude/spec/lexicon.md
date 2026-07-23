@@ -38,6 +38,7 @@ This list is closed the same way the event taxonomy is closed: a term absent fro
 - **Dispatch** — the frontiersman's account sent to the patron: miles gained, crossings lost, landmarks found, the trail ahead. Bad news gains nothing from delay. (`code/patron.md`, "Read the dispatches")
 - **Rider** — a question that must go home before the company acts, carried with the frontiersman's counsel. The charter says which questions ride. (`code/patron.md`, "Answer the questions that ride home")
 - **Word** — the patron's answer to a rider: press on, turn aside, or return. (`code/patron.md`, "Answer the questions that ride home")
+- **Missive** — the patron speaking first, mid-journey: a request for an account, news, or changed terms. Answered with a dispatch drawn from the record, not from memory; if it alters the charter, traveling on under it signs the amendment. (`code/patron.md`, "Send word when home learns what the trail cannot"; `code/frontiersman.md`, "Survey the camp before giving account")
 
 ## The record
 

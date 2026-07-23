@@ -18,7 +18,7 @@ Every event has:
 | `ts` | yes | ISO 8601 timestamp |
 | `expedition` | yes | expedition id (the `{name}` in `expeditions/{name}/`) |
 | `schema` | yes | schema version, currently `"1"` |
-| `type` | yes | one of the eleven event types below |
+| `type` | yes | one of the twelve event types below |
 | `actor` | yes | `patron`, `frontiersman`, or `scout` |
 | `account` | yes | free-text prose telling what happened |
 | `refs` | no | paths or ids this event points to (documents, earlier events) |
@@ -27,7 +27,7 @@ Three types carry one additional required field each: `crossing.outcome`, `rider
 
 ## Event taxonomy
 
-A closed set of eleven, each traceable to the canon. Adding, removing, or renaming a type is a rider to the patron, never an implementation choice.
+A closed set of twelve, each traceable to the canon. Adding, removing, or renaming a type is a rider to the patron, never an implementation choice.
 
 | Type | Canonical root | Meaning |
 |---|---|---|
@@ -38,6 +38,7 @@ A closed set of eleven, each traceable to the canon. Adding, removing, or renami
 | `dispatch` | "A patron who remains behind learns through dispatches." | Reference event indexing a markdown dispatch (in `refs`). |
 | `rider` | "Answer the questions that ride home." | A question sent to the patron. `category` matches one of the charter's rider categories. |
 | `word` | "The patron sends back word: press on, turn aside, or return." | The patron's answer. `answer`: free text; `refs` points at the rider. |
+| `missive` | "The patron need not wait to be asked." | The patron speaks first: a request for an account, news, or changed terms. `account` carries the patron's words verbatim or near it. |
 | `course-change` | "The craft lies in changing course without losing the reason for the journey." | The route changed while the purpose held. |
 | `arrival` | "It says what will count as arrival." | The expedition accomplished its commission. |
 | `return` | "Press on, turn aside, or return." | The expedition ends without arrival. |
@@ -45,7 +46,7 @@ A closed set of eleven, each traceable to the canon. Adding, removing, or renami
 
 ## Authority split
 
-Charters and dispatches are **markdown-primary**: documents with voice, indexed into the log by reference events (`departure`, `dispatch`) whose `refs` point at them. Crossings, scout reports, riders, words, basecamps, and course changes are **log-primary**: the log line is the record, rendered into prose when needed.
+Charters and dispatches are **markdown-primary**: documents with voice, indexed into the log by reference events (`departure`, `dispatch`) whose `refs` point at them. Crossings, scout reports, riders, words, missives, basecamps, and course changes are **log-primary**: the log line is the record, rendered into prose when needed.
 
 ## Validation
 
