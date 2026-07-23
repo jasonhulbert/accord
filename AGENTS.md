@@ -17,11 +17,13 @@ When contributing:
 - `plugin/` — the plugin root for both Claude Code and Codex; only this subtree is installed into consuming projects. Repo-root files (`AGENTS.md`, `FIELD_GUIDE.md`, `README.md`, `CLAUDE.md`) are contributor-facing and never ship.
   - `plugin/creed/` — the creed: `frontiersman.md`, `patron.md`, `scout.md`. Permanent, role-level, amended rarely. Narratives only; reference material belongs in `plugin/spec/`.
   - `plugin/templates/` — charter, dispatch, and journal-entry templates.
+  - `plugin/hooks/` — shared, read-only Claude Code and Codex lifecycle hooks.
   - `plugin/spec/` — journey-state spec (`journey-state.md`), `journey.schema.json`, `examples/`, `analysis.md`.
   - `plugin/skills/` — the `expedition` and `expedition-missive` skills, shared by both harnesses. Each SKILL.md references `creed/`, `templates/`, and `spec/` at the plugin root; never vendor copies into skill folders.
   - `plugin/.claude-plugin/`, `plugin/.codex-plugin/` — plugin manifests.
   - `plugin/tools/` — `validate`, `render`.
 - `.claude-plugin/marketplace.json`, `.agents/plugins/` — marketplace catalogs at the repo root, pointing at `./plugin`.
+- `tests/` — contributor-facing behavior tests for shared plugin components.
 - `.expeditions/` — journeys run *on this repo itself* (dogfooding). Excluded from git, like any project's expedition records. Charters and journals for other projects never live here.
 
 ## Amendment discipline

@@ -31,9 +31,12 @@ plugin/                     the plugin root — the only tree that installs
     expedition/SKILL.md     the expedition skill (shared by both harnesses)
     expedition-missive/SKILL.md
   creed/                    the creed (frontiersman.md, patron.md, scout.md)
+  hooks/                    shared Claude Code and Codex lifecycle hooks
   templates/                charter, dispatch, and journal-entry templates
   spec/                     journey-state spec, JSON Schema, examples, analysis notes
   tools/                    validate and render scripts
+tests/
+  test_hooks.py             cross-harness hook behavior tests
 ```
 
 ## Adoption
@@ -45,6 +48,10 @@ plugin/                     the plugin root — the only tree that installs
 The plugin travels across projects and needs no target-project configuration. On invocation the skills establish the roles, draft a charter with the patron, and create `.expeditions/{name}/` in the target project. If an `.expeditions/` charter already exists for the work at hand, they resume under that charter. The `.expeditions/` directory is the persistence mechanism.
 
 Each expedition keeps an append-only log, `.expeditions/{name}/journey.jsonl`, described in `plugin/spec/journey-state.md`. Validate a log with `plugin/tools/validate`; render it into a visual journey with `plugin/tools/render`.
+
+The plugin bundles two read-only lifecycle hooks through `plugin/hooks/hooks.json`, discovered by both harnesses. `SessionStart` supplies a factual index of expedition records on startup, resume, and compaction. `PostToolUse` validates journey logs after a shell or file-editing tool explicitly names `.expeditions` or `journey.jsonl`. The hooks never choose an active charter, infer an event, or write to the expedition record.
+
+Run the hook behavior tests with `python3 -m unittest discover -s tests -v`.
 
 ## Amendment discipline
 
