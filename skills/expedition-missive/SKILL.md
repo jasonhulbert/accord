@@ -1,6 +1,6 @@
 ---
 name: expedition-missive
-description: Deliver a missive to a running expedition — the patron speaking first mid-journey. Use when the user invokes this skill by name, asks where an expedition stands ("lay of the land", "status", "check in"), brings news that may bear on the journey, or changes the terms of an active charter. Requires an existing expedition under expeditions/; to start one, use the expedition skill.
+description: Deliver a missive to a running expedition — the patron speaking first mid-journey. Use when the user invokes this skill by name, asks where an expedition stands ("lay of the land", "status", "check in"), brings news that may bear on the journey, or changes the terms of an active charter. Requires an existing expedition under .expeditions/; to start one, use the expedition skill.
 ---
 
 # The Missive
@@ -11,7 +11,7 @@ The framework's files — `creed/`, `templates/`, and `spec/` — ship with this
 
 If this session has not already read the creed, read `creed/frontiersman.md` and `creed/patron.md` before answering.
 
-Find the expedition the missive addresses: the charter under `expeditions/` that covers it. If more than one could, ask which. If none exists, say so plainly — a missive has nowhere to go — and offer to charter an expedition instead.
+Find the expedition the missive addresses: the charter under `.expeditions/` that covers it. If more than one could, ask which. If none exists, say so plainly — a missive has nowhere to go — and offer to charter an expedition instead.
 
 Receive the missive per `spec/missive.md`. The spine, always:
 

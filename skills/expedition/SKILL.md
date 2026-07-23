@@ -19,21 +19,21 @@ The metaphor is the interface for the ceremonies — charters, dispatches, rider
 
 ## Beginning or resuming
 
-Look for an `expeditions/` directory in the target project. If a charter there covers the work at hand, resume under it — do not draft a new charter. A new session inherits the expedition with no memory of the last: survey the camp first (charter, journey log, journal, dispatches, and the actual state of the work), and brief the patron on where the company stands and what it means to try next before pressing on.
+Look for an `.expeditions/` directory in the target project. If a charter there covers the work at hand, resume under it — do not draft a new charter. A new session inherits the expedition with no memory of the last: survey the camp first (charter, journey log, journal, dispatches, and the actual state of the work), and brief the patron on where the company stands and what it means to try next before pressing on.
 
 Otherwise, draft a charter with the patron using `templates/charter.md`. Counsel before departure: identify material dangers, missing provisions, unclear authority, and bounds that are too narrow or too loose; put unresolved patron decisions in the charter as riders. Settle it together, then create:
 
 ```
-expeditions/{name}/
+.expeditions/{name}/
   charter.md
   journey.jsonl
 ```
 
-The charter is a draft until the patron sends the company out; open the log with a `departure` event referencing the charter — departure is the charter's signature. The `expeditions/` directory is the persistence mechanism; a future session resumes from the record, not from memory.
+The charter is a draft until the patron sends the company out; open the log with a `departure` event referencing the charter — departure is the charter's signature. The `.expeditions/` directory is the persistence mechanism; a future session resumes from the record, not from memory.
 
 ## The journey log
 
-Append events to `expeditions/{name}/journey.jsonl` as the work proceeds, one JSON object per line, per `spec/journey-state.md`. Read that spec before writing the first event. The log is append-only; corrections are subsequent events. Twelve event types exist — `departure`, `scout-report`, `crossing`, `basecamp`, `dispatch`, `rider`, `word`, `missive`, `course-change`, `arrival`, `return`, `account` — and anything that fits no type is logged as an `account`, never forced or skipped. The log records what happened; nothing here obliges any phase to emit any event.
+Append events to `.expeditions/{name}/journey.jsonl` as the work proceeds, one JSON object per line, per `spec/journey-state.md`. Read that spec before writing the first event. The log is append-only; corrections are subsequent events. Twelve event types exist — `departure`, `scout-report`, `crossing`, `basecamp`, `dispatch`, `rider`, `word`, `missive`, `course-change`, `arrival`, `return`, `account` — and anything that fits no type is logged as an `account`, never forced or skipped. The log records what happened; nothing here obliges any phase to emit any event.
 
 Charters and dispatches are markdown documents with voice, written from `templates/`, indexed into the log by reference events. Crossings, scout reports, riders, words, missives, basecamps, and course changes live in the log itself.
 

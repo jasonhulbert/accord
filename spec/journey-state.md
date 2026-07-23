@@ -1,11 +1,11 @@
 # Journey State
 
-Each expedition keeps one append-only log: `expeditions/{name}/journey.jsonl`, one JSON object per line. The log is the expedition's memory of what happened. It describes; it never prescribes. No schema here creates an obligation to emit any event — "every phase must emit event X" is the failure mode this spec exists to avoid.
+Each expedition keeps one append-only log: `.expeditions/{name}/journey.jsonl`, one JSON object per line. The log is the expedition's memory of what happened. It describes; it never prescribes. No schema here creates an obligation to emit any event — "every phase must emit event X" is the failure mode this spec exists to avoid.
 
 ## Rules
 
 - **Append-only.** Lines are never rewritten or deleted. A correction is a subsequent event that says what the earlier one got wrong.
-- **Self-describing.** Every line carries `expedition` and `schema`, even though they are redundant within one file, so `cat expeditions/*/journey.jsonl` is a valid cross-expedition corpus with no join logic.
+- **Self-describing.** Every line carries `expedition` and `schema`, even though they are redundant within one file, so `cat .expeditions/*/journey.jsonl` is a valid cross-expedition corpus with no join logic.
 - **Narrative-first.** Prose lives inside events, in `account`. The structured payload carries only what comparison and rendering need; everything else stays narrative.
 - **Escape hatch.** Anything that fits no other type is logged as an `account` event rather than forced into the wrong type or skipped.
 
@@ -16,7 +16,7 @@ Every event has:
 | Field | Required | Meaning |
 |---|---|---|
 | `ts` | yes | ISO 8601 timestamp |
-| `expedition` | yes | expedition id (the `{name}` in `expeditions/{name}/`) |
+| `expedition` | yes | expedition id (the `{name}` in `.expeditions/{name}/`) |
 | `schema` | yes | schema version, currently `"1"` |
 | `type` | yes | one of the twelve event types below |
 | `actor` | yes | `patron`, `frontiersman`, or `scout` |

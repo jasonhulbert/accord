@@ -4,6 +4,8 @@ A narrative role framework for human-in-the-loop AI work. It aligns a human (the
 
 The creed shapes the traveler, never the trail: it prepares whoever journeys under it to meet terrain it cannot predict. The framework prescribes that its ceremonies exist, never their choreography.
 
+New to the workflow? Start with [FIELD_GUIDE.md](FIELD_GUIDE.md) — how a journey runs, common pitfalls, and what is expected of the patron.
+
 ## The layers
 
 The framework separates what is permanent from what is disposable, and keeps learning where it belongs.
@@ -19,6 +21,7 @@ Updates flow one way. Creed improvements reach projects through package upgrades
 The repository is itself a plugin for both Claude Code and Codex: one shared tree of framework resources, with both skills referencing it — nothing is vendored or duplicated.
 
 ```
+FIELD_GUIDE.md              user-facing guide: the workflow, pitfalls, the patron's part
 .claude-plugin/             Claude Code plugin manifest + marketplace catalog
 .codex-plugin/              Codex plugin manifest
 .agents/plugins/            Codex marketplace catalog
@@ -37,9 +40,9 @@ tools/                      validate and render scripts
 
 **Codex.** Add this repository as a plugin marketplace (`codex plugin marketplace add <repo>`) and install the `expedition` plugin; both skills come with it.
 
-The plugin travels across projects and needs no target-project configuration. On invocation the skills establish the roles, draft a charter with the patron, and create `expeditions/{name}/` in the target project. If an `expeditions/` charter already exists for the work at hand, they resume under that charter. The `expeditions/` directory is the persistence mechanism.
+The plugin travels across projects and needs no target-project configuration. On invocation the skills establish the roles, draft a charter with the patron, and create `.expeditions/{name}/` in the target project. If an `.expeditions/` charter already exists for the work at hand, they resume under that charter. The `.expeditions/` directory is the persistence mechanism.
 
-Each expedition keeps an append-only log, `expeditions/{name}/journey.jsonl`, described in `spec/journey-state.md`. Validate a log with `tools/validate`; render it into a visual journey with `tools/render`.
+Each expedition keeps an append-only log, `.expeditions/{name}/journey.jsonl`, described in `spec/journey-state.md`. Validate a log with `tools/validate`; render it into a visual journey with `tools/render`.
 
 ## Amendment discipline
 

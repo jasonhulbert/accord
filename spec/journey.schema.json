@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://expedition.dev/journey.schema.json",
   "title": "Journey event",
-  "description": "One line of an expeditions/{name}/journey.jsonl append-only log. Describes what happened; never prescribes what must happen.",
+  "description": "One line of an .expeditions/{name}/journey.jsonl append-only log. Describes what happened; never prescribes what must happen.",
   "type": "object",
   "required": ["ts", "expedition", "schema", "type", "actor", "account"],
   "additionalProperties": false,

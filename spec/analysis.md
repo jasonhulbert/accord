@@ -1,6 +1,6 @@
 # Reading the corpus
 
-Because every journey line is self-describing, `cat expeditions/*/journey.jsonl` is a valid cross-expedition corpus with no join logic. It can answer descriptive questions such as:
+Because every journey line is self-describing, `cat .expeditions/*/journey.jsonl` is a valid cross-expedition corpus with no join logic. It can answer descriptive questions such as:
 
 - **Rider frequency** — how often questions ride home, and in which charter categories. A charter that generates riders at every fork was drawn too narrow; one that never generates them may be drawn too loose.
 - **First-approach survival** — how often the route approved at departure holds to arrival, versus how often `course-change` events redraw it.

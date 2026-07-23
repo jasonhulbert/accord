@@ -20,7 +20,7 @@ When contributing:
 - `skills/` — the `expedition` and `expedition-missive` skills, shared by both harnesses. Each SKILL.md references `creed/`, `templates/`, and `spec/` at the plugin root; never vendor copies into skill folders.
 - `.claude-plugin/`, `.codex-plugin/`, `.agents/plugins/` — plugin manifests and marketplace catalogs. The repository root is the plugin root for both Claude Code and Codex.
 - `tools/` — `validate`, `render`.
-- `expeditions/` — journeys run *on this repo itself* (dogfooding). Charters and journals for other projects never live here.
+- `.expeditions/` — journeys run *on this repo itself* (dogfooding). Excluded from git, like any project's expedition records. Charters and journals for other projects never live here.
 
 ## Amendment discipline
 
