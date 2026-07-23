@@ -18,6 +18,7 @@ When contributing:
 - `templates/` — charter, dispatch, and journal-entry templates.
 - `spec/` — journey-state spec (`journey-state.md`), `journey.schema.json`, `examples/`, `analysis.md`.
 - `adapters/claude/` — self-contained Claude skill (vendored creed, templates, spec essentials). The repo is the source of truth; the skill folder is a build target produced by `tools/build-skill`.
+- `adapters/codex/expedition/` — self-contained Codex skill with Codex metadata and vendored creed, templates, and spec essentials. The repo is the source of truth; shared files are build targets produced by `tools/build-skill`.
 - `adapters/project-snippet.md` — deterministic fallback for tools without a skill mechanism.
 - `tools/` — `validate`, `render`, `build-skill`.
 - `expeditions/` — journeys run *on this repo itself* (dogfooding). Charters and journals for other projects never live here.

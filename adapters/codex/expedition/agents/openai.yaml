@@ -1,0 +1,4 @@
+interface:
+  display_name: "Expedition"
+  short_description: "Chartered human-AI work for uncertain paths"
+  default_prompt: "Use $expedition to begin or resume this work under a shared charter."

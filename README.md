@@ -22,13 +22,20 @@ templates/                  charter, dispatch, and journal-entry templates
 spec/                       journey-state spec, JSON Schema, examples, analysis notes
 adapters/
   claude/                   self-contained Claude skill (vendored creed + templates + spec)
+  codex/expedition/         self-contained Codex skill (metadata + vendored framework)
   project-snippet.md        fallback for tools without a skill mechanism
 tools/                      validate, render, and skill-build scripts
 ```
 
 ## Adoption
 
-**Skill-first.** Build the skill with `tools/build-skill` and install the resulting `expedition.skill` per-user. It travels across projects and needs no target-project configuration. On invocation it establishes the roles, drafts a charter with the patron, and creates `expeditions/{name}/` in the target project. If an `expeditions/` charter already exists for the work at hand, it resumes under that charter — the `expeditions/` directory is the persistence mechanism.
+Run `tools/build-skill` before installing either adapter. It vendors the current creed, templates, and spec essentials into both skill folders and builds the Claude package.
+
+**Codex.** Install `adapters/codex/expedition/` as a user skill at `~/.agents/skills/expedition/`, or as a repository skill at `.agents/skills/expedition/`. Codex supports copied or symlinked skill folders. Invoke it as `$expedition`; Codex may also select it when a request matches its description.
+
+**Claude.** Install the generated `expedition.skill` per-user.
+
+Both adapters travel across projects and need no target-project configuration. On invocation they establish the roles, draft a charter with the patron, and create `expeditions/{name}/` in the target project. If an `expeditions/` charter already exists for the work at hand, they resume under that charter. The `expeditions/` directory is the persistence mechanism.
 
 **Fallback.** For tools without a skill mechanism, paste `adapters/project-snippet.md` into the project's AGENTS.md or CLAUDE.md.
 

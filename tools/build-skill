@@ -1,28 +1,38 @@
 #!/bin/sh
-# Build expedition.skill: vendor canon, templates, and spec essentials into
-# adapters/claude/ and zip it with the structure expedition/SKILL.md + folders.
+# Vendor the framework into the Claude and Codex skill adapters, then package
+# the Claude skill as expedition.skill.
 set -eu
 
 repo=$(cd "$(dirname "$0")/.." && pwd)
-skill="$repo/adapters/claude"
+claude="$repo/adapters/claude"
+codex="$repo/adapters/codex/expedition"
 out="$repo/expedition.skill"
 
-mkdir -p "$skill/creed" "$skill/templates" "$skill/spec"
-cp "$repo"/creed/*.md "$skill/creed/"
-cp "$repo"/templates/*.md "$skill/templates/"
-cp "$repo"/spec/journey-state.md "$repo"/spec/journey.schema.json "$repo"/spec/lexicon.md "$skill/spec/"
+vendor() {
+  skill=$1
+  mkdir -p "$skill/creed" "$skill/templates" "$skill/spec"
+  cp "$repo"/creed/*.md "$skill/creed/"
+  cp "$repo"/templates/*.md "$skill/templates/"
+  cp "$repo"/spec/journey-state.md "$repo"/spec/journey.schema.json "$repo"/spec/lexicon.md "$skill/spec/"
+}
+
+vendor "$claude"
+vendor "$codex"
 
 # Self-containment check: no references escaping the skill folder.
-if grep -rn '\.\./' "$skill" >/dev/null 2>&1; then
-  echo "build-skill: skill folder contains relative references outside itself:" >&2
-  grep -rn '\.\./' "$skill" >&2
-  exit 1
-fi
+for skill in "$claude" "$codex"; do
+  if grep -rn '\.\./' "$skill" >/dev/null 2>&1; then
+    echo "build-skill: skill folder contains relative references outside itself:" >&2
+    grep -rn '\.\./' "$skill" >&2
+    exit 1
+  fi
+done
 
 stage=$(mktemp -d)
 trap 'rm -rf "$stage"' EXIT
-cp -R "$skill" "$stage/expedition"
+cp -R "$claude" "$stage/expedition"
 rm -f "$out"
 (cd "$stage" && zip -qr "$out" expedition)
+echo "synced $codex"
 echo "built $out"
 unzip -l "$out"
