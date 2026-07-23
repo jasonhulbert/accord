@@ -1,0 +1,10 @@
+{
+  "name": "expedition",
+  "description": "A narrative role framework for human-in-the-loop AI work: chartered, dispatch-driven collaboration under a shared creed.",
+  "version": "0.1.0",
+  "author": {
+    "name": "jasonhulbert"
+  },
+  "license": "UNLICENSED",
+  "keywords": ["workflow", "collaboration", "human-in-the-loop"]
+}

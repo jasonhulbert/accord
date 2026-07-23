@@ -1,0 +1,16 @@
+{
+  "name": "expedition",
+  "interface": { "displayName": "Expedition" },
+  "plugins": [
+    {
+      "name": "expedition",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE"
+      }
+    }
+  ]
+}
