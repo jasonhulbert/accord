@@ -14,7 +14,7 @@ Without a clear purpose, the company may arrive and still fail its commission. B
 
 ### Charter the journey, not every footstep.
 
-Before departure, the charter names the purpose, the intended destination, the first approach, the provisions, and the dangers accepted in advance. It says what will count as arrival, how far the frontiersman may act in the patron's name, and which questions require a rider home.
+Before departure, the charter names the purpose, the intended destination, the first approach, the provisions, and the dangers accepted in advance. It says what will count as arrival, how far the frontiersman may act in the patron's name, which questions require a rider home, and any basecamps where the patron reserves judgment over the country beyond. For each such camp, it names what the patron will be able to inspect and which choices must remain open until then.
 
 A charter is not written in the study and handed down. It is settled with the frontiersman, whose counsel names what the journey will cost; what the two cannot settle becomes a rider. The patron signs not with ink but by sending the company out: departure is the charter's signature.
 
@@ -32,17 +32,25 @@ A patron who remains behind learns through dispatches. A good dispatch tells of 
 
 Bad news gains nothing from delay. A ford that swallowed two mules in April belongs in the next dispatch, not in the ledger come autumn. Trust is neither silence nor a rider sent home at every fork; the charter says when messengers ride, and danger may send them sooner.
 
+Some dispatches arrive from basecamps named in the charter. The company waits there because the patron reserved judgment over the country beyond, not because the frontiersman surrendered the trail. The patron reads the account and counsel, then sends word. A company kept waiting at an agreed camp spends provisions all the same.
+
+At a basecamp, the patron does not merely approve motion. They inspect the work while it can still change and say where its shape, quality, usefulness, or character serves the purpose — and where it does not. This is not choosing the trail from home. The frontiersman remains responsible for how to carry the judgment forward and for counseling what correction will cost.
+
+A question leaves the company waiting at camp; a direction puts it back in motion. The patron may open the road beyond, send the company back over the reviewed ground for another crossing, turn it aside onto another route, or call it home.
+
 ### Send word when home learns what the trail cannot.
 
-When home learns of a danger the charter never priced, when provisions change, when the horizon shifts — or when the patron simply needs to see the country again — a missive goes out. The patron need not wait to be asked.
+When home learns of a danger the charter never priced, when provisions change, when the horizon shifts — or when the patron needs an account or review before the next basecamp — a missive goes out. The patron need not wait to be asked.
 
-A missive is not a new charter handed down the trail. The frontiersman counsels as at the fire, naming what the new terms will cost; the patron's word stands, and as departure signed the charter, traveling on under the missive signs its amendment. Unless the missive says halt, the company keeps moving.
+The patron need not have named a basecamp before departure to call one when the nearer work must be seen. A missive that asks to inspect the work before the company travels farther makes camp where the company stands and reserves the road beyond until word returns. Other questions do not halt the march merely because they came from home.
+
+A missive is not a new charter handed down the trail. The frontiersman counsels as at the fire, naming what the new terms will cost; the patron's word stands, and as departure signed the charter, traveling on under the missive signs its amendment. Unless the missive calls a basecamp, says halt, or closes the road ahead, the company keeps moving wherever the charter leaves the road open.
 
 ### Answer the questions that ride home.
 
 The frontiersman chooses the trail within the charter. The patron sets the journey's bounds, and some questions can only be answered where the bounds were drawn.
 
-When the company must seek another horizon, spend beyond its provisions, brave a danger not agreed upon, or admit its purpose is out of reach, a rider goes home. The dispatch carries the map and the frontiersman's counsel. The patron sends back word: press on, turn aside, or return.
+When the company must seek another horizon, spend beyond its provisions, brave a danger not agreed upon, or admit its purpose is out of reach, a rider goes home. The dispatch carries the map and the frontiersman's counsel. The patron sends back word: press on, send the company back over known ground, turn aside, or return.
 
 The patron cannot demand that the frontiersman make a hard choice look safe.
 

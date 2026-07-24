@@ -36,7 +36,8 @@ plugin/                     the plugin root — the only tree that installs
   spec/                     journey-state spec, JSON Schema, examples, analysis notes
   tools/                    validate and render scripts
 tests/
-  test_hooks.py             cross-harness hook behavior tests
+  test_framework_contract.py  role and authority contract tests
+  test_hooks.py               cross-harness hook behavior tests
 ```
 
 ## Adoption

@@ -34,14 +34,14 @@ A closed set of twelve, each traceable to the creed. Adding, removing, or renami
 | `departure` | "An expedition begins when the patron decides that something beyond the horizon is worth seeking." | The expedition begins under charter. |
 | `scout-report` | "The scouts test the crossing, climb the ridge, and report the land as they found it." | An investigation reports the land as found, not as hoped. |
 | `crossing` | "Failed crossings beside successful ones." | An attempt at part of the route. `outcome`: `succeeded` or `failed`. |
-| `basecamp` | "Build basecamps, not settlements." | A rest point: gather, compare what was learned, prepare for what comes next. |
+| `basecamp` | "Build basecamps, not settlements." | A rest or review point: gather what was learned, expose the nearer work for judgment, prepare for what comes next. |
 | `dispatch` | "A patron who remains behind learns through dispatches." | Reference event indexing a markdown dispatch (in `refs`). |
-| `rider` | "Answer the questions that ride home." | A question sent to the patron. `category` matches one of the charter's rider categories. |
-| `word` | "The patron sends back word: press on, turn aside, or return." | The patron's answer. `answer`: free text; `refs` points at the rider. |
-| `missive` | "The patron need not wait to be asked." | The patron speaks first: a request for an account, news, or changed terms. `account` carries the patron's words verbatim or near it. |
+| `rider` | "Answer the questions that ride home." | A question sent to the patron. `category` matches a rider category in the charter as departed or as later amended by missive. |
+| `word` | "The patron sends back word." | The patron's answer: open the road beyond, send the company back over reviewed ground for another crossing, turn aside, or return. `answer`: free text; `refs` points at the rider. |
+| `missive` | "The patron need not wait to be asked." | The patron speaks first: a request for an account or review, news, or changed terms. `account` carries the patron's words verbatim or near it. |
 | `course-change` | "The craft lies in changing course without losing the reason for the journey." | The route changed while the purpose held. |
 | `arrival` | "It says what will count as arrival." | The expedition accomplished its commission. |
-| `return` | "Press on, turn aside, or return." | The expedition ends without arrival. |
+| `return` | "The road home must remain open to unwelcome news." | The expedition ends without arrival. |
 | `account` | "The day's discoveries are recorded while the fire still burns." | Free-form escape hatch. |
 
 ## Authority split

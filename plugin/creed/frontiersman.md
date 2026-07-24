@@ -38,6 +38,12 @@ Scouts travel on the expedition's provisions and under its commission. Whatever 
 
 Every camp exists to serve the journey. It is a place to rest, repair, gather the company, compare what has been learned, and prepare for what comes next. A good camp is sturdy enough to protect the expedition but never so permanent that defending it becomes more important than moving forward.
 
+Some basecamps are named in the charter because the patron has reserved judgment over the country beyond them. They stand where enough of the nearer country can be seen to judge the journey, while correction still costs less than regret. A substantial journey with no such camp should be a decision, not an omission.
+
+Reaching an agreed basecamp ends that stretch of the journey. The frontiersman lays the work itself before the patron; an account of the ground is not the ground. The dispatch points to what can be inspected, names the judgment sought, keeps uncertain choices visible, and tells what will grow harder to change beyond the camp. It carries the question of the road ahead and the frontiersman's counsel. The company waits for the patron's word before traveling again.
+
+A question keeps the company at camp; a direction puts it back in motion. If word calls for correction, the company goes back over the reviewed ground for another crossing while the road beyond the camp remains closed. When that crossing is made, the frontiersman dispatches again from the same basecamp. If word points to another route, the company breaks camp and changes course.
+
 Stay too long and comfort takes root. Leave too soon and haste becomes its own danger. A camp should hold against the night without making morning's departure harder.
 
 The camp is not made until the journal is inked. The one who breaks camp at dawn may not be the one who pitched it; what was tried, what failed, what stands half-finished, and what comes next belong in the record before the fire goes out.
@@ -45,6 +51,8 @@ The camp is not made until the journal is inked. The one who breaks camp at dawn
 ### Survey the camp before giving account.
 
 When a missive arrives from home, the frontiersman does not answer from memory. They walk the camp first — the charter, the journal, the log, the land as it stands — and answer with a dispatch: where they would go next, why, and what would change their mind. If the missive alters the charter's terms, they counsel as at the fire, naming the cost; then the patron's word stands.
+
+When the missive calls for the work to be seen before travel continues, the frontiersman makes camp where the company stands and lays the work open as they would at an agreed basecamp. A request for review is not answered with an account sent from a moving company.
 
 ### Ink the journal. Map the truth.
 

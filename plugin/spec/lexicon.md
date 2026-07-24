@@ -25,7 +25,7 @@ This list is closed the same way the event taxonomy is closed: a term absent fro
 ## Setting out
 
 - **Expedition** — one chartered journey toward one horizon. It ends in arrival or return. (`creed/patron.md`, opening)
-- **Charter** — the agreement drawn before departure: purpose, destination, first approach, provisions, dangers accepted, what counts as arrival, how far the frontiersman may act alone, and which questions must ride home. Disposable; it expires with the expedition. (`creed/patron.md`, "Charter the journey")
+- **Charter** — the agreement drawn before departure: purpose, destination, first approach, provisions, dangers accepted, what counts as arrival, how far the frontiersman may act alone, which questions must ride home, and any basecamps where the patron reserves judgment. Disposable; it expires with the expedition. (`creed/patron.md`, "Charter the journey")
 - **Provisions** — what the expedition carries and may spend: time, money, tools, trust. (`creed/patron.md`, opening)
 - **Departure** — the moment the expedition begins under its charter; until the patron sends the company out, the charter is a draft, and departure is its signature. (`creed/patron.md`, "Charter the journey"; `creed/frontiersman.md`, "Counsel the patron")
 
@@ -33,16 +33,16 @@ This list is closed the same way the event taxonomy is closed: a term absent fro
 
 - **Crossing** — an attempt at part of the route. It succeeds or fails, and a failed crossing is a fact of the country, not a sin of the traveler. (`creed/frontiersman.md`, "Ink the journal"; `creed/patron.md`, "Judge the journey")
 - **Course change** — a new route taken while the purpose holds. Proof of watching the land, not of losing the way. (`creed/frontiersman.md`, "Keep your eyes on the horizon")
-- **Basecamp** — a place to rest, gather what was learned, and prepare for what comes next. Sturdy enough for the night, never worth defending for its own sake. (`creed/frontiersman.md`, "Build basecamps")
+- **Basecamp** — a place to rest, gather what was learned, and expose the nearer work for judgment while correction remains affordable. Sturdy enough for the night, never worth defending for its own sake. (`creed/frontiersman.md`, "Build basecamps")
 - **Settlement** — what a basecamp must not become: a camp so permanent that defending it matters more than moving forward. (`creed/frontiersman.md`, "Build basecamps")
 - **Scout report** — the land as one rider found it, witnessed kept apart from surmised. (`creed/scout.md`, "Report the land")
 
 ## Word between camp and home
 
-- **Dispatch** — the frontiersman's account sent to the patron: miles gained, crossings lost, landmarks found, the trail ahead. Bad news gains nothing from delay. (`creed/patron.md`, "Read the dispatches")
+- **Dispatch** — the frontiersman's account sent to the patron: miles gained, crossings lost, landmarks found, work to inspect, and the trail ahead. It orients the patron to the work; it does not stand in for it. (`creed/patron.md`, "Read the dispatches")
 - **Rider** — a question that must go home before the company acts, carried with the frontiersman's counsel. The charter says which questions ride. (`creed/patron.md`, "Answer the questions that ride home")
-- **Word** — the patron's answer to a rider: press on, turn aside, or return. (`creed/patron.md`, "Answer the questions that ride home")
-- **Missive** — the patron speaking first, mid-journey: a request for an account, news, or changed terms. Answered with a dispatch drawn from the record, not from memory; if it alters the charter, traveling on under it signs the amendment. (`creed/patron.md`, "Send word when home learns what the trail cannot"; `creed/frontiersman.md`, "Survey the camp before giving account")
+- **Word** — the patron's answer to a rider: open the road beyond, send the company back over reviewed ground for another crossing, turn it aside, or return. A direction puts the company back in motion. (`creed/patron.md`, "Read the dispatches"; "Answer the questions that ride home")
+- **Missive** — the patron speaking first, mid-journey: a request for an account or review, news, or changed terms. Answered with a dispatch drawn from the record, not from memory; if it alters the charter, traveling on under it signs the amendment. (`creed/patron.md`, "Send word when home learns what the trail cannot"; `creed/frontiersman.md`, "Survey the camp before giving account")
 
 ## The record
 

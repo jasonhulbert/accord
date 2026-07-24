@@ -18,6 +18,12 @@ What will count as arrival — how patron and frontiersman alike will know the e
 
 The route the patron approves at departure. The frontiersman may depart from it when the country requires; within the charter, a flooded river needs no rider home.
 
+## Basecamps
+
+Landmarks at which the patron reserves judgment over the country beyond. For each, name the work or evidence that will be coherent enough to inspect, the judgment or feedback sought, and the consequential choices that should remain open until word returns.
+
+These are not footsteps on the route. A useful basecamp is far enough along for the patron to judge the nearer view, bounded enough to understand, and early enough that correction remains affordable.
+
 ## Provisions
 
 What the expedition carries and may spend: time, budget, tools, access, dependencies.
@@ -32,4 +38,4 @@ How far the frontiersman may act in the patron's name without sending word home.
 
 ## Riders
 
-The questions that must ride home before acting. Some questions can only be answered where the bounds were drawn: another horizon, spending beyond provisions, dangers not agreed upon, a purpose out of reach.
+The questions that must ride home before acting, including the judgment reserved at each agreed basecamp. Some questions can only be answered where the bounds were drawn: another horizon, spending beyond provisions, dangers not agreed upon, a purpose out of reach.

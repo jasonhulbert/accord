@@ -14,10 +14,14 @@ What failed, what it cost, and what the failure revealed.
 
 What the company now knows about the country that it did not know before — including anything that changes the journey's value or its cost.
 
+## Work for review
+
+At a basecamp, direct the patron to the actual work or evidence and give enough orientation to inspect it. Name the slice in view, the judgment sought, the consequential choices still open, and what will grow harder to change beyond this camp. The dispatch presents the work; it does not stand in for it.
+
 ## The trail ahead
 
-The route the company means to take next.
+The route the company means to take next. At a basecamp where the road beyond waits for the patron's word, give the frontiersman's counsel without presuming the answer.
 
 ## Riders
 
-Questions carried home with this dispatch, if any, each with the frontiersman's counsel.
+Questions carried home with this dispatch, if any, each with the frontiersman's counsel. At a basecamp, ask for the judgment named in the charter rather than for generic approval.
