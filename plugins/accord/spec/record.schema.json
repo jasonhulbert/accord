@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Accord record event",
+  "description": "One line of an .accord/{task}/record.jsonl append-only record. It describes what happened and never prescribes what must happen.",
+  "type": "object",
+  "required": ["ts", "task", "schema", "type", "actor", "summary"],
+  "additionalProperties": false,
+  "properties": {
+    "ts": { "type": "string", "format": "date-time" },
+    "task": { "type": "string", "minLength": 1 },
+    "schema": { "const": "1" },
+    "type": {
+      "enum": [
+        "start", "investigation", "attempt", "review", "report", "question",
+        "direction", "check-in", "approach-change", "completion", "end", "note"
+      ]
+    },
+    "actor": { "enum": ["human", "agent", "investigator"] },
+    "summary": { "type": "string", "minLength": 1 },
+    "refs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "outcome": { "enum": ["succeeded", "failed"] },
+    "subject": { "type": "string", "minLength": 1 },
+    "decision": { "type": "string", "minLength": 1 }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": ["type"],
+        "properties": { "type": { "const": "attempt" } }
+      },
+      "then": { "required": ["outcome"] },
+      "else": { "not": { "required": ["outcome"] } }
+    },
+    {
+      "if": {
+        "required": ["type"],
+        "properties": { "type": { "const": "question" } }
+      },
+      "then": { "required": ["subject"] },
+      "else": { "not": { "required": ["subject"] } }
+    },
+    {
+      "if": {
+        "required": ["type"],
+        "properties": { "type": { "const": "direction" } }
+      },
+      "then": { "required": ["decision"] },
+      "else": { "not": { "required": ["decision"] } }
+    }
+  ]
+}

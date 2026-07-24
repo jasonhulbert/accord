@@ -1,0 +1,27 @@
+{
+  "name": "accord",
+  "version": "0.1.0",
+  "description": "A narrative framework for substantial human-agent work: agree on purpose, authority, review, and reserved judgment, then adapt together as evidence changes the work.",
+  "author": {
+    "name": "jasonhulbert"
+  },
+  "keywords": [
+    "workflow",
+    "collaboration",
+    "human-in-the-loop",
+    "agreement"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Accord",
+    "shortDescription": "Purpose, trust, and judgment for substantial AI work",
+    "longDescription": "Reach a working agreement before substantial human-agent work begins, give the agent room to own implementation, and return consequential judgment to the human while change remains practical.",
+    "developerName": "jasonhulbert",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "defaultPrompt": "Use Accord to reach a working agreement with me before beginning this work."
+  }
+}

@@ -1,0 +1,353 @@
+#!/usr/bin/env python3
+"""Render record.jsonl files into a self-contained HTML timeline.
+
+Usage: tools/render <record.jsonl> [more.jsonl ...] [-o record.html]
+
+The output embeds its events and all CSS and JavaScript. It fetches nothing.
+"""
+
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+
+TEMPLATE = r"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Accord record</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --paper: #f5f1e9;
+    --panel: #fffdf8;
+    --ink: #292723;
+    --muted: #6f6a61;
+    --line: #d6cec0;
+    --human: #865b42;
+    --agent: #3f6671;
+    --investigator: #6c5a87;
+    --success: #3f704f;
+    --failure: #9b493f;
+    --question: #9a762f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #1d1c19;
+      --panel: #292722;
+      --ink: #eee9df;
+      --muted: #b5aea2;
+      --line: #4d4941;
+      --human: #d39a78;
+      --agent: #83b4c1;
+      --investigator: #ae9aca;
+      --success: #84b992;
+      --failure: #d68479;
+      --question: #d2ae5d;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font: 15px/1.55 ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  }
+  main {
+    width: min(900px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 56px 0 80px;
+  }
+  header { margin-bottom: 44px; }
+  h1, h2 { font-weight: 500; letter-spacing: -0.02em; }
+  h1 { margin: 0 0 8px; font-size: clamp(2rem, 5vw, 3.4rem); }
+  h2 { margin: 0; font-size: 1.55rem; }
+  .intro { max-width: 650px; color: var(--muted); font-size: 1.05rem; }
+  .task { margin-top: 46px; }
+  .task-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 22px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .count { color: var(--muted); font-size: .88rem; }
+  .timeline { position: relative; margin-left: 12px; }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    bottom: 14px;
+    left: 7px;
+    width: 1px;
+    background: var(--line);
+  }
+  .event {
+    --actor: var(--agent);
+    position: relative;
+    display: grid;
+    grid-template-columns: 16px minmax(0, 1fr);
+    gap: 20px;
+    padding-bottom: 20px;
+  }
+  .event[data-actor="human"] { --actor: var(--human); }
+  .event[data-actor="investigator"] { --actor: var(--investigator); }
+  .dot {
+    position: relative;
+    z-index: 1;
+    width: 15px;
+    height: 15px;
+    margin-top: 19px;
+    border: 3px solid var(--paper);
+    border-radius: 50%;
+    background: var(--actor);
+    box-shadow: 0 0 0 1px var(--actor);
+  }
+  .card {
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--panel);
+  }
+  .event[data-type="completion"] .card { border-color: var(--success); }
+  .event[data-type="end"] .card,
+  .event[data-outcome="failed"] .card { border-color: var(--failure); }
+  .event[data-type="question"] .card { border-color: var(--question); }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px 10px;
+    margin-bottom: 8px;
+    color: var(--muted);
+    font: 12px/1.4 ui-sans-serif, system-ui, sans-serif;
+  }
+  .type {
+    padding: 3px 7px;
+    border-radius: 999px;
+    color: var(--panel);
+    background: var(--actor);
+    font-weight: 650;
+    letter-spacing: .02em;
+  }
+  .summary { margin: 0; font-size: 1rem; }
+  .detail {
+    margin: 11px 0 0;
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: .92rem;
+  }
+  .detail strong { color: var(--ink); font-weight: 600; }
+  .refs {
+    margin: 10px 0 0;
+    padding-left: 18px;
+    color: var(--muted);
+    font: 12px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 20px;
+    color: var(--muted);
+    font: 12px/1.4 ui-sans-serif, system-ui, sans-serif;
+  }
+  .legend span::before {
+    content: "";
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 6px;
+    border-radius: 50%;
+    background: var(--legend-color);
+  }
+  @media (max-width: 560px) {
+    main { width: min(100% - 22px, 900px); padding-top: 32px; }
+    .event { gap: 14px; }
+    .card { padding: 14px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Accord record</h1>
+    <p class="intro">A factual view of what changed, where judgment returned to
+    the human, and how the work responded to evidence.</p>
+    <div class="legend">
+      <span style="--legend-color:var(--human)">Human</span>
+      <span style="--legend-color:var(--agent)">Agent</span>
+      <span style="--legend-color:var(--investigator)">Investigator</span>
+    </div>
+  </header>
+  <div id="tasks"></div>
+</main>
+<script>
+const EVENTS = __DATA__;
+const tasks = new Map();
+for (const event of EVENTS) {
+  if (!tasks.has(event.task)) tasks.set(event.task, []);
+  tasks.get(event.task).push(event);
+}
+
+function element(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function label(value) {
+  return String(value).replaceAll("-", " ");
+}
+
+function addDetail(card, event) {
+  const details = [];
+  if (event.outcome) details.push(["Outcome", event.outcome]);
+  if (event.subject) details.push(["Question", event.subject]);
+  if (event.decision) details.push(["Direction", event.decision]);
+  for (const [name, value] of details) {
+    const line = element("p", "detail");
+    const strong = element("strong", "", name + ": ");
+    line.append(strong, document.createTextNode(value));
+    card.appendChild(line);
+  }
+  if (event.refs && event.refs.length) {
+    const list = element("ul", "refs");
+    for (const ref of event.refs) {
+      list.appendChild(element("li", "", ref));
+    }
+    card.appendChild(list);
+  }
+}
+
+const root = document.getElementById("tasks");
+for (const [taskName, events] of tasks) {
+  const section = element("section", "task");
+  const head = element("div", "task-head");
+  head.append(
+    element("h2", "", taskName),
+    element("span", "count", events.length + (events.length === 1 ? " event" : " events"))
+  );
+  section.appendChild(head);
+
+  const timeline = element("div", "timeline");
+  for (const event of events) {
+    const row = element("article", "event");
+    row.dataset.actor = event.actor;
+    row.dataset.type = event.type;
+    if (event.outcome) row.dataset.outcome = event.outcome;
+    row.appendChild(element("span", "dot"));
+
+    const card = element("div", "card");
+    const meta = element("div", "meta");
+    meta.append(
+      element("span", "type", label(event.type)),
+      element("span", "", label(event.actor)),
+      element("time", "", event.ts)
+    );
+    card.append(
+      meta,
+      element("p", "summary", event.summary)
+    );
+    addDetail(card, event);
+    row.appendChild(card);
+    timeline.appendChild(row);
+  }
+  section.appendChild(timeline);
+  root.appendChild(section);
+}
+</script>
+</body>
+</html>
+"""
+
+
+def parse_args(argv: list[str]) -> tuple[list[str], str] | None:
+    """Parse the deliberately small command-line interface."""
+    output = "record.html"
+    files = []
+    index = 0
+    while index < len(argv):
+        if argv[index] == "-o":
+            if index + 1 >= len(argv):
+                print("-o requires an output path", file=sys.stderr)
+                return None
+            output = argv[index + 1]
+            index += 2
+        else:
+            files.append(argv[index])
+            index += 1
+    if not files:
+        print(__doc__.strip(), file=sys.stderr)
+        return None
+    return files, output
+
+
+def read_events(files: list[str]) -> list[dict] | None:
+    """Read JSONL input and report exact file and line failures."""
+    events = []
+    required = {"ts", "task", "schema", "type", "actor", "summary"}
+    for path_string in files:
+        try:
+            lines = Path(path_string).read_text().splitlines()
+        except OSError as error:
+            print(f"{path_string}: cannot read: {error}", file=sys.stderr)
+            return None
+        for line_number, raw in enumerate(lines, 1):
+            if not raw.strip():
+                continue
+            try:
+                event = json.loads(raw)
+            except json.JSONDecodeError as error:
+                print(
+                    f"{path_string}:{line_number}: invalid JSON: {error}",
+                    file=sys.stderr,
+                )
+                return None
+            if not isinstance(event, dict):
+                print(
+                    f"{path_string}:{line_number}: event is not a JSON object",
+                    file=sys.stderr,
+                )
+                return None
+            missing = sorted(required - event.keys())
+            if missing:
+                print(
+                    f"{path_string}:{line_number}: missing required fields "
+                    f"{', '.join(missing)}",
+                    file=sys.stderr,
+                )
+                return None
+            events.append(event)
+    return events
+
+
+def main(argv: list[str]) -> int:
+    parsed = parse_args(argv)
+    if parsed is None:
+        return 2
+    files, output = parsed
+    events = read_events(files)
+    if events is None:
+        return 1
+
+    embedded = json.dumps(events, separators=(",", ":")).replace("<", "\\u003c")
+    html = TEMPLATE.replace("__DATA__", embedded)
+    try:
+        Path(output).write_text(html)
+    except OSError as error:
+        print(f"{output}: cannot write: {error}", file=sys.stderr)
+        return 2
+    print(f"rendered {len(events)} events from {len(files)} file(s) to {output}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

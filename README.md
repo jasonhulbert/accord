@@ -1,63 +1,107 @@
-# The Expedition Framework
+# Accord
 
-A narrative role framework for human-in-the-loop AI work. It aligns a human (the patron) and an AI agent (the frontiersman) through shared roles, a common creed, and reliable ceremonies of communication — leaving the agent room to exercise judgment instead of managing it step by step.
+A narrative framework for substantial human-in-the-loop AI work.
 
-The creed shapes the traveler, never the trail: it prepares whoever journeys under it to meet terrain it cannot predict. The framework prescribes that its ceremonies exist, never their choreography.
+The human holds the purpose. The agent holds the work. They reach agreement on
+the space between them before either mistakes motion for progress.
 
-New to the workflow? Start with [FIELD_GUIDE.md](FIELD_GUIDE.md) — how a journey runs, common pitfalls, and what is expected of the patron.
+Accord gives a capable agent room to investigate, implement, verify, and adapt
+without turning the human into a passive observer. The human keeps judgment over
+purpose, consequential risk, resources, and the choices that should not be
+delegated. Review happens while the work can still change.
 
-## The layers
+New to the framework? Start with [GUIDE.md](GUIDE.md).
 
-The framework separates what is permanent from what is disposable, and keeps learning where it belongs.
+## The operating model
 
-- **Creed** (`plugin/creed/`) — the frontiersman's, patron's, and scout's narratives. Permanent and role-level, amended rarely. Ships with the package.
-- **Charter** — per-expedition and disposable. Because it expires with the task, it is allowed to be specific: purpose, destination, first approach, provisions, accepted dangers, arrival criteria, and which questions require a rider home. Templates ship with the framework; charters never live in the framework repo.
-- **Journal** — per-project and accumulating. Maps, not mandates: entries inform future judgment, never bind it. Journals never travel back into the framework repo.
+- **Creed** (`plugins/accord/creed/`) — the durable point of view for the human,
+  agent, and investigator. It states responsibility and authority without
+  prescribing implementation.
+- **Agreement** — the understanding reached for one task before work begins:
+  purpose, evidence of success, first approach, resources, risks, room to act,
+  review points, and questions kept by the human.
+- **Record** — an append-only factual account that lets later sessions resume
+  from evidence instead of memory.
+- **Reports** — durable orientation to work, evidence, failure, uncertainty, and
+  counsel. A report points to the work; it never substitutes for inspection.
+- **Learning notes** — context that may help later judgment. Evidence, not
+  mandates.
 
-Updates flow one way. Creed improvements reach projects through package upgrades; project learnings stay home in that project's journal.
+The agreement is not handed down. The agent inspects what is known and counsels
+on cost, risk, missing context, unclear authority, and useful review points. The
+human and agent discuss and revise the draft. Work begins only after the human
+has seen and explicitly accepted the agreement.
 
 ## Repository layout
 
-The `plugin/` subtree is the plugin for both Claude Code and Codex: one shared tree of framework resources, with both skills referencing it — nothing is vendored or duplicated. Only `plugin/` is installed into consuming projects; repo-root docs (this README, FIELD_GUIDE.md, AGENTS.md, CLAUDE.md) stay behind.
+Only `plugins/accord/` is installed into consuming projects. The documents at
+the repository root are contributor-facing.
 
-```
-FIELD_GUIDE.md              user-facing guide: the workflow, pitfalls, the patron's part
-.claude-plugin/             marketplace catalog (points at ./plugin)
-.agents/plugins/            Codex marketplace catalog (points at ./plugin)
-plugin/                     the plugin root — the only tree that installs
-  .claude-plugin/           Claude Code plugin manifest
-  .codex-plugin/            Codex plugin manifest
+```text
+GUIDE.md                       practical human-facing guide
+ACCORD_STYLE_GUIDE.md          voice and writing standard
+DESIGN_LINEAGE.md              why metaphor helped shape the framework
+.claude-plugin/                Claude Code marketplace catalog
+.agents/plugins/               Codex marketplace catalog
+plugins/accord/                installable plugin root
+  .claude-plugin/              Claude Code manifest
+  .codex-plugin/               Codex manifest
   skills/
-    expedition/SKILL.md     the expedition skill (shared by both harnesses)
-    expedition-missive/SKILL.md
-  creed/                    the creed (frontiersman.md, patron.md, scout.md)
-  hooks/                    shared Claude Code and Codex lifecycle hooks
-  templates/                charter, dispatch, and journal-entry templates
-  spec/                     journey-state spec, JSON Schema, examples, analysis notes
-  tools/                    validate and render scripts
-tests/
-  test_framework_contract.py  role and authority contract tests
-  test_hooks.py               cross-harness hook behavior tests
+    accord/SKILL.md            begin or resume substantial work
+    check-in/SKILL.md          human-initiated communication during active work
+  creed/                       agent.md, human.md, investigator.md
+  hooks/                       shared read-only lifecycle hooks
+  templates/                   agreement, report, and learning-note templates
+  spec/                        record and check-in specifications
+  tools/                       validate and render
+tests/                         framework, hook, and tool behavior tests
 ```
 
 ## Adoption
 
-**Claude Code.** Add this repository as a marketplace and install the plugin (`/plugin marketplace add <repo>` then `/plugin install expedition`), or load it directly for development with `claude --plugin-dir <path-to-repo>/plugin`. Skills are namespaced: `/expedition:expedition`, `/expedition:expedition-missive`. Run `claude plugin validate ./plugin` after changes.
+**Claude Code.** Add this repository as a marketplace and install `accord`
+(`/plugin marketplace add <repo>` then `/plugin install accord`), or load the
+plugin directly during development with
+`claude --plugin-dir <path-to-repo>/plugins/accord`. Its skills are
+`/accord:accord` and `/accord:check-in`.
 
-**Codex.** Add this repository as a plugin marketplace (`codex plugin marketplace add <repo>`) and install the `expedition` plugin; both skills come with it.
+**Codex.** Add this repository as a plugin marketplace
+(`codex plugin marketplace add <repo>`) and install `accord`.
 
-The plugin travels across projects and needs no target-project configuration. On invocation the skills establish the roles, draft a charter with the patron, and create `.expeditions/{name}/` in the target project. If an `.expeditions/` charter already exists for the work at hand, they resume under that charter. The `.expeditions/` directory is the persistence mechanism.
+The plugin needs no target-project configuration. An accepted agreement creates:
 
-Each expedition keeps an append-only log, `.expeditions/{name}/journey.jsonl`, described in `plugin/spec/journey-state.md`. Validate a log with `plugin/tools/validate`; render it into a visual journey with `plugin/tools/render`.
+```text
+.accord/{task}/
+  agreement.md
+  record.jsonl
+  reports/
+```
 
-The plugin bundles two read-only lifecycle hooks through `plugin/hooks/hooks.json`, discovered by both harnesses. `SessionStart` supplies a factual index of expedition records on startup, resume, and compaction. `PostToolUse` validates journey logs after a shell or file-editing tool explicitly names `.expeditions` or `journey.jsonl`. The hooks never choose an active charter, infer an event, or write to the expedition record.
+`plugins/accord/tools/validate` checks a record against the shared schema.
+`plugins/accord/tools/render` creates a self-contained HTML timeline.
 
-Run the hook behavior tests with `python3 -m unittest discover -s tests -v`.
+The plugin bundles two read-only lifecycle hooks through
+`plugins/accord/hooks/hooks.json`, shared by Claude Code and Codex.
+`SessionStart` supplies a factual index of Accord records after startup, resume,
+or compaction. `PostToolUse` validates records after a shell or file-editing tool
+explicitly names `.accord` or `record.jsonl`. The hooks do not choose an active
+agreement, infer events, or write to the record.
 
-## Amendment discipline
+## Development
 
-- The creed records role responsibilities only. Additions must be fought for; clarifications and removals are cheap.
-- Mid-task fixes belong in that task's charter. Lessons belong in the journal as dated accounts. Only role responsibilities belong in the creed.
-- New lexicon terms, roles, actors, or event types are admitted only when the existing vocabulary cannot express a distinct responsibility — and admitting one is a rider to the patron, not an implementation choice.
-- Templates name what a ceremony contains, never steps. A template that grows steps has failed.
-- The log describes what happened; it never prescribes what must happen. Analytics over logs are descriptive only, feeding the patron's judgment — they never generate rules, scores, or instructions that flow back to the agent.
+Run the full behavior suite:
+
+```text
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
+```
+
+Validate the Claude Code manifest:
+
+```text
+claude plugin validate ./plugins/accord
+```
+
+The creed carries the point of view. Skills should remain concise. Templates
+name what a conversation or record contains, not a sequence of steps.
+Specifications define structure. Analytics over records remain descriptive and
+must never generate rules, scores, or instructions that flow back to the agent.
