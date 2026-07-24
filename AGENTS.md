@@ -1,35 +1,65 @@
-# Project Context
+# Project context
 
-This directory explores an expedition metaphor as a framework for human-in-the-loop AI work. Its premise is that clear roles, a shared "creed", and reliable communication can align a human and an AI agent while leaving the agent room to exercise judgment and capability. The narratives test whether this shared point of view can sustain trust and alignment without relying on prescriptive plans that manage the agent step by step.
+This repository develops Accord, a narrative framework for substantial
+human-in-the-loop AI work. Its premise is that clear roles, a shared creed, and
+reliable communication can align a human and an AI agent while leaving the agent
+room to exercise judgment.
 
-Read the current narratives (in `plugin/creed/`) before proposing changes or additions. Treat them as the source of truth for the metaphor.
+The roles and responsibilities are literal. The writing remains narrative:
+warm, declarative, and attentive to pressure, consequence, and the division of
+authority.
+
+Read `ACCORD_STYLE_GUIDE.md` and every current creed in
+`plugins/accord/creed/` before proposing changes. Together they are the source
+of truth for the framework's point of view.
 
 When contributing:
 
-- Preserve the restrained, declarative tone of the existing narratives.
-- Use the metaphor to clarify a meaningful idea about responsibility, authority, uncertainty, evidence, adaptation, or communication.
-- Keep the framework useful across specific tools, models, and software methodologies.
-- Identify contradictions or unclear role boundaries rather than silently resolving them.
-- Do not introduce new lexicon terms or roles unless the existing vocabulary cannot express a distinct responsibility.
+- Preserve the restrained, declarative voice defined in the style guide.
+- Clarify responsibility, authority, uncertainty, evidence, adaptation, or
+  communication without prescribing implementation step by step.
+- Keep the framework independent of specific tools, models, and software
+  methodologies.
+- Identify contradictions or unclear role boundaries rather than silently
+  resolving them.
+- Do not introduce a new term or role when ordinary language or the existing
+  vocabulary already expresses the responsibility.
+- Keep the human and agent capable. Do not reduce either to an input source,
+  approval mechanism, executor, or tool.
 
 ## Repository layout
 
-- `plugin/` — the plugin root for both Claude Code and Codex; only this subtree is installed into consuming projects. Repo-root files (`AGENTS.md`, `FIELD_GUIDE.md`, `README.md`, `CLAUDE.md`) are contributor-facing and never ship.
-  - `plugin/creed/` — the creed: `frontiersman.md`, `patron.md`, `scout.md`. Permanent, role-level, amended rarely. Narratives only; reference material belongs in `plugin/spec/`.
-  - `plugin/templates/` — charter, dispatch, and journal-entry templates.
-  - `plugin/hooks/` — shared, read-only Claude Code and Codex lifecycle hooks.
-  - `plugin/spec/` — journey-state spec (`journey-state.md`), `journey.schema.json`, `examples/`, `analysis.md`.
-  - `plugin/skills/` — the `expedition` and `expedition-missive` skills, shared by both harnesses. Each SKILL.md references `creed/`, `templates/`, and `spec/` at the plugin root; never vendor copies into skill folders.
-  - `plugin/.claude-plugin/`, `plugin/.codex-plugin/` — plugin manifests.
-  - `plugin/tools/` — `validate`, `render`.
-- `.claude-plugin/marketplace.json`, `.agents/plugins/` — marketplace catalogs at the repo root, pointing at `./plugin`.
-- `tests/` — contributor-facing behavior tests for shared plugin components.
-- `.expeditions/` — journeys run *on this repo itself* (dogfooding). Excluded from git, like any project's expedition records. Charters and journals for other projects never live here.
+- `plugins/accord/` — the installable plugin root for Claude Code and Codex.
+  Only this subtree ships to consuming projects.
+  - `creed/` — `agent.md`, `human.md`, `investigator.md`. Permanent,
+    role-level, and amended rarely.
+  - `skills/` — `accord` and `check-in`. Both reference shared plugin-root
+    resources; never vendor copies into skill folders.
+  - `templates/` — agreement, report, and learning-note contents. Templates
+    name substance, not choreography.
+  - `spec/` — record schema, event example, check-in semantics, and descriptive
+    analysis boundary.
+  - `hooks/` — shared, read-only Claude Code and Codex lifecycle hooks.
+  - `tools/` — record validation and rendering.
+- `.claude-plugin/`, `.agents/plugins/` — repository marketplace catalogs
+  pointing to `./plugins/accord`.
+- `tests/` — contributor-facing contract, hook, and tool behavior tests.
+- `ACCORD_STYLE_GUIDE.md` — accepted voice and style authority.
+- `DESIGN_LINEAGE.md` — why metaphor helped shape the framework and why the
+  installed interface is now literal.
+- `.accord/` — work run on this repository itself. Excluded from version
+  control like any project's Accord records.
 
 ## Amendment discipline
 
-- Updates flow one way: creed improvements leave via package upgrade; project learnings stay home in that project's journal.
-- Mid-task fixes go in that task's charter; lessons go in the journal as dated accounts; only role responsibilities go in the creed. Additions to the creed must be fought for; clarifications and removals are cheap.
-- Adding, removing, or renaming any event type, actor, or lexicon term is a question for the patron, not an implementation choice — and only if the existing vocabulary cannot express a distinct responsibility.
-- Templates name what a ceremony contains, never steps. A template that grows steps has failed.
-- The journey log describes what happened; it never prescribes what must happen. Analytics over logs are descriptive only and feed the patron's judgment; they never generate rules, scores, or instructions that flow back to the agent.
+- Creed improvements leave through plugin upgrades. Project learning stays in
+  that project's Accord record and learning notes.
+- Mid-task changes belong in the task's agreement. Lessons belong in learning
+  notes. Only durable role responsibilities belong in the creed.
+- Changes to event types, actors, or the shared vocabulary require human
+  agreement. They are not incidental implementation decisions.
+- Templates name what a conversation or record contains, never a required
+  sequence of steps.
+- The record describes what happened. Analytics over records remain
+  descriptive and feed human judgment; they never generate rules, scores, or
+  instructions that flow back to the agent.

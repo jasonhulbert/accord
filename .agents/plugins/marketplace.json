@@ -1,16 +1,20 @@
 {
-  "name": "expedition",
-  "interface": { "displayName": "Expedition" },
+  "name": "accord",
+  "interface": {
+    "displayName": "Accord"
+  },
   "plugins": [
     {
-      "name": "expedition",
+      "name": "accord",
       "source": {
         "source": "local",
-        "path": "./plugin"
+        "path": "./plugins/accord"
       },
       "policy": {
-        "installation": "AVAILABLE"
-      }
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
     }
   ]
 }
