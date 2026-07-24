@@ -1,0 +1,36 @@
+"""Resolve Accord's per-user, per-project record storage."""
+
+from __future__ import annotations
+
+import hashlib
+import re
+from pathlib import Path
+
+
+def project_root(cwd: Path) -> Path:
+    """Return the enclosing Git worktree, or the supplied directory itself."""
+    current = cwd.expanduser().resolve()
+    if not current.is_dir():
+        current = current.parent
+    for candidate in (current, *current.parents):
+        if (candidate / ".git").exists():
+            return candidate
+    return current
+
+
+def project_key(root: Path) -> str:
+    """Create a readable, collision-resistant identifier for a project root."""
+    resolved = root.expanduser().resolve()
+    name = re.sub(r"[^a-z0-9]+", "-", resolved.name.lower()).strip("-")
+    digest = hashlib.sha256(str(resolved).encode()).hexdigest()[:12]
+    return f"{name or 'project'}-{digest}"
+
+
+def accord_home() -> Path:
+    """Return the hidden, per-user home for all Accord records."""
+    return Path.home() / ".accord"
+
+
+def accord_root_for(cwd: Path) -> Path:
+    """Return the record root reserved for the project containing ``cwd``."""
+    return accord_home() / "projects" / project_key(project_root(cwd))

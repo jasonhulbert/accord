@@ -1,7 +1,9 @@
 # The Accord record
 
 Each active agreement keeps an append-only record at
-`.accord/{task}/record.jsonl`. One JSON object occupies each nonblank line.
+`{store}/{task}/record.jsonl`, where `{store}` is the project directory printed
+by `tools/location` under `~/.accord/projects/`. One JSON object occupies each
+nonblank line.
 
 The record describes what happened. It does not score the agent, prescribe the
 next action, or turn earlier experience into a rule.
@@ -24,12 +26,12 @@ Every event has:
 | Field | Required | Meaning |
 |---|---|---|
 | `ts` | yes | ISO 8601 timestamp |
-| `task` | yes | task id, matching `{task}` in `.accord/{task}/` |
+| `task` | yes | task id, matching `{task}` in `{store}/{task}/` |
 | `schema` | yes | schema version, currently `"1"` |
 | `type` | yes | one of the twelve event types below |
 | `actor` | yes | `human`, `agent`, or `investigator` |
 | `summary` | yes | plain-language account of what happened |
-| `refs` | no | paths or ids the event points to |
+| `refs` | no | task-relative paths or ids the event points to |
 
 Three types require one additional field: `attempt.outcome`,
 `question.subject`, and `direction.decision`. No other structured payload is

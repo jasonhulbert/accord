@@ -6,6 +6,7 @@ from __future__ import annotations
 import sys
 
 from hook_support import (
+    display_path,
     find_accord_root,
     payload_cwd,
     read_payload,
@@ -31,14 +32,13 @@ def main() -> int:
         return 0
 
     failures: list[str] = []
-    project_root = accord_root.parent
     for log in record_logs(accord_root):
         valid, output = validate_log(log)
         if valid:
             continue
-        failures.append(f"{log.relative_to(project_root)} is invalid:")
+        failures.append(f"{display_path(log)} is invalid:")
         failures.extend(
-            f"  {line}" for line in validation_excerpt(output, project_root)
+            f"  {line}" for line in validation_excerpt(output, accord_root)
         )
 
     if not failures:

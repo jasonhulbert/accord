@@ -1,6 +1,6 @@
 ---
 name: accord
-description: Run substantial human-agent work under Accord. Use when the user invokes Accord by name, asks to start or resume an Accord, or wants a purpose-led working agreement for consequential work whose implementation path is not fully known. Do not use for small, routine, or completely specified tasks. Establishes the human, agent, and investigator roles; reaches agreement through dialogue before work begins; and keeps an append-only record under .accord/.
+description: Run substantial human-agent work under Accord. Use when the user invokes Accord by name, asks to start or resume an Accord, or wants a purpose-led working agreement for consequential work whose implementation path is not fully known. Do not use for small, routine, or completely specified tasks. Establishes the human, agent, and investigator roles; reaches agreement through dialogue before work begins; and keeps an append-only record in the user's hidden Accord store.
 ---
 
 # Accord
@@ -15,11 +15,17 @@ this skill carries only what is needed to work under it.
 
 ## Reach agreement
 
-Look for `.accord/` in the target project. If an existing agreement covers the
-request, resume from it. Read its agreement, record, reports, learning notes,
-and actual work. If a review or question is open, wait for human direction.
-Otherwise orient the human to the current state and continue within the
-agreement.
+Run `tools/location` from the target project's root to locate its record store.
+It prints a directory under `~/.accord/projects/`; use that exact directory.
+If an existing agreement there covers the request, resume from it. Read its
+agreement, record, reports, learning notes, and actual work. If a review or
+question is open, wait for human direction. Otherwise orient the human to the
+current state and continue within the agreement.
+
+If the home store has no agreement but the project contains a legacy
+`.accord/` directory that covers the request, explain the choice to move it to
+the home store and ask the human how to proceed. Do not create a replacement
+agreement or rewrite valid history.
 
 If no agreement covers the work, inspect enough of the project and request to
 offer informed counsel. Draft an agreement from `templates/agreement.md`. Name
@@ -46,7 +52,7 @@ work should begin.
 After acceptance, create:
 
 ```text
-.accord/{task}/
+{store}/{task}/
   agreement.md
   record.jsonl
 ```
@@ -95,13 +101,13 @@ review, or where a consequential question exceeds the agreement.
 ## Keep the record
 
 Read `spec/record.md` before writing the first event. Append material events to
-`.accord/{task}/record.jsonl`; never rewrite valid history. The twelve types are
+`{store}/{task}/record.jsonl`; never rewrite valid history. The twelve types are
 `start`, `investigation`, `attempt`, `review`, `report`, `question`,
 `direction`, `check-in`, `approach-change`, `completion`, `end`, and `note`.
 Use `note` when no more specific type fits. The record describes what happened;
 it does not require an event for every phase or tool call.
 
-Write reports as durable markdown documents under `.accord/{task}/reports/` and
+Write reports as durable markdown documents under `{store}/{task}/reports/` and
 index them with `report` events. Use `templates/learning-note.md` when another
 session would otherwise have to rediscover an important lesson. Learning notes
 inform later judgment; they do not become rules.

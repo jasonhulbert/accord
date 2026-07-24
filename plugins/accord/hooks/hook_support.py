@@ -12,6 +12,9 @@ from typing import Any
 
 PLUGIN_ROOT = Path(__file__).resolve().parent.parent
 VALIDATOR = PLUGIN_ROOT / "tools" / "validate"
+sys.path.insert(0, str(PLUGIN_ROOT))
+
+from storage import accord_root_for  # noqa: E402
 
 
 def read_payload() -> dict[str, Any]:
@@ -34,13 +37,9 @@ def payload_cwd(payload: dict[str, Any]) -> Path:
 
 
 def find_accord_root(cwd: Path) -> Path | None:
-    """Find the nearest .accord directory at or above cwd."""
-    current = cwd if cwd.is_dir() else cwd.parent
-    for candidate in (current, *current.parents):
-        accord = candidate / ".accord"
-        if accord.is_dir():
-            return accord
-    return None
+    """Find this project's Accord directory in the user's hidden home store."""
+    accord = accord_root_for(cwd)
+    return accord if accord.is_dir() else None
 
 
 def record_logs(accord_root: Path) -> list[Path]:
@@ -68,10 +67,18 @@ def validate_log(path: Path) -> tuple[bool, str]:
     return result.returncode == 0, output
 
 
-def validation_excerpt(output: str, project_root: Path, limit: int = 8) -> list[str]:
+def display_path(path: Path) -> str:
+    """Keep home-store paths recognizable without depending on a username."""
+    try:
+        return f"~/{path.relative_to(Path.home()).as_posix()}"
+    except ValueError:
+        return str(path)
+
+
+def validation_excerpt(output: str, accord_root: Path, limit: int = 8) -> list[str]:
     """Keep validation feedback useful without flooding model context."""
-    relative = output.replace(f"{project_root}{Path('/')}", "")
-    lines = [line for line in relative.splitlines() if line.strip()]
+    readable = output.replace(str(accord_root), display_path(accord_root))
+    lines = [line for line in readable.splitlines() if line.strip()]
     if len(lines) <= limit:
         return lines
     return [*lines[:limit], f"... {len(lines) - limit} more validation lines"]

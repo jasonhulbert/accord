@@ -1,6 +1,6 @@
 ---
 name: check-in
-description: Check in on active work under Accord. Use when the user invokes this skill by name, asks for status or an account, requests an unscheduled review, supplies context that may change the work, answers or follows up on an open question, or proposes changed terms for an agreement under .accord/. Requires an existing Accord; use the accord skill to begin one.
+description: Check in on active work under Accord. Use when the user invokes this skill by name, asks for status or an account, requests an unscheduled review, supplies context that may change the work, answers or follows up on an open question, or proposes changed terms for an existing Accord. Requires an existing Accord; use the accord skill to begin one.
 ---
 
 # Check in
@@ -11,8 +11,14 @@ The framework files are at the plugin root, two directories above this file. If
 the creed has not been read in this session, read `creed/agent.md` and
 `creed/human.md`. Read `spec/check-in.md`.
 
-Find the agreement under `.accord/` that covers the message. If several could,
-ask which one. If none does, say so plainly and offer to begin an Accord.
+Run `tools/location` from the target project's root to find its record store
+under `~/.accord/projects/`. Find the agreement there that covers the message.
+If several could, ask which one.
+
+If the project contains a legacy `.accord/` directory that covers the message,
+ask the human whether it should move to the home store. Do not create a second
+record for the same work. If neither location contains an agreement, say so
+plainly and offer to begin an Accord.
 
 Read the agreement, record, reports, learning notes, and actual work before
 responding. Do not reconstruct the state from memory or from the most recent

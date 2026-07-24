@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -16,6 +17,7 @@ HOOKS_ROOT = REPO_ROOT / "plugins" / "accord" / "hooks"
 HOOK_CONFIG = HOOKS_ROOT / "hooks.json"
 SESSION_START = HOOKS_ROOT / "session_start.py"
 POST_TOOL_USE = HOOKS_ROOT / "post_tool_use.py"
+LOCATION = REPO_ROOT / "plugins" / "accord" / "tools" / "location"
 
 
 def event(event_type: str = "start") -> dict[str, str]:
@@ -30,17 +32,33 @@ def event(event_type: str = "start") -> dict[str, str]:
 
 
 class HookTests(unittest.TestCase):
-    def run_hook(self, script: Path, payload: dict) -> subprocess.CompletedProcess[str]:
+    def run_hook(
+        self, script: Path, payload: dict, home: Path
+    ) -> subprocess.CompletedProcess[str]:
+        environment = os.environ | {"HOME": str(home)}
         return subprocess.run(
             [sys.executable, str(script)],
             input=json.dumps(payload),
             text=True,
             capture_output=True,
             check=False,
+            env=environment,
         )
 
-    def make_accord(self, root: Path, contents: str) -> Path:
-        task = root / ".accord" / "rate-limit"
+    def accord_root(self, root: Path, home: Path) -> Path:
+        result = subprocess.run(
+            [sys.executable, str(LOCATION), str(root)],
+            text=True,
+            capture_output=True,
+            check=False,
+            env=os.environ | {"HOME": str(home)},
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return Path(result.stdout.strip())
+
+    def make_accord(self, root: Path, home: Path, contents: str) -> Path:
+        (root / ".git").mkdir(exist_ok=True)
+        task = self.accord_root(root, home) / "rate-limit"
         task.mkdir(parents=True)
         (task / "agreement.md").write_text("# Agreement: rate-limit\n")
         log = task / "record.jsonl"
@@ -65,6 +83,8 @@ class HookTests(unittest.TestCase):
 
     def test_session_start_is_silent_without_accord_records(self):
         with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory) / "home"
+            home.mkdir()
             result = self.run_hook(
                 SESSION_START,
                 {
@@ -72,6 +92,7 @@ class HookTests(unittest.TestCase):
                     "source": "startup",
                     "cwd": directory,
                 },
+                home,
             )
 
         self.assertEqual(result.returncode, 0)
@@ -81,15 +102,20 @@ class HookTests(unittest.TestCase):
     def test_session_start_reports_facts_without_selecting_an_agreement(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            self.make_accord(root, json.dumps(event()) + "\n")
+            home = root / "home"
+            home.mkdir()
+            self.make_accord(root, home, json.dumps(event()) + "\n")
+            nested = root / "src"
+            nested.mkdir()
 
             result = self.run_hook(
                 SESSION_START,
                 {
                     "hook_event_name": "SessionStart",
                     "source": "resume",
-                    "cwd": str(root / ".accord" / "rate-limit"),
+                    "cwd": str(nested),
                 },
+                home,
             )
 
         self.assertEqual(result.returncode, 0)
@@ -105,11 +131,14 @@ class HookTests(unittest.TestCase):
             "not a decision that any agreement covers",
             result.stdout,
         )
+        self.assertIn("~/.accord/projects/", result.stdout)
 
     def test_session_start_surfaces_invalid_history_without_blocking_startup(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            self.make_accord(root, '{"type": "start"}\n')
+            home = root / "home"
+            home.mkdir()
+            self.make_accord(root, home, '{"type": "start"}\n')
 
             result = self.run_hook(
                 SESSION_START,
@@ -118,6 +147,7 @@ class HookTests(unittest.TestCase):
                     "source": "compact",
                     "cwd": str(root),
                 },
+                home,
             )
 
         self.assertEqual(result.returncode, 0)
@@ -127,7 +157,9 @@ class HookTests(unittest.TestCase):
     def test_post_tool_use_ignores_unrelated_edits_even_with_invalid_history(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            self.make_accord(root, '{"type": "start"}\n')
+            home = root / "home"
+            home.mkdir()
+            self.make_accord(root, home, '{"type": "start"}\n')
 
             result = self.run_hook(
                 POST_TOOL_USE,
@@ -137,6 +169,7 @@ class HookTests(unittest.TestCase):
                     "tool_input": {"file_path": str(root / "README.md")},
                     "cwd": str(root),
                 },
+                home,
             )
 
         self.assertEqual(result.returncode, 0)
@@ -146,7 +179,9 @@ class HookTests(unittest.TestCase):
     def test_post_tool_use_stays_silent_when_touched_records_are_valid(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            log = self.make_accord(root, json.dumps(event()) + "\n")
+            home = root / "home"
+            home.mkdir()
+            log = self.make_accord(root, home, json.dumps(event()) + "\n")
 
             result = self.run_hook(
                 POST_TOOL_USE,
@@ -156,16 +191,40 @@ class HookTests(unittest.TestCase):
                     "tool_input": {"file_path": str(log)},
                     "cwd": str(root),
                 },
+                home,
             )
 
         self.assertEqual(result.returncode, 0)
         self.assertEqual(result.stdout, "")
         self.assertEqual(result.stderr, "")
 
+    def test_post_tool_use_checks_history_after_a_related_document_edit(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            home = root / "home"
+            home.mkdir()
+            log = self.make_accord(root, home, '{"type": "start"}\n')
+
+            result = self.run_hook(
+                POST_TOOL_USE,
+                {
+                    "hook_event_name": "PostToolUse",
+                    "tool_name": "Edit",
+                    "tool_input": {"file_path": str(log.parent / "agreement.md")},
+                    "cwd": str(root),
+                },
+                home,
+            )
+
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("record validation failed", result.stderr)
+
     def test_post_tool_use_blocks_progress_after_malformed_record_append(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            log = self.make_accord(root, json.dumps(event()) + "\nnot-json\n")
+            home = root / "home"
+            home.mkdir()
+            log = self.make_accord(root, home, json.dumps(event()) + "\nnot-json\n")
 
             result = self.run_hook(
                 POST_TOOL_USE,
@@ -175,12 +234,14 @@ class HookTests(unittest.TestCase):
                     "tool_input": {"command": f"printf malformed >> {log}"},
                     "cwd": str(root),
                 },
+                home,
             )
 
         self.assertEqual(result.returncode, 2)
         self.assertIn("tool has already run", result.stderr)
         self.assertIn("invalid JSON", result.stderr)
-        self.assertIn(".accord/rate-limit/record.jsonl", result.stderr)
+        self.assertIn("~/.accord/projects/", result.stderr)
+        self.assertIn("rate-limit/record.jsonl", result.stderr)
 
 
 if __name__ == "__main__":

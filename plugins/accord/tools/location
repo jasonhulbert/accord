@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+"""Print the per-project Accord record directory.
+
+Usage: tools/location [project-directory]
+
+Without an argument, the current directory identifies the project. The nearest
+ancestor with a .git entry is the project root. For a directory outside Git,
+the supplied directory is the project root.
+"""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+
+PLUGIN_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PLUGIN_ROOT))
+
+from storage import accord_root_for  # noqa: E402
+
+
+def main(argv: list[str]) -> int:
+    if len(argv) > 1 or (argv and argv[0] in {"-h", "--help"}):
+        stream = sys.stdout if argv and argv[0] in {"-h", "--help"} else sys.stderr
+        print(__doc__.strip(), file=stream)
+        return 0 if stream is sys.stdout else 2
+
+    project = Path(argv[0]) if argv else Path.cwd()
+    if not project.is_dir():
+        print(f"{project}: project directory does not exist", file=sys.stderr)
+        return 2
+
+    print(accord_root_for(project))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

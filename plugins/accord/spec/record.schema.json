@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Accord record event",
-  "description": "One line of an .accord/{task}/record.jsonl append-only record. It describes what happened and never prescribes what must happen.",
+  "description": "One line of a task's append-only Accord record. It describes what happened and never prescribes what must happen.",
   "type": "object",
   "required": ["ts", "task", "schema", "type", "actor", "summary"],
   "additionalProperties": false,

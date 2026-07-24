@@ -53,7 +53,7 @@ plugins/accord/                installable plugin root
   hooks/                       shared read-only lifecycle hooks
   templates/                   agreement, report, and learning-note templates
   spec/                        record and check-in specifications
-  tools/                       validate and render
+  tools/                       location, validate, and render
 tests/                         framework, hook, and tool behavior tests
 ```
 
@@ -68,14 +68,24 @@ plugin directly during development with
 **Codex.** Add this repository as a plugin marketplace
 (`codex plugin marketplace add <repo>`) and install `accord`.
 
-The plugin needs no target-project configuration. An accepted agreement creates:
+The plugin needs no target-project configuration. Its records live in the
+user's hidden home store, outside the target project. `tools/location` prints
+the exact directory for a target project. An accepted agreement creates:
 
 ```text
-.accord/{task}/
+~/.accord/projects/{project-key}/{task}/
   agreement.md
   record.jsonl
   reports/
 ```
+
+The project key is derived from the project root, so two projects with the same
+directory name keep separate records. The path stays stable while the project
+remains at that root.
+
+Existing project-local `.accord/` directories are not moved automatically.
+Before resuming one, the agent asks whether it should move to the home store;
+it does not create a competing agreement or rewrite the existing record.
 
 `plugins/accord/tools/validate` checks a record against the shared schema.
 `plugins/accord/tools/render` creates a self-contained HTML timeline.
@@ -84,7 +94,7 @@ The plugin bundles two read-only lifecycle hooks through
 `plugins/accord/hooks/hooks.json`, shared by Claude Code and Codex.
 `SessionStart` supplies a factual index of Accord records after startup, resume,
 or compaction. `PostToolUse` validates records after a shell or file-editing tool
-explicitly names `.accord` or `record.jsonl`. The hooks do not choose an active
+explicitly names `~/.accord` or `record.jsonl`. The hooks do not choose an active
 agreement, infer events, or write to the record.
 
 ## Development

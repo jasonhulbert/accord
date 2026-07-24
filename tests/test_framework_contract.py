@@ -80,6 +80,14 @@ class FrameworkContractTests(unittest.TestCase):
         )
         self.assertIn("make the current work inspectable", check_in_skill)
 
+    def test_legacy_records_do_not_silently_fork_the_work(self):
+        accord_skill = self.read("plugins/accord/skills/accord/SKILL.md")
+        check_in_skill = self.read("plugins/accord/skills/check-in/SKILL.md")
+
+        self.assertIn("legacy\n`.accord/` directory", accord_skill)
+        self.assertIn("Do not create a replacement\nagreement", accord_skill)
+        self.assertIn("Do not create a second\nrecord", check_in_skill)
+
     def test_internal_pause_does_not_become_an_approval_gate(self):
         agent = self.read("plugins/accord/creed/agent.md")
         skill = self.read("plugins/accord/skills/accord/SKILL.md")

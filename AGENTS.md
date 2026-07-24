@@ -47,8 +47,8 @@ When contributing:
 - `ACCORD_STYLE_GUIDE.md` — accepted voice and style authority.
 - `DESIGN_LINEAGE.md` — why metaphor helped shape the framework and why the
   installed interface is now literal.
-- `.accord/` — work run on this repository itself. Excluded from version
-  control like any project's Accord records.
+- `~/.accord/` — per-user Accord records, partitioned by project and kept
+  outside project workspaces.
 
 ## Amendment discipline
 

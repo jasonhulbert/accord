@@ -6,6 +6,7 @@ from __future__ import annotations
 import sys
 
 from hook_support import (
+    display_path,
     event_count_and_last,
     find_accord_root,
     latest_named_file,
@@ -32,9 +33,8 @@ def main() -> int:
     if not logs:
         return 0
 
-    project_root = accord_root.parent
     lines = [
-        f"Accord records found at {accord_root}.",
+        f"Accord records found at {display_path(accord_root)}.",
         (
             "This is a factual index, not a decision that any agreement "
             "covers the current work."
@@ -60,7 +60,7 @@ def main() -> int:
             lines.append("  Validation:")
             lines.extend(
                 f"    {line}"
-                for line in validation_excerpt(validation_output, project_root)
+                for line in validation_excerpt(validation_output, accord_root)
             )
 
     lines.append(

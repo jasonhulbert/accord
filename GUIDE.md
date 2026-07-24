@@ -43,8 +43,8 @@ risk, authority, or judgment you kept. Expect evidence and counsel with the
 question. Your direction resolves that judgment and puts the work back in
 motion.
 
-The record under `.accord/{task}/` keeps material events visible across
-sessions. It is memory, not surveillance. Failed attempts belong beside
+The record in Accord's per-project home store keeps material events visible
+across sessions. It is memory, not surveillance. Failed attempts belong beside
 successful ones because later judgment needs both.
 
 ## Review while change remains practical
@@ -138,11 +138,20 @@ responsibilities, not components exchanging inputs and approvals.
 
 ## Where things live
 
-- `.accord/{task}/agreement.md` — the accepted understanding and later
+Accord keeps its records outside the project workspace. From the project root,
+`tools/location` prints its record directory. The default location is
+`~/.accord/projects/{project-key}/`; `{project-key}` is derived from that
+project's root so records from similarly named projects do not collide.
+
+An older project-local `.accord/` directory stays in place until you decide to
+move it. The agent should bring that choice to you before it starts a second
+record for the same work.
+
+- `~/.accord/projects/{project-key}/{task}/agreement.md` — the accepted understanding and later
   amendments;
-- `.accord/{task}/record.jsonl` — the append-only factual record;
-- `.accord/{task}/reports/` — durable reports and review orientation;
-- `.accord/{task}/learning-*.md` — context another session should not have to
+- `~/.accord/projects/{project-key}/{task}/record.jsonl` — the append-only factual record;
+- `~/.accord/projects/{project-key}/{task}/reports/` — durable reports and review orientation;
+- `~/.accord/projects/{project-key}/{task}/learning-*.md` — context another session should not have to
   rediscover.
 
 The agreement gives the work room. The record lets that room survive a change
