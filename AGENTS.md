@@ -45,8 +45,6 @@ When contributing:
   pointing to `./plugins/accord`.
 - `tests/` — contributor-facing contract, hook, and tool behavior tests.
 - `ACCORD_STYLE_GUIDE.md` — accepted voice and style authority.
-- `DESIGN_LINEAGE.md` — why metaphor helped shape the framework and why the
-  installed interface is now literal.
 - `~/.accord/` — per-user Accord records, partitioned by project and kept
   outside project workspaces.
 

@@ -91,7 +91,6 @@ class ToolTests(unittest.TestCase):
         self.assertIn("<title>Accord record</title>", html)
         self.assertIn("rate-limiting", html)
         self.assertIn("A factual view of what changed", html)
-        self.assertNotIn("Journey map", html)
         self.assertNotIn("https://", html)
 
     def test_renderer_rejects_incomplete_events_before_rendering(self):

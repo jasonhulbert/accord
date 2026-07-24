@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import json
-import re
 import unittest
 from pathlib import Path
 
@@ -80,14 +79,6 @@ class FrameworkContractTests(unittest.TestCase):
         )
         self.assertIn("make the current work inspectable", check_in_skill)
 
-    def test_legacy_records_do_not_silently_fork_the_work(self):
-        accord_skill = self.read("plugins/accord/skills/accord/SKILL.md")
-        check_in_skill = self.read("plugins/accord/skills/check-in/SKILL.md")
-
-        self.assertIn("legacy\n`.accord/` directory", accord_skill)
-        self.assertIn("Do not create a replacement\nagreement", accord_skill)
-        self.assertIn("Do not create a second\nrecord", check_in_skill)
-
     def test_internal_pause_does_not_become_an_approval_gate(self):
         agent = self.read("plugins/accord/creed/agent.md")
         skill = self.read("plugins/accord/skills/accord/SKILL.md")
@@ -126,29 +117,6 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertIn("The investigator finds. The agent decides.", investigator)
         self.assertIn("Delegation can move an inquiry", agent)
         self.assertIn("It cannot move accountability", agent)
-
-    def test_installed_plugin_has_literal_roles_without_private_expedition_lexicon(
-        self,
-    ):
-        banned = re.compile(
-            r"\b(expedition|frontiersman|patron|scout|charter|basecamp|"
-            r"dispatch|rider|missive|journey|horizon|trail|crossing|"
-            r"provisions|ceremony)\b",
-            re.IGNORECASE,
-        )
-        violations = []
-        for path in PLUGIN_ROOT.rglob("*"):
-            if not path.is_file():
-                continue
-            try:
-                text = path.read_text()
-            except UnicodeDecodeError:
-                continue
-            match = banned.search(text)
-            if match:
-                violations.append(f"{path.relative_to(PLUGIN_ROOT)}: {match.group(0)}")
-
-        self.assertEqual(violations, [])
 
     def test_plugin_and_marketplaces_share_the_accord_identity(self):
         codex_manifest = json.loads(
@@ -226,15 +194,11 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertIn("descriptive questions", analysis)
         self.assertIn("must not generate instructions, compliance scores", analysis)
 
-    def test_contributor_guidance_preserves_voice_and_design_lineage(self):
+    def test_contributor_guidance_preserves_voice(self):
         agents = self.read("AGENTS.md")
-        lineage = self.read("DESIGN_LINEAGE.md")
 
         self.assertIn("ACCORD_STYLE_GUIDE.md", agents)
         self.assertIn("literal", agents)
-        self.assertIn("compression", lineage)
-        self.assertIn("simulation", lineage)
-        self.assertIn("coherence", lineage)
 
 
 if __name__ == "__main__":

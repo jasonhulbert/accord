@@ -22,11 +22,6 @@ agreement, record, reports, learning notes, and actual work. If a review or
 question is open, wait for human direction. Otherwise orient the human to the
 current state and continue within the agreement.
 
-If the home store has no agreement but the project contains a legacy
-`.accord/` directory that covers the request, explain the choice to move it to
-the home store and ask the human how to proceed. Do not create a replacement
-agreement or rewrite valid history.
-
 If no agreement covers the work, inspect enough of the project and request to
 offer informed counsel. Draft an agreement from `templates/agreement.md`. Name
 material risks, missing resources, unclear authority, bounds that leave too

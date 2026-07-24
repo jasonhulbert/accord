@@ -143,10 +143,6 @@ Accord keeps its records outside the project workspace. From the project root,
 `~/.accord/projects/{project-key}/`; `{project-key}` is derived from that
 project's root so records from similarly named projects do not collide.
 
-An older project-local `.accord/` directory stays in place until you decide to
-move it. The agent should bring that choice to you before it starts a second
-record for the same work.
-
 - `~/.accord/projects/{project-key}/{task}/agreement.md` — the accepted understanding and later
   amendments;
 - `~/.accord/projects/{project-key}/{task}/record.jsonl` — the append-only factual record;

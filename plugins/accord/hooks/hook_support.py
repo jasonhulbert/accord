@@ -14,7 +14,7 @@ PLUGIN_ROOT = Path(__file__).resolve().parent.parent
 VALIDATOR = PLUGIN_ROOT / "tools" / "validate"
 sys.path.insert(0, str(PLUGIN_ROOT))
 
-from storage import accord_root_for  # noqa: E402
+from storage import accord_home, accord_root_for  # noqa: E402
 
 
 def read_payload() -> dict[str, Any]:
@@ -123,4 +123,4 @@ def tool_input_mentions_accord(payload: dict[str, Any]) -> bool:
         serialized = json.dumps(tool_input, sort_keys=True)
     except (TypeError, ValueError):
         serialized = repr(tool_input)
-    return ".accord" in serialized or "record.jsonl" in serialized
+    return str(accord_home()) in serialized or "~/.accord" in serialized

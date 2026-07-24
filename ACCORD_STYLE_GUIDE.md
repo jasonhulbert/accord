@@ -1,7 +1,7 @@
 # The Voice of Accord
 
-This guide governs the rewrite of the Expedition framework as Accord. It is an
-authoring standard, not another layer of workflow.
+This guide governs Accord's writing. It is an authoring standard, not another
+layer of workflow.
 
 Accord keeps the operating model and sheds the fictional world around it. Its
 roles and responsibilities are literal. Its writing remains warm, rhythmic, and
@@ -165,7 +165,7 @@ or the integrity of the record.
 and outputs can still misrepresent the relationship. Restore the reason, the
 tension, and the human consequence.
 
-**Costume vocabulary.** Do not replace the expedition with a new fictional
+**Costume vocabulary.** Do not replace literal responsibilities with a fictional
 setting or a thesaurus of Accord-branded terms.
 
 **Process gravity.** Do not let useful conversations harden into mandatory

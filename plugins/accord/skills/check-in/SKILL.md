@@ -13,12 +13,8 @@ the creed has not been read in this session, read `creed/agent.md` and
 
 Run `tools/location` from the target project's root to find its record store
 under `~/.accord/projects/`. Find the agreement there that covers the message.
-If several could, ask which one.
-
-If the project contains a legacy `.accord/` directory that covers the message,
-ask the human whether it should move to the home store. Do not create a second
-record for the same work. If neither location contains an agreement, say so
-plainly and offer to begin an Accord.
+If several could, ask which one. If none does, say so plainly and offer to begin
+an Accord.
 
 Read the agreement, record, reports, learning notes, and actual work before
 responding. Do not reconstruct the state from memory or from the most recent
