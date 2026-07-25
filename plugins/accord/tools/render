@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import sys
+from html import escape
 from pathlib import Path
 
 
@@ -18,62 +19,56 @@ TEMPLATE = r"""<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Accord record</title>
+<title>__TITLE__</title>
 <style>
   :root {
-    color-scheme: light dark;
-    --paper: #f5f1e9;
-    --panel: #fffdf8;
-    --ink: #292723;
-    --muted: #6f6a61;
-    --line: #d6cec0;
-    --human: #865b42;
-    --agent: #3f6671;
-    --supporting-agent: #6c5a87;
-    --success: #3f704f;
-    --failure: #9b493f;
-    --question: #9a762f;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --paper: #1d1c19;
-      --panel: #292722;
-      --ink: #eee9df;
-      --muted: #b5aea2;
-      --line: #4d4941;
-      --human: #d39a78;
-      --agent: #83b4c1;
-      --supporting-agent: #ae9aca;
-      --success: #84b992;
-      --failure: #d68479;
-      --question: #d2ae5d;
-    }
+    color-scheme: dark;
+    --paper: #000;
+    --ink: #f4f4ef;
+    --muted: #8c8c88;
+    --line: #383836;
+    --running: #879b8a;
+    --success: #a9bd72;
+    --warning: #b9a06a;
+    --danger: #bd7772;
+    --human: #bd9a7a;
+    --agent: #8da6ad;
+    --supporting-agent: #a394b8;
   }
   * { box-sizing: border-box; }
   body {
     margin: 0;
     background: var(--paper);
     color: var(--ink);
-    font: 15px/1.55 ui-serif, Georgia, Cambria, "Times New Roman", serif;
+    font: 15px/1.55 "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif;
   }
   main {
-    width: min(900px, calc(100% - 32px));
+    width: min(1000px, calc(100% - 32px));
     margin: 0 auto;
-    padding: 56px 0 80px;
+    padding: 0 0 64px;
   }
-  header { margin-bottom: 44px; }
-  h1, h2 { font-weight: 500; letter-spacing: -0.02em; }
-  h1 { margin: 0 0 8px; font-size: clamp(2rem, 5vw, 3.4rem); }
-  h2 { margin: 0; font-size: 1.55rem; }
+  .view-nav {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--muted);
+    font: 11px/1.4 "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .view-nav a { color: var(--ink); }
+  header { padding: 42px 0 30px; border-bottom: 1px solid var(--line); }
+  h1, h2 { font-weight: 600; letter-spacing: -0.04em; }
+  h1 { margin: 0 0 10px; font-size: clamp(2.2rem, 7vw, 4.6rem); line-height: .95; }
+  h2 { margin: 0; font-size: 1.45rem; }
   .intro { max-width: 650px; color: var(--muted); font-size: 1.05rem; }
-  .task { margin-top: 46px; }
+  .task { margin-top: 0; }
   .task-head {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
     gap: 16px;
-    margin-bottom: 22px;
-    padding-bottom: 10px;
+    margin: 0;
+    padding: 20px 0 12px;
     border-bottom: 1px solid var(--line);
   }
   .count { color: var(--muted); font-size: .88rem; }
@@ -81,44 +76,48 @@ TEMPLATE = r"""<!doctype html>
   .timeline::before {
     content: "";
     position: absolute;
-    top: 4px;
-    bottom: 14px;
-    left: 7px;
+    top: 0;
+    bottom: 0;
+    left: 4px;
     width: 1px;
     background: var(--line);
   }
   .event {
-    --actor: var(--agent);
     position: relative;
     display: grid;
-    grid-template-columns: 16px minmax(0, 1fr);
+    grid-template-columns: 10px minmax(0, 1fr);
     gap: 20px;
-    padding-bottom: 20px;
+    padding: 0;
   }
-  .event[data-actor="human"] { --actor: var(--human); }
-  .event[data-actor="supporting-agent"] { --actor: var(--supporting-agent); }
-  .event[data-actor="investigator"] { --actor: var(--supporting-agent); }
+  .event::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: var(--line);
+  }
   .dot {
     position: relative;
     z-index: 1;
-    width: 15px;
-    height: 15px;
-    margin-top: 19px;
-    border: 3px solid var(--paper);
-    border-radius: 50%;
-    background: var(--actor);
-    box-shadow: 0 0 0 1px var(--actor);
+    width: 9px;
+    height: 9px;
+    margin-top: 20px;
+    background: var(--running);
   }
+  .event[data-type="completion"] .dot,
+  .event[data-outcome="succeeded"] .dot { background: var(--success); }
+  .event[data-type="approach-change"] .dot,
+  .event[data-type="question"] .dot,
+  .event[data-type="review"] .dot { background: var(--warning); }
+  .event[data-type="end"] .dot,
+  .event[data-outcome="failed"] .dot { background: var(--danger); }
   .card {
-    padding: 16px 18px;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    background: var(--panel);
+    padding: 20px 0 22px;
+    border: 0;
+    background: transparent;
   }
-  .event[data-type="completion"] .card { border-color: var(--success); }
-  .event[data-type="end"] .card,
-  .event[data-outcome="failed"] .card { border-color: var(--failure); }
-  .event[data-type="question"] .card { border-color: var(--question); }
   .meta {
     display: flex;
     flex-wrap: wrap;
@@ -126,15 +125,13 @@ TEMPLATE = r"""<!doctype html>
     gap: 7px 10px;
     margin-bottom: 8px;
     color: var(--muted);
-    font: 12px/1.4 ui-sans-serif, system-ui, sans-serif;
+    font: 11px/1.4 "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif;
+    letter-spacing: .04em;
+    text-transform: uppercase;
   }
   .type {
-    padding: 3px 7px;
-    border-radius: 999px;
-    color: var(--panel);
-    background: var(--actor);
-    font-weight: 650;
-    letter-spacing: .02em;
+    color: var(--ink);
+    font-weight: 700;
   }
   .summary { margin: 0; font-size: 1rem; }
   .detail {
@@ -149,7 +146,7 @@ TEMPLATE = r"""<!doctype html>
     margin: 10px 0 0;
     padding-left: 18px;
     color: var(--muted);
-    font: 12px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
+    font: 11px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
   }
   .legend {
     display: flex;
@@ -157,7 +154,9 @@ TEMPLATE = r"""<!doctype html>
     gap: 16px;
     margin-top: 20px;
     color: var(--muted);
-    font: 12px/1.4 ui-sans-serif, system-ui, sans-serif;
+    font: 11px/1.4 "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif;
+    letter-spacing: .04em;
+    text-transform: uppercase;
   }
   .legend span::before {
     content: "";
@@ -165,26 +164,28 @@ TEMPLATE = r"""<!doctype html>
     width: 8px;
     height: 8px;
     margin-right: 6px;
-    border-radius: 50%;
     background: var(--legend-color);
   }
+  .legend-human { --legend-color: var(--human); }
+  .legend-agent { --legend-color: var(--agent); }
+  .legend-supporting-agent { --legend-color: var(--supporting-agent); }
   @media (max-width: 560px) {
-    main { width: min(100% - 22px, 900px); padding-top: 32px; }
+    main { width: min(100% - 22px, 1000px); }
     .event { gap: 14px; }
-    .card { padding: 14px; }
+    .card { padding: 18px 0 20px; }
   }
 </style>
 </head>
 <body>
 <main>
+  <nav class="view-nav">__NAV__</nav>
   <header>
-    <h1>Accord record</h1>
-    <p class="intro">A factual view of what changed, where judgment returned to
-    the human, and how the work responded to evidence.</p>
+    <h1>__HEADING__</h1>
+    <p class="intro">__INTRO__</p>
     <div class="legend">
-      <span style="--legend-color:var(--human)">Human</span>
-      <span style="--legend-color:var(--agent)">Agent</span>
-      <span style="--legend-color:var(--supporting-agent)">Supporting agent</span>
+      <span class="legend-human">Human</span>
+      <span class="legend-agent">Agent</span>
+      <span class="legend-supporting-agent">Supporting agent</span>
     </div>
   </header>
   <div id="tasks"></div>
@@ -265,6 +266,7 @@ for (const [taskName, events] of tasks) {
   root.appendChild(section);
 }
 </script>
+__LIVE_SCRIPT__
 </body>
 </html>
 """
@@ -293,41 +295,68 @@ def parse_args(argv: list[str]) -> tuple[list[str], str] | None:
 
 def read_events(files: list[str]) -> list[dict] | None:
     """Read JSONL input and report exact file and line failures."""
+    events, error = parse_events(files)
+    if error:
+        print(error, file=sys.stderr)
+        return None
+    return events
+
+
+def parse_events(files: list[str]) -> tuple[list[dict] | None, str | None]:
+    """Read JSONL input and return a user-facing error without printing it."""
     events = []
     required = {"ts", "task", "schema", "type", "actor", "summary"}
     for path_string in files:
         try:
             lines = Path(path_string).read_text().splitlines()
         except OSError as error:
-            print(f"{path_string}: cannot read: {error}", file=sys.stderr)
-            return None
+            return None, f"{path_string}: cannot read: {error}"
         for line_number, raw in enumerate(lines, 1):
             if not raw.strip():
                 continue
             try:
                 event = json.loads(raw)
             except json.JSONDecodeError as error:
-                print(
-                    f"{path_string}:{line_number}: invalid JSON: {error}",
-                    file=sys.stderr,
-                )
-                return None
+                return None, f"{path_string}:{line_number}: invalid JSON: {error}"
             if not isinstance(event, dict):
-                print(
-                    f"{path_string}:{line_number}: event is not a JSON object",
-                    file=sys.stderr,
-                )
-                return None
+                return None, f"{path_string}:{line_number}: event is not a JSON object"
             missing = sorted(required - event.keys())
             if missing:
-                print(
+                return None, (
                     f"{path_string}:{line_number}: missing required fields "
-                    f"{', '.join(missing)}",
-                    file=sys.stderr,
+                    f"{', '.join(missing)}"
                 )
-                return None
             events.append(event)
-    return events
+    return events, None
+
+
+def build_html(
+    events: list[dict],
+    *,
+    title: str = "Accord record",
+    heading: str = "Accord record",
+    intro: str = (
+        "A factual view of what changed, where judgment returned to the "
+        "human, and how the work responded to evidence."
+    ),
+    nav: str = "",
+    live: bool = False,
+) -> str:
+    """Build the shared record page for static or live delivery."""
+    embedded = json.dumps(events, separators=(",", ":")).replace("<", "\\u003c")
+    live_script = (
+        '<script>setTimeout(() => window.location.reload(), 2000);</script>'
+        if live
+        else ""
+    )
+    return (
+        TEMPLATE.replace("__TITLE__", escape(title))
+        .replace("__HEADING__", escape(heading))
+        .replace("__INTRO__", escape(intro))
+        .replace("__NAV__", nav)
+        .replace("__LIVE_SCRIPT__", live_script)
+        .replace("__DATA__", embedded)
+    )
 
 
 def main(argv: list[str]) -> int:
@@ -339,8 +368,7 @@ def main(argv: list[str]) -> int:
     if events is None:
         return 1
 
-    embedded = json.dumps(events, separators=(",", ":")).replace("<", "\\u003c")
-    html = TEMPLATE.replace("__DATA__", embedded)
+    html = build_html(events)
     try:
         Path(output).write_text(html)
     except OSError as error:

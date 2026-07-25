@@ -119,6 +119,65 @@ class ToolTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn(f"{path}:2: invalid JSON", result.stderr)
 
+    def test_renderer_keeps_record_text_that_matches_view_placeholders(self):
+        valid = {
+            "ts": "2026-07-23T12:00:00Z",
+            "task": "test",
+            "schema": "1",
+            "type": "note",
+            "actor": "agent",
+            "summary": "__TITLE__ __HEADING__ __INTRO__ __NAV__ __LIVE_SCRIPT__",
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "record.jsonl"
+            output = Path(directory) / "record.html"
+            path.write_text(json.dumps(valid) + "\n")
+            result = self.run_tool(RENDER, str(path), "-o", str(output))
+            html = output.read_text()
+
+        self.assertEqual(result.returncode, 0)
+        for placeholder in (
+            "__TITLE__",
+            "__HEADING__",
+            "__INTRO__",
+            "__NAV__",
+            "__LIVE_SCRIPT__",
+        ):
+            self.assertIn(placeholder, html)
+
+    def test_renderer_preserves_the_black_surface_and_state_marks(self):
+        valid = {
+            "ts": "2026-07-23T12:00:00Z",
+            "task": "test",
+            "schema": "1",
+            "type": "question",
+            "actor": "human",
+            "summary": "A judgment returned to the human.",
+            "subject": "view-access-pattern",
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "record.jsonl"
+            output = Path(directory) / "record.html"
+            path.write_text(json.dumps(valid) + "\n")
+            result = self.run_tool(RENDER, str(path), "-o", str(output))
+            html = output.read_text()
+
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("--paper: #000", html)
+        self.assertIn("--running:", html)
+        self.assertIn("--warning:", html)
+        self.assertIn("--danger:", html)
+        self.assertIn("--human:", html)
+        self.assertIn("--agent:", html)
+        self.assertIn("--supporting-agent:", html)
+        self.assertIn(".event::after", html)
+        self.assertIn("left: 4px", html)
+        self.assertIn("margin-top: 20px", html)
+        self.assertIn('<span class="legend-human">Human</span>', html)
+        self.assertIn('<span class="legend-agent">Agent</span>', html)
+        self.assertIn('<span class="legend-supporting-agent">Supporting agent</span>', html)
+        self.assertNotIn("border-radius:", html)
+
 
 if __name__ == "__main__":
     unittest.main()

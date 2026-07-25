@@ -152,3 +152,17 @@ project's root so records from similarly named projects do not collide.
 
 The agreement gives the work room. The record lets that room survive a change
 of session.
+
+## Inspect a live record
+
+When you want to see the work itself while an Accord is active, start the
+bundled local view from the project root:
+
+```text
+tools/serve
+```
+
+The view lists the project's records, lets you choose one, and refreshes as new
+events are appended. It binds to localhost, opens a browser when possible, and
+stops when you press `Ctrl-C`. Use `tools/serve --task TASK` when the task is
+already known, or `--no-open` when you only need the printed URL.

@@ -52,7 +52,7 @@ plugins/accord/                installable plugin root
   hooks/                       shared read-only lifecycle hooks
   templates/                   agreement, report, and learning-note templates
   spec/                        record and check-in specifications
-  tools/                       location, validate, and render
+  tools/                       location, validate, render, and serve
 tests/                         framework, hook, and tool behavior tests
 ```
 
@@ -84,6 +84,17 @@ remains at that root.
 
 `plugins/accord/tools/validate` checks a record against the shared schema.
 `plugins/accord/tools/render` creates a self-contained HTML timeline.
+`plugins/accord/tools/serve` starts a live, localhost-only view of the current
+project's records. From the project root, run:
+
+```text
+plugins/accord/tools/serve
+```
+
+It opens the record list in a browser and refreshes while work continues. Use
+`--task TASK` to open one record directly, `--no-open` to print the URL without
+opening a browser, and `Ctrl-C` to stop the server. The server reads records but
+does not change them.
 
 The plugin bundles two read-only lifecycle hooks through
 `plugins/accord/hooks/hooks.json`, shared by Claude Code and Codex.
