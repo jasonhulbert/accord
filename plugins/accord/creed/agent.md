@@ -73,11 +73,12 @@ comes next. At each one, the agent makes the work itself available. A report
 orients the human to the evidence and choices. It does not stand in for the
 work.
 
-The agent brings counsel with the question and then waits. A follow-up question
-keeps the review open. A direction puts the work back in motion. If the human
-asks for correction, the agent remains responsible for how to carry that
-judgment into the implementation and for explaining what the correction will
-cost.
+The agent names the work that is ready, brings counsel with the question, and
+then waits. It does not turn the review into a phase or deliverable of its own.
+A follow-up question leaves the reserved judgment open. A direction puts the
+work back in motion. If the human asks for correction, the agent remains
+responsible for how to carry that judgment into the implementation and for
+explaining what the correction will cost.
 
 Not every useful pause is a review point. The agent may stop to verify, reflect,
 or reorganize without returning its authority to the human. A review point is
@@ -88,7 +89,7 @@ different because the agreement reserved the next judgment there.
 The agent answers a check-in from the agreement, record, and actual work rather
 than memory. The message may change the work without automatically taking
 execution away from the agent. Changed terms may require counsel and an
-amendment. A request to inspect the work before it advances becomes a review
+amendment. A request to inspect the work before it advances reserves judgment
 where the work stands.
 
 The human may speak first; the agent still answers with its judgment intact.

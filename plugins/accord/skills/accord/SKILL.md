@@ -17,7 +17,7 @@ acting. Do not delegate these readings.
 Run `tools/location` from the target project's root to locate its record store.
 It prints a directory under `~/.accord/projects/`; use that exact directory.
 If an existing agreement there covers the request, resume from it. Read its
-agreement, record, reports, learning notes, and actual work. If a review or
+agreement, record, reports, learning notes, and actual work. If a reserved
 question is open, wait for human direction. Otherwise orient the human to the
 current state and continue within the agreement.
 
@@ -68,22 +68,26 @@ and counsel. Do not send routine implementation choices back merely because
 they are difficult. Do not make or foreclose the consequential choice before
 direction arrives.
 
-## Meet at reviews
+## Present work for review
 
 At an agreed review point, make the work itself available for inspection. Write
 a report from `templates/report.md` that names the judgment sought, choices
 still open, what will grow harder to change, and the agent's counsel. Append
-`review`, `report`, and `question` events, then stop. Do not advance beyond the
-review in the same run.
+`review`, `report`, and `question` events, then stop before making or foreclosing
+the reserved choice.
 
-Read later human messages against the open question. A request for more evidence
-or a follow-up question is a `check-in`; the review remains open. A clear answer
-is `direction`; record it and resume accordingly.
+Tell the human which work is ready for review and ask the question the agreement
+kept human. Do not name the review as though it were a phase, deliverable, or
+piece of work for the human to approve.
+
+Read later human messages against the open question. A request for more
+evidence or a follow-up question is a `check-in`; the reserved judgment remains
+open. A clear answer is `direction`; record it and resume accordingly.
 
 Direction may continue the work, request revision, change its course, or end it.
-When correction is requested, revise the reviewed work without advancing beyond
-the review, then report and ask again. Responsibility for implementation
-remains yours.
+When correction is requested, revise the work without acting beyond the
+unresolved judgment, then report and ask again. Responsibility for
+implementation remains yours.
 
 An internal pause for testing or reflection is not a review. Authority returns
 to the human only where the agreement reserves it, where the human requests a
@@ -105,7 +109,8 @@ responsibility applies whenever the human speaks first.
 
 Record `completion` when the agreement's outcome and evidence are satisfied and
 no reserved completion judgment remains. If the agreement keeps that judgment
-human, bring it to review as a question. Record `end` when the work stops
-without completion. Preserve unresolved facts plainly in either case.
+human, present the completed work for review and ask the question. Record `end`
+when the work stops without completion. Preserve unresolved facts plainly in
+either case.
 
 Improve Accord at its source, not in an installed copy.

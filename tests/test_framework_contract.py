@@ -42,8 +42,25 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertIn("the human has kept judgment over what comes next", agent)
         self.assertIn("then waits", agent)
         self.assertIn("The agent remains responsible for how that judgment", human)
-        self.assertIn("Do not advance beyond the review in the same run.", skill)
+        self.assertIn(
+            "stop before making or foreclosing the reserved choice", skill
+        )
         self.assertIn("Responsibility for implementation remains yours", skill)
+
+    def test_review_names_the_work_and_question_not_a_phase_to_approve(self):
+        style = self.prose("ACCORD_STYLE_GUIDE.md")
+        agent = self.prose("plugins/accord/creed/agent.md")
+        skill = self.prose("plugins/accord/skills/accord/SKILL.md")
+        agreement = self.prose("plugins/accord/templates/agreement.md")
+
+        self.assertIn("Review is what the human does with the work", style)
+        self.assertIn("The agent names the work that is ready", agent)
+        self.assertIn(
+            "Do not name the review as though it were a phase, deliverable", skill
+        )
+        self.assertIn(
+            "is not a substitute for saying what will be ready", agreement
+        )
 
     def test_review_exposes_work_while_human_judgment_has_leverage(self):
         agent = self.prose("plugins/accord/creed/agent.md")
@@ -57,13 +74,13 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertIn("## Work to inspect", report)
         self.assertIn("does not stand in for the work itself", report)
 
-    def test_corrective_direction_reopens_the_same_review(self):
+    def test_corrective_direction_keeps_reserved_judgment_visible(self):
         skill = self.prose("plugins/accord/skills/accord/SKILL.md")
 
         self.assertIn("a follow-up question is a `check-in`", skill)
-        self.assertIn("the review remains open", skill)
+        self.assertIn("the reserved judgment remains open", skill)
         self.assertIn(
-            "revise the reviewed work without advancing beyond the review", skill
+            "revise the work without acting beyond the unresolved judgment", skill
         )
         self.assertIn("then report and ask again", skill)
 
@@ -74,13 +91,13 @@ class FrameworkContractTests(unittest.TestCase):
         check_in_skill = self.read("plugins/accord/skills/check-in/SKILL.md")
 
         self.assertIn("A clear answer to that question is `direction`", check_in_spec)
-        self.assertIn("A review request", check_in_spec)
-        self.assertIn("creates a review where the work stands", check_in_spec)
+        self.assertIn("A request to inspect the work", check_in_spec)
+        self.assertIn("reserves judgment where the work stands", check_in_spec)
         self.assertIn(
             "does not halt work merely because the human spoke first", check_in_spec
         )
         self.assertIn("Changed terms may require counsel and an", agent)
-        self.assertIn("becomes a review where the work stands", agent)
+        self.assertIn("reserves judgment where the work stands", agent)
         self.assertIn("seek the agent's counsel", human)
         self.assertIn("A request for counsel", check_in_spec)
         self.assertIn("accounts, counsel, reviews", check_in_skill)
@@ -112,7 +129,7 @@ class FrameworkContractTests(unittest.TestCase):
             skill_prose,
         )
         self.assertIn(
-            "If the agreement keeps that judgment human, bring it to review",
+            "present the completed work for review and ask the question",
             skill_prose,
         )
 

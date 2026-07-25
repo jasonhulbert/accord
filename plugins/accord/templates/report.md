@@ -19,14 +19,14 @@ anything that changes its value, cost, or risk.
 
 ## Work to inspect
 
-At a review, point to the actual work or evidence and give enough orientation
-to judge it. Name the slice in view, the judgment sought, the choices still
-open, and what will grow harder to change afterward.
+When presenting work for review, point to the actual work or evidence and give
+enough orientation to judge it. Name the slice in view, the judgment sought,
+the choices still open, and what will grow harder to change afterward.
 
 ## What comes next
 
-The approach the agent recommends from here. At an open review, give counsel
-without presuming the human's direction.
+The approach the agent recommends from here. While reserved judgment remains
+open, give counsel without presuming the human's direction.
 
 ## Questions and counsel
 

@@ -29,6 +29,10 @@ afterward.
 Review points are not implementation steps. A useful one arrives late enough
 for the work to be judged and early enough for judgment to matter.
 
+Name the work and judgment at each point. A number may help locate it, but
+“Review 3” is not a substitute for saying what will be ready and what the human
+will decide.
+
 ## What we can spend
 
 Time, budget, tools, access, dependencies, and other resources available to the

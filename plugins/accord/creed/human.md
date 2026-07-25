@@ -57,9 +57,9 @@ They answer the question the agreement kept for them and say where the work
 serves the purpose or misses it. The agent remains responsible for how that
 judgment becomes implementation.
 
-A follow-up question keeps the review open. Direction returns the work to the
-agent. Prompt direction matters because work waiting for reserved judgment
-still spends time and attention.
+A follow-up question leaves the reserved judgment open. Direction returns the
+work to the agent. Prompt direction matters because work waiting for reserved
+judgment still spends time and attention.
 
 Review is not approval theater. Its purpose is to make consequential human
 judgment possible before choices harden.

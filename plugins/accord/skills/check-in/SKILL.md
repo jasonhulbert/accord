@@ -20,6 +20,7 @@ Read the agreement, record, reports, learning notes, and actual work before
 responding. Do not reconstruct the state from memory or from the most recent
 report alone.
 
-Follow `spec/check-in.md`. For an open question, follow the review
-responsibilities in `skills/accord/SKILL.md`. Use `templates/report.md` for a
-durable account or review, and point to the work itself.
+Follow `spec/check-in.md`. For an open question, follow the responsibilities for
+presenting work in `skills/accord/SKILL.md`. Use `templates/report.md` for a
+durable account or when presenting work for review, and point to the work
+itself.

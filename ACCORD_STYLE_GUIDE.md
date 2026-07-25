@@ -104,14 +104,29 @@ Prefer a small, stable vocabulary:
 - **agreement** for the accepted purpose, bounds, authority, risks, resources,
   review points, and reserved decisions;
 - **check-in** for a human-initiated conversation during the work;
-- **review** for a point where the human inspects the work and exercises
-  judgment while change remains practical;
+- **review** for the human's inspection and judgment while change remains
+  practical;
 - **question** for a consequential choice the agreement leaves with the human;
 - **direction** for the human's answer;
 - **record** for the factual, append-only account of what happened.
 
 These are ordinary terms, not a replacement mythology. Do not force them into
 sentences where simpler language is more natural.
+
+Review is what the human does with the work. A review point names where the
+agreement reserves that judgment. Neither is a phase, deliverable, or ceremony
+for the agent to complete. Name the work that is ready and the question that
+needs an answer:
+
+> The public-page extraction work is ready for review. Do you authorize model
+> calibration under the proposed limits?
+
+Avoid:
+
+> Review 3B is complete. Do you approve Review 3B and authorize Review 3C?
+
+Numbered references may help locate a review point in a long agreement, but
+they should not replace the work or judgment in ordinary conversation.
 
 Use technical human-in-the-loop terms when they add precision. Do not gather
 them for atmosphere. Words such as *orchestration*, *governance*, *autonomy
