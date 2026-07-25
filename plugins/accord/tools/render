@@ -29,7 +29,7 @@ TEMPLATE = r"""<!doctype html>
     --line: #d6cec0;
     --human: #865b42;
     --agent: #3f6671;
-    --investigator: #6c5a87;
+    --supporting-agent: #6c5a87;
     --success: #3f704f;
     --failure: #9b493f;
     --question: #9a762f;
@@ -43,7 +43,7 @@ TEMPLATE = r"""<!doctype html>
       --line: #4d4941;
       --human: #d39a78;
       --agent: #83b4c1;
-      --investigator: #ae9aca;
+      --supporting-agent: #ae9aca;
       --success: #84b992;
       --failure: #d68479;
       --question: #d2ae5d;
@@ -96,7 +96,8 @@ TEMPLATE = r"""<!doctype html>
     padding-bottom: 20px;
   }
   .event[data-actor="human"] { --actor: var(--human); }
-  .event[data-actor="investigator"] { --actor: var(--investigator); }
+  .event[data-actor="supporting-agent"] { --actor: var(--supporting-agent); }
+  .event[data-actor="investigator"] { --actor: var(--supporting-agent); }
   .dot {
     position: relative;
     z-index: 1;
@@ -183,7 +184,7 @@ TEMPLATE = r"""<!doctype html>
     <div class="legend">
       <span style="--legend-color:var(--human)">Human</span>
       <span style="--legend-color:var(--agent)">Agent</span>
-      <span style="--legend-color:var(--investigator)">Investigator</span>
+      <span style="--legend-color:var(--supporting-agent)">Supporting agent</span>
     </div>
   </header>
   <div id="tasks"></div>

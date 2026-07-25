@@ -1,14 +1,8 @@
 # The Human
 
-Work begins when the human decides that something is worth changing.
-
-The human names what the work should accomplish, why it matters, and what it
-must not sacrifice. They need not know every choice required to get there. They
-work with an agent because the agent can develop that nearer view and accept
-responsibility for the implementation.
-
-The human holds the purpose. The agent holds the work. Accord begins when both
-understand what that division means.
+The human decides what is worth changing. They name what the work should
+accomplish, why it matters, and what it must not sacrifice. The human holds the
+purpose. The agent holds the work.
 
 ### Name what matters, not every move.
 
@@ -28,15 +22,12 @@ for judgment visible without filling it in advance.
 The agent must be able to keep the agreement in good faith.
 
 Before acceptance, the human listens to the agent's counsel about cost, risk,
-missing context, unclear authority, and where review would improve the outcome.
-The agreement may change because of that counsel. This is not resistance to the
-human's intent. It is how practical knowledge enters the work before it becomes
-expensive.
+missing context, unclear authority, and useful review. That counsel may change
+the agreement.
 
-The human may question, revise, or reject the draft. The agent may recommend
-different bounds or a different beginning. They continue until both can stand
-behind the purpose and division of responsibility. Then the human accepts the
-agreement explicitly and authorizes the work to begin.
+Human and agent revise until both can stand behind the purpose and division of
+responsibility. Then the human accepts the agreement explicitly and authorizes
+the work to begin.
 
 Acceptance is a decision, not the absence of an objection.
 
@@ -53,6 +44,9 @@ The agent may change its approach when evidence changes. The human judges
 whether the work remains faithful to the agreement, not whether it followed the
 first plan without deviation.
 
+Delegation within the agreement does not divide the primary agent's
+responsibility for the course, integration, and outcome.
+
 ### Meet where the work can still change.
 
 At an agreed review point, the human inspects the work itself. A polished report
@@ -63,28 +57,22 @@ They answer the question the agreement kept for them and say where the work
 serves the purpose or misses it. The agent remains responsible for how that
 judgment becomes implementation.
 
-A follow-up question keeps the review open. A direction may continue the work,
-ask for another pass over what was reviewed, change its course, amend the
-agreement, or end it. Prompt direction matters because work waiting for reserved
-judgment still spends time and attention.
+A follow-up question keeps the review open. Direction returns the work to the
+agent. Prompt direction matters because work waiting for reserved judgment
+still spends time and attention.
 
 Review is not approval theater. Its purpose is to make consequential human
 judgment possible before choices harden.
 
 ### Speak when context changes.
 
-The human need not wait for a scheduled review when they learn something the
-agent cannot, when resources change, or when they need to inspect the work
-sooner. They check in.
-
-A check-in can ask for an account, bring new context, change a term, or request
-a review where the work stands. The agent answers from the agreement, record,
-and actual work. If the check-in changes what the work requires, the agent
-counsels on the cost before the change becomes part of the agreement.
+The human checks in when they learn something the agent cannot, resources
+change, or they need an account or earlier review. They may also seek the
+agent's counsel when they want to understand the work or its choices more
+clearly.
 
 Communication does not become interference merely because the human began it.
-Nor does every message become a reason for the agent to stop. The content of the
-check-in determines what changes.
+The message determines what changes and whether the work stops.
 
 ### Answer the questions kept human.
 
@@ -110,9 +98,6 @@ choose again.
 
 ---
 
-This is the human's charge: name what matters, give trust a clear shape, inspect
-the work where judgment still has leverage, and answer the questions only the
-human can answer.
-
-The agent can find and carry out a way forward. Only the human can decide
-whether it still leads to an outcome worth having.
+This is the human's charge: name what matters, hear the agent's counsel,
+inspect the work while judgment still has leverage, and answer the questions
+only the human can answer.

@@ -1,8 +1,8 @@
 # A check-in
 
 A check-in is the human speaking first while work is active. It may ask for an
-account, request an unscheduled review, bring context the agent could not know,
-or propose a change to the agreement.
+account or counsel, request an unscheduled review, bring context the agent could
+not know, or propose a change to the agreement.
 
 The meaning belongs to the message, not to whether the `check-in` skill was
 invoked by name.
@@ -22,6 +22,8 @@ The shape of the message determines what follows:
 
 - **An account** gets a report of what changed, what did not work, what is now
   known, and what the agent recommends next.
+- **A request for counsel** gets the agent's explanation and judgment from the
+  work, including relevant evidence and uncertainty.
 - **A review request** creates a review where the work stands. Make the work
   inspectable, report, ask for the requested judgment, and wait for direction.
 - **New context** gets the agent's judgment about what it changes. If it changes

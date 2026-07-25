@@ -29,7 +29,7 @@ Every event has:
 | `task` | yes | task id, matching `{task}` in `{store}/{task}/` |
 | `schema` | yes | schema version, currently `"1"` |
 | `type` | yes | one of the twelve event types below |
-| `actor` | yes | `human`, `agent`, or `investigator` |
+| `actor` | yes | `human`, `agent`, or `supporting-agent` |
 | `summary` | yes | plain-language account of what happened |
 | `refs` | no | task-relative paths or ids the event points to |
 
@@ -57,12 +57,19 @@ defined.
 Changing the event or actor set changes the shared record contract. It requires
 human agreement, not an implementation choice made in passing.
 
+Schema version `"1"` also accepts `investigator` so records written before the
+supporting-agent role was adopted remain valid. New events use
+`supporting-agent`; append-only history is not rewritten to adopt new
+vocabulary.
+
 ## Documents and events
 
 Agreements and reports are markdown-primary: the document carries the
 conversation and its voice, while `start` and `report` events point to it.
 Investigations, attempts, reviews, questions, directions, check-ins, approach
-changes, completion, and endings are record-primary.
+changes, completion, and endings are record-primary. A supporting agent records
+the kind of work it did rather than receiving a separate event type merely
+because the work was delegated.
 
 Learning notes may be referenced by `note` events when the reference matters to
 resumption.

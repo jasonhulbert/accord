@@ -18,9 +18,9 @@ defaults of a software methodology or governance model.
 
 Narrative made consequences easier to feel. A boundary drawn too tightly caused
 work to stop at every choice. A review placed too late could no longer change
-the outcome. An investigator rewarded only for welcome findings made the shared
-record less trustworthy. These relationships were memorable because they moved,
-not because they had labels.
+the outcome. A supporting agent rewarded only for welcome results made the
+shared record less trustworthy. These relationships were memorable because
+they moved, not because they had labels.
 
 The analogy therefore served three purposes:
 
@@ -37,7 +37,7 @@ Every private term had to be translated before a new user could apply it.
 Fictional language could leak into work products or encourage behavior because
 it fit the story rather than the responsibility.
 
-Accord removes that translation tax. Human, agent, investigator, agreement,
+Accord removes that translation tax. Human, agent, supporting agent, agreement,
 review, question, direction, and record say directly what they mean.
 
 The rewrite does not reject narrative. It keeps the argument inside each

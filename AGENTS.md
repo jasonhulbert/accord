@@ -31,7 +31,7 @@ When contributing:
 
 - `plugins/accord/` — the installable plugin root for Claude Code and Codex.
   Only this subtree ships to consuming projects.
-  - `creed/` — `agent.md`, `human.md`, `investigator.md`. Permanent,
+  - `creed/` — `agent.md`, `human.md`, `supporting-agent.md`. Permanent,
     role-level, and amended rarely.
   - `skills/` — `accord` and `check-in`. Both reference shared plugin-root
     resources; never vendor copies into skill folders.

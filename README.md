@@ -15,7 +15,7 @@ New to the framework? Start with [GUIDE.md](GUIDE.md).
 ## The operating model
 
 - **Creed** (`plugins/accord/creed/`) — the durable point of view for the human,
-  agent, and investigator. It states responsibility and authority without
+  agent, and supporting agent. It states responsibility and authority without
   prescribing implementation.
 - **Agreement** — the understanding reached for one task before work begins:
   purpose, evidence of success, first approach, resources, risks, room to act,
@@ -48,7 +48,7 @@ plugins/accord/                installable plugin root
   skills/
     accord/SKILL.md            begin or resume substantial work
     check-in/SKILL.md          human-initiated communication during active work
-  creed/                       agent.md, human.md, investigator.md
+  creed/                       agent.md, human.md, supporting-agent.md
   hooks/                       shared read-only lifecycle hooks
   templates/                   agreement, report, and learning-note templates
   spec/                        record and check-in specifications

@@ -43,7 +43,7 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertIn("then waits", agent)
         self.assertIn("The agent remains responsible for how that judgment", human)
         self.assertIn("Do not advance beyond the review in the same run.", skill)
-        self.assertIn("responsibility for implementation remains yours", skill)
+        self.assertIn("Responsibility for implementation remains yours", skill)
 
     def test_review_exposes_work_while_human_judgment_has_leverage(self):
         agent = self.prose("plugins/accord/creed/agent.md")
@@ -68,6 +68,8 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertIn("then report and ask again", skill)
 
     def test_check_in_can_request_review_without_making_every_message_a_halt(self):
+        agent = self.prose("plugins/accord/creed/agent.md")
+        human = self.prose("plugins/accord/creed/human.md")
         check_in_spec = self.read("plugins/accord/spec/check-in.md")
         check_in_skill = self.read("plugins/accord/skills/check-in/SKILL.md")
 
@@ -77,7 +79,12 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertIn(
             "does not halt work merely because the human spoke first", check_in_spec
         )
-        self.assertIn("make the current work inspectable", check_in_skill)
+        self.assertIn("Changed terms may require counsel and an", agent)
+        self.assertIn("becomes a review where the work stands", agent)
+        self.assertIn("seek the agent's counsel", human)
+        self.assertIn("A request for counsel", check_in_spec)
+        self.assertIn("accounts, counsel, reviews", check_in_skill)
+        self.assertIn("Follow `spec/check-in.md`", check_in_skill)
 
     def test_internal_pause_does_not_become_an_approval_gate(self):
         agent = self.read("plugins/accord/creed/agent.md")
@@ -109,14 +116,67 @@ class FrameworkContractTests(unittest.TestCase):
             skill_prose,
         )
 
-    def test_investigation_informs_agent_judgment_without_inheriting_it(self):
-        investigator = self.read("plugins/accord/creed/investigator.md")
-        agent = self.read("plugins/accord/creed/agent.md")
+    def test_delegation_moves_work_without_fragmenting_accountability(self):
+        supporting_agent = self.prose(
+            "plugins/accord/creed/supporting-agent.md"
+        )
+        agent = self.prose("plugins/accord/creed/agent.md")
+        skill = self.prose("plugins/accord/skills/accord/SKILL.md")
 
-        self.assertIn("evidence and inference distinct", investigator)
-        self.assertIn("The investigator finds. The agent decides.", investigator)
-        self.assertIn("Delegation can move an inquiry", agent)
-        self.assertIn("It cannot move accountability", agent)
+        self.assertIn(
+            "The supporting agent contributes. The primary agent integrates",
+            supporting_agent,
+        )
+        self.assertIn("It cannot move responsibility for the whole", agent)
+        self.assertIn(
+            "evidence, implementation, verification, review", supporting_agent
+        )
+        self.assertIn("Look actively for bounded parts", skill)
+        self.assertIn(
+            "keep responsibility for the course, integration, and the completed work",
+            skill,
+        )
+        self.assertIn(
+            "act and delegate with judgment, meet the human where judgment remains theirs",
+            agent,
+        )
+        self.assertIn(
+            "return useful work with its evidence and limits visible",
+            supporting_agent,
+        )
+
+    def test_direction_remains_the_human_answer_not_a_delegation_synonym(self):
+        record = self.prose("plugins/accord/spec/record.md")
+        delegation_text = " ".join(
+            [
+                self.prose("plugins/accord/creed/agent.md"),
+                self.prose("plugins/accord/creed/human.md"),
+                self.prose("plugins/accord/creed/supporting-agent.md"),
+                self.prose("plugins/accord/skills/accord/SKILL.md"),
+            ]
+        )
+
+        self.assertIn("The human answers an open question", record)
+        self.assertNotIn("responsibility for direction", delegation_text)
+        self.assertNotIn("leave direction of the whole", delegation_text)
+        self.assertIn("responsibility for the course", delegation_text)
+
+    def test_each_creed_closes_by_reinforcing_its_distinct_charge(self):
+        agent = self.prose("plugins/accord/creed/agent.md")
+        human = self.prose("plugins/accord/creed/human.md")
+        supporting_agent = self.prose(
+            "plugins/accord/creed/supporting-agent.md"
+        )
+
+        self.assertIn("This is the agent's creed:", agent)
+        self.assertIn("meet the human where judgment remains theirs", agent)
+        self.assertIn("This is the human's charge:", human)
+        self.assertIn("answer the questions only the human can answer", human)
+        self.assertIn("This is the supporting agent's charge:", supporting_agent)
+        self.assertIn(
+            "leave responsibility for the whole with the primary agent",
+            supporting_agent,
+        )
 
     def test_plugin_and_marketplaces_share_the_accord_identity(self):
         codex_manifest = json.loads(
@@ -161,7 +221,7 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertEqual(set(schema["properties"]["type"]["enum"]), expected_types)
         self.assertEqual(
             set(schema["properties"]["actor"]["enum"]),
-            {"human", "agent", "investigator"},
+            {"human", "agent", "supporting-agent", "investigator"},
         )
 
         conditional_requirements = {
@@ -176,6 +236,18 @@ class FrameworkContractTests(unittest.TestCase):
                 "direction": {"decision"},
             },
         )
+
+    def test_replaced_actor_name_does_not_invalidate_append_only_history(self):
+        schema = json.loads(self.read("plugins/accord/spec/record.schema.json"))
+        record = self.prose("plugins/accord/spec/record.md")
+
+        self.assertIn("supporting-agent", schema["properties"]["actor"]["enum"])
+        self.assertIn("investigator", schema["properties"]["actor"]["enum"])
+        self.assertIn(
+            "records written before the supporting-agent role was adopted remain valid",
+            record,
+        )
+        self.assertIn("append-only history is not rewritten", record)
 
     def test_templates_hold_substance_without_choreographing_conversation(self):
         for name in ("agreement.md", "report.md", "learning-note.md"):
@@ -196,9 +268,11 @@ class FrameworkContractTests(unittest.TestCase):
 
     def test_contributor_guidance_preserves_voice(self):
         agents = self.read("AGENTS.md")
+        skill = self.read("plugins/accord/skills/accord/SKILL.md")
 
         self.assertIn("ACCORD_STYLE_GUIDE.md", agents)
         self.assertIn("literal", agents)
+        self.assertIn("Improve Accord at its source", skill)
 
 
 if __name__ == "__main__":

@@ -86,9 +86,10 @@ Avoid headings that sound like a manual or policy taxonomy:
 
 ## Literal language, lightly held
 
-Name roles by what they are: **human**, **agent**, and **investigator**. Name the
-things they do in ordinary language: **agree**, **work**, **investigate**,
-**review**, **ask**, **answer**, **change direction**, and **record**.
+Name roles by what they are: **human**, **agent**, and **supporting agent**. Name
+the things they do in ordinary language: **agree**, **work**, **delegate**,
+**investigate**, **implement**, **verify**, **review**, **ask**, **answer**,
+**change direction**, and **record**.
 
 Use **Accord** as the name and central idea. Accord is the mutual understanding
 that makes purposeful delegation possible. A written agreement records it; the
@@ -132,10 +133,12 @@ reporting. It does not ask the human to choose routine implementation details.
 It does not disguise a consequential choice as implementation merely because it
 can make the choice itself.
 
-The investigator answers a bounded question with evidence. It separates what it
-observed from what it inferred and leaves uncertainty visible. It informs the
-agent's judgment but does not inherit responsibility for the work or choose its
-direction.
+The supporting agent carries a bounded part of the work with enough purpose,
+context, and room to use judgment. It may investigate, implement, verify,
+review, or contribute in another useful way. It returns work the primary agent
+can examine and keeps evidence, inference, uncertainty, and limits visible. The
+primary agent remains responsible for integrating the contribution and for the
+work as a whole.
 
 Skills may address the acting agent directly when a direct instruction is
 clearer. User-facing guidance may address the human as “you.” Precision about

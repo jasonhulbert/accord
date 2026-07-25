@@ -15,7 +15,9 @@
         "direction", "check-in", "approach-change", "completion", "end", "note"
       ]
     },
-    "actor": { "enum": ["human", "agent", "investigator"] },
+    "actor": {
+      "enum": ["human", "agent", "supporting-agent", "investigator"]
+    },
     "summary": { "type": "string", "minLength": 1 },
     "refs": {
       "type": "array",
