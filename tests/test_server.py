@@ -95,6 +95,18 @@ class ServerTests(unittest.TestCase):
                 "rate-limit",
                 json.dumps(event("The agreement was accepted.", "start")) + "\n",
             )
+            task = store / "rate-limit"
+            (task / "agreement.md").write_text(
+                "# Agreement: rate-limit\n\nThe agreement is visible.\n"
+            )
+            reports = task / "reports"
+            reports.mkdir()
+            (reports / "2026-07-25.md").write_text(
+                "# Report: rate-limit\n\nThe report is visible.\n"
+            )
+            (task / "learning-2026-07-25.md").write_text(
+                "# Learning note: rate-limit\n\nThe learning is visible.\n"
+            )
             self.write_record(
                 store,
                 "second-task",
@@ -116,7 +128,11 @@ class ServerTests(unittest.TestCase):
             status, page = self.get(task_url)
             self.assertEqual(status, 200)
             self.assertIn("The agreement was accepted.", page)
-            self.assertIn("setTimeout(() => window.location.reload(), 2000)", page)
+            self.assertIn("<dialog id=\"document-dialog\">", page)
+            self.assertIn("The agreement is visible.", page)
+            self.assertIn("The report is visible.", page)
+            self.assertIn("The learning is visible.", page)
+            self.assertIn('document.querySelector("dialog[open]")', page)
 
             record = store / "rate-limit" / "record.jsonl"
             with record.open("a") as handle:

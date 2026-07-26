@@ -40,6 +40,7 @@ def load_renderer():
 
 _RENDERER = load_renderer()
 build_html = _RENDERER.build_html
+collect_documents = _RENDERER.collect_documents
 parse_events = _RENDERER.parse_events
 
 
@@ -225,6 +226,7 @@ def make_handler(accord_root: Path):
                 nav = '<a href="/">All records</a> · live view'
                 html = build_html(
                     events,
+                    documents=collect_documents([str(record)], events),
                     title=f"{task} — Accord",
                     heading=task,
                     intro=(

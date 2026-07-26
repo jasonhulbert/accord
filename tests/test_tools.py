@@ -93,6 +93,76 @@ class ToolTests(unittest.TestCase):
         self.assertIn("A factual view of what changed", html)
         self.assertNotIn("https://", html)
 
+    def test_renderer_places_task_documents_after_the_events_that_reference_them(self):
+        with tempfile.TemporaryDirectory() as directory:
+            task = Path(directory) / "task"
+            reports = task / "reports"
+            reports.mkdir(parents=True)
+            record = task / "record.jsonl"
+            agreement = task / "agreement.md"
+            report = reports / "2026-07-26.md"
+            learning = task / "learning-2026-07-26.md"
+            agreement.write_text("# Agreement: task\n\nThe accepted purpose.\n")
+            report.write_text("# Report: task\n\nEvidence from the work.\n")
+            learning.write_text("# Learning note: task\n\nContext worth keeping.\n")
+            events = [
+                {
+                    **{
+                        "ts": "2026-07-26T12:00:00Z",
+                        "task": "task",
+                        "schema": "1",
+                        "actor": "human",
+                    },
+                    "type": "start",
+                    "summary": "The agreement was accepted.",
+                    "refs": ["agreement.md"],
+                },
+                {
+                    **{
+                        "ts": "2026-07-26T13:00:00Z",
+                        "task": "task",
+                        "schema": "1",
+                        "actor": "agent",
+                    },
+                    "type": "review",
+                    "summary": "The report informed a reserved judgment.",
+                    "refs": ["reports/2026-07-26.md"],
+                },
+                {
+                    **{
+                        "ts": "2026-07-26T13:05:00Z",
+                        "task": "task",
+                        "schema": "1",
+                        "actor": "agent",
+                    },
+                    "type": "report",
+                    "summary": "The work was reported.",
+                    "refs": [
+                        "reports/2026-07-26.md",
+                        "learning-2026-07-26.md",
+                    ],
+                },
+            ]
+            record.write_text("".join(json.dumps(item) + "\n" for item in events))
+            output = Path(directory) / "record.html"
+
+            result = self.run_tool(RENDER, str(record), "-o", str(output))
+            html = output.read_text()
+
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("<dialog id=\"document-dialog\">", html)
+        self.assertIn('"kind":"agreement"', html)
+        self.assertIn('"kind":"report"', html)
+        self.assertIn('"kind":"learning"', html)
+        self.assertIn('"title":"Agreement: task"', html)
+        self.assertIn('"title":"Report: task"', html)
+        self.assertIn('"title":"Learning note: task"', html)
+        self.assertIn('"after":0', html)
+        self.assertNotIn('"kind":"report","title":"Report: task","content":"# Report: task\\n\\nEvidence from the work.\\n","after":1', html)
+        self.assertEqual(html.count('"after":2'), 2)
+        self.assertIn("documentDialog.showModal()", html)
+        self.assertIn("renderMarkdown(documentItem.content", html)
+
     def test_renderer_rejects_incomplete_events_before_rendering(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "record.jsonl"

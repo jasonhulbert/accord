@@ -113,6 +113,13 @@ TEMPLATE = r"""<!doctype html>
   .event[data-type="review"] .dot { background: var(--warning); }
   .event[data-type="end"] .dot,
   .event[data-outcome="failed"] .dot { background: var(--danger); }
+  .event.document .dot {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+  }
+  .event.document[data-error="true"] .dot {
+    border-color: var(--danger);
+  }
   .card {
     padding: 20px 0 22px;
     border: 0;
@@ -134,6 +141,20 @@ TEMPLATE = r"""<!doctype html>
     font-weight: 700;
   }
   .summary { margin: 0; font-size: 1rem; }
+  .document-open {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: var(--ink);
+    background: transparent;
+    font: inherit;
+    font-size: 1rem;
+    text-align: left;
+    text-decoration: underline;
+    text-decoration-thickness: .08em;
+    text-underline-offset: .15em;
+    cursor: pointer;
+  }
   .detail {
     margin: 11px 0 0;
     padding-top: 10px;
@@ -169,6 +190,65 @@ TEMPLATE = r"""<!doctype html>
   .legend-human { --legend-color: var(--human); }
   .legend-agent { --legend-color: var(--agent); }
   .legend-supporting-agent { --legend-color: var(--supporting-agent); }
+  dialog {
+    width: min(780px, calc(100% - 24px));
+    max-height: calc(100% - 24px);
+    padding: 0;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    background: var(--paper);
+  }
+  dialog::backdrop { background: rgb(0 0 0 / .78); }
+  .dialog-frame { padding: 22px clamp(18px, 4vw, 34px) 36px; }
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 0 18px;
+  }
+  .dialog-close {
+    padding: 7px 10px;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    background: transparent;
+    font: 11px/1.4 "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .document-meta {
+    margin: 0 0 22px;
+    color: var(--muted);
+    font: 11px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+  }
+  .document-body h1,
+  .document-body h2,
+  .document-body h3,
+  .document-body h4,
+  .document-body h5,
+  .document-body h6 {
+    margin: 1.6em 0 .55em;
+    letter-spacing: -.025em;
+  }
+  .document-body h1:first-child { margin-top: 0; }
+  .document-body p,
+  .document-body ul,
+  .document-body ol,
+  .document-body blockquote,
+  .document-body pre { margin: 0 0 1em; }
+  .document-body ul,
+  .document-body ol { padding-left: 24px; }
+  .document-body blockquote {
+    padding-left: 16px;
+    border-left: 1px solid var(--line);
+    color: var(--muted);
+  }
+  .document-body pre {
+    padding: 14px;
+    border: 1px solid var(--line);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    font: 13px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+  }
   @media (max-width: 560px) {
     main { width: min(100% - 22px, 1000px); }
     .event { gap: 14px; }
@@ -190,12 +270,30 @@ TEMPLATE = r"""<!doctype html>
   </header>
   <div id="tasks"></div>
 </main>
+<dialog id="document-dialog">
+  <div class="dialog-frame">
+    <form class="dialog-actions" method="dialog">
+      <button class="dialog-close" type="submit">Close</button>
+    </form>
+    <p class="document-meta" id="document-meta"></p>
+    <article class="document-body" id="document-body"></article>
+  </div>
+</dialog>
 <script>
 const EVENTS = __DATA__;
+const DOCUMENTS = __DOCUMENTS__;
 const tasks = new Map();
 for (const event of EVENTS) {
   if (!tasks.has(event.task)) tasks.set(event.task, []);
   tasks.get(event.task).push(event);
+}
+const documentsByTask = new Map();
+for (const documentItem of DOCUMENTS) {
+  if (!tasks.has(documentItem.task)) tasks.set(documentItem.task, []);
+  if (!documentsByTask.has(documentItem.task)) {
+    documentsByTask.set(documentItem.task, []);
+  }
+  documentsByTask.get(documentItem.task).push(documentItem);
 }
 
 function element(tag, className, text) {
@@ -229,18 +327,140 @@ function addDetail(card, event) {
   }
 }
 
+function renderMarkdown(content, container) {
+  container.replaceChildren();
+  const lines = String(content).replaceAll("\r", "").split("\n");
+  let paragraph = [];
+  let list = null;
+  let quote = [];
+  let code = [];
+  let inCode = false;
+
+  function appendParagraph() {
+    if (!paragraph.length) return;
+    container.appendChild(element("p", "", paragraph.join(" ")));
+    paragraph = [];
+  }
+
+  function appendQuote() {
+    if (!quote.length) return;
+    container.appendChild(element("blockquote", "", quote.join("\n")));
+    quote = [];
+  }
+
+  function endList() {
+    list = null;
+  }
+
+  for (const line of lines) {
+    if (line.startsWith("```")) {
+      appendParagraph();
+      appendQuote();
+      endList();
+      if (inCode) {
+        const pre = element("pre");
+        pre.appendChild(element("code", "", code.join("\n")));
+        container.appendChild(pre);
+        code = [];
+      }
+      inCode = !inCode;
+      continue;
+    }
+    if (inCode) {
+      code.push(line);
+      continue;
+    }
+
+    const heading = line.match(/^(#{1,6})\s+(.+)$/);
+    const unordered = line.match(/^\s*[-*]\s+(.+)$/);
+    const ordered = line.match(/^\s*\d+\.\s+(.+)$/);
+    if (heading) {
+      appendParagraph();
+      appendQuote();
+      endList();
+      container.appendChild(
+        element("h" + heading[1].length, "", heading[2])
+      );
+    } else if (unordered || ordered) {
+      appendParagraph();
+      appendQuote();
+      const tag = unordered ? "ul" : "ol";
+      if (!list || list.tagName.toLowerCase() !== tag) {
+        list = element(tag);
+        container.appendChild(list);
+      }
+      list.appendChild(element("li", "", (unordered || ordered)[1]));
+    } else if (line.startsWith(">")) {
+      appendParagraph();
+      endList();
+      quote.push(line.replace(/^>\s?/, ""));
+    } else if (!line.trim()) {
+      appendParagraph();
+      appendQuote();
+      endList();
+    } else {
+      appendQuote();
+      endList();
+      paragraph.push(line.trim());
+    }
+  }
+  if (inCode && code.length) {
+    const pre = element("pre");
+    pre.appendChild(element("code", "", code.join("\n")));
+    container.appendChild(pre);
+  }
+  appendParagraph();
+  appendQuote();
+}
+
+const documentDialog = document.getElementById("document-dialog");
+const documentMeta = document.getElementById("document-meta");
+const documentBody = document.getElementById("document-body");
+
+function openDocument(documentItem) {
+  documentMeta.textContent = label(documentItem.kind) + " · " + documentItem.ref;
+  renderMarkdown(documentItem.content, documentBody);
+  documentDialog.showModal();
+}
+
+function documentRow(documentItem) {
+  const row = element("article", "event document");
+  row.dataset.type = "document";
+  row.dataset.kind = documentItem.kind;
+  if (documentItem.error) row.dataset.error = "true";
+  row.appendChild(element("span", "dot"));
+
+  const card = element("div", "card");
+  const meta = element("div", "meta");
+  meta.append(
+    element("span", "type", "document"),
+    element("span", "", label(documentItem.kind))
+  );
+  const button = element("button", "document-open", documentItem.title);
+  button.type = "button";
+  button.addEventListener("click", () => openDocument(documentItem));
+  card.append(meta, button, element("p", "detail", documentItem.ref));
+  row.appendChild(card);
+  return row;
+}
+
 const root = document.getElementById("tasks");
 for (const [taskName, events] of tasks) {
+  const documents = documentsByTask.get(taskName) || [];
   const section = element("section", "task");
   const head = element("div", "task-head");
+  const itemCount = events.length + " " + (events.length === 1 ? "event" : "events");
+  const documentCount = documents.length
+    ? " · " + documents.length + " " + (documents.length === 1 ? "document" : "documents")
+    : "";
   head.append(
     element("h2", "", taskName),
-    element("span", "count", events.length + (events.length === 1 ? " event" : " events"))
+    element("span", "count", itemCount + documentCount)
   );
   section.appendChild(head);
 
   const timeline = element("div", "timeline");
-  for (const event of events) {
+  for (const [eventIndex, event] of events.entries()) {
     const row = element("article", "event");
     row.dataset.actor = event.actor;
     row.dataset.type = event.type;
@@ -261,6 +481,14 @@ for (const [taskName, events] of tasks) {
     addDetail(card, event);
     row.appendChild(card);
     timeline.appendChild(row);
+    for (const documentItem of documents.filter(
+      item => item.after === eventIndex
+    )) {
+      timeline.appendChild(documentRow(documentItem));
+    }
+  }
+  for (const documentItem of documents.filter(item => item.after === null)) {
+    timeline.appendChild(documentRow(documentItem));
   }
   section.appendChild(timeline);
   root.appendChild(section);
@@ -330,9 +558,100 @@ def parse_events(files: list[str]) -> tuple[list[dict] | None, str | None]:
     return events, None
 
 
+def document_title(path: Path, content: str) -> str:
+    """Use the document's first Markdown heading, then its filename."""
+    for line in content.splitlines():
+        if line.startswith("# "):
+            return line.removeprefix("# ").strip()
+    return path.stem.replace("-", " ")
+
+
+def collect_documents(files: list[str], events: list[dict]) -> list[dict]:
+    """Read task documents and anchor them to the events that reference them."""
+    documents = []
+    seen = set()
+    events_by_task: dict[str, list[dict]] = {}
+    for event in events:
+        events_by_task.setdefault(event["task"], []).append(event)
+
+    for path_string in files:
+        task_dir = Path(path_string).parent
+        task = task_dir.name
+        task_events = events_by_task.get(task, [])
+        candidates: list[tuple[str, Path]] = []
+        agreement = task_dir / "agreement.md"
+        if agreement.is_file():
+            candidates.append(("agreement", agreement))
+        reports = task_dir / "reports"
+        if reports.is_dir():
+            candidates.extend(("report", path) for path in sorted(reports.glob("*.md")))
+        candidates.extend(
+            ("learning", path) for path in sorted(task_dir.glob("learning*.md"))
+        )
+
+        for kind, path in candidates:
+            ref = path.relative_to(task_dir).as_posix()
+            key = (task, ref)
+            if key in seen:
+                continue
+            seen.add(key)
+            try:
+                content = path.read_text()
+                read_error = None
+            except OSError as error:
+                read_error = f"Accord could not read this document: {error}"
+                content = read_error
+
+            preferred_type = {
+                "agreement": "start",
+                "report": "report",
+                "learning": "note",
+            }[kind]
+            after = next(
+                (
+                    index
+                    for index, event in enumerate(task_events)
+                    if event["type"] == preferred_type
+                    and ref in event.get("refs", [])
+                ),
+                None,
+            )
+            if after is None:
+                after = next(
+                    (
+                        index
+                        for index, event in enumerate(task_events)
+                        if ref in event.get("refs", [])
+                    ),
+                    None,
+                )
+            if after is None and kind == "agreement":
+                after = next(
+                    (
+                        index
+                        for index, event in enumerate(task_events)
+                        if event["type"] == "start"
+                    ),
+                    None,
+                )
+            documents.append(
+                {
+                    "task": task,
+                    "ref": ref,
+                    "kind": kind,
+                    "title": document_title(path, content),
+                    "content": content,
+                    "after": after,
+                    "error": read_error is not None,
+                }
+            )
+    return documents
+
+
 def build_html(
     events: list[dict],
     *,
+    documents: list[dict] | None = None,
     title: str = "Accord record",
     heading: str = "Accord record",
     intro: str = (
@@ -344,8 +663,19 @@ def build_html(
 ) -> str:
     """Build the shared record page for static or live delivery."""
     embedded = json.dumps(events, separators=(",", ":")).replace("<", "\\u003c")
+    embedded_documents = json.dumps(
+        documents or [], separators=(",", ":")
+    ).replace("<", "\\u003c")
     live_script = (
-        '<script>setTimeout(() => window.location.reload(), 2000);</script>'
+        "<script>"
+        "function refreshWhenIdle() {"
+        " setTimeout(() => {"
+        '  if (document.querySelector("dialog[open]")) refreshWhenIdle();'
+        "  else window.location.reload();"
+        " }, 2000);"
+        "}"
+        "refreshWhenIdle();"
+        "</script>"
         if live
         else ""
     )
@@ -355,6 +685,7 @@ def build_html(
         .replace("__INTRO__", escape(intro))
         .replace("__NAV__", nav)
         .replace("__LIVE_SCRIPT__", live_script)
+        .replace("__DOCUMENTS__", embedded_documents)
         .replace("__DATA__", embedded)
     )
 
@@ -368,7 +699,7 @@ def main(argv: list[str]) -> int:
     if events is None:
         return 1
 
-    html = build_html(events)
+    html = build_html(events, documents=collect_documents(files, events))
     try:
         Path(output).write_text(html)
     except OSError as error:
