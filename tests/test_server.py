@@ -122,6 +122,12 @@ class ServerTests(unittest.TestCase):
             self.assertIn("This page refreshes", index)
             self.assertIn("--paper: #000", index)
             self.assertIn("status-mark", index)
+            self.assertEqual(index.count("@font-face"), 4)
+            self.assertIn("font: 15px/1.55 var(--font-sans)", index)
+            self.assertIn("line-height: 1.1", index)
+            self.assertIn(".record > .meta { margin-left: 18px; }", index)
+            self.assertIn('data:font/woff2;base64,', index)
+            self.assertNotIn("Avenir", index)
             self.assertNotIn("border-radius:", index)
 
             task_url = url.rstrip("/") + "/task/rate-limit"
@@ -133,6 +139,7 @@ class ServerTests(unittest.TestCase):
             self.assertIn("The report is visible.", page)
             self.assertIn("The learning is visible.", page)
             self.assertIn('document.querySelector("dialog[open]")', page)
+            self.assertIn("font: 13px/1.5 var(--font-mono)", page)
 
             record = store / "rate-limit" / "record.jsonl"
             with record.open("a") as handle:
@@ -175,6 +182,11 @@ class ServerTests(unittest.TestCase):
             self.assertEqual(status, 422)
             self.assertIn("The record was not changed.", page)
             self.assertIn("invalid JSON", page)
+            self.assertEqual(page.count("@font-face"), 4)
+            self.assertIn('<nav class="view-nav"><a href="/">All records</a></nav>', page)
+            self.assertIn('<div class="error-copy">', page)
+            self.assertIn("font: 12px/1.5 var(--font-mono)", page)
+            self.assertNotIn("ui-monospace", page)
 
 
 if __name__ == "__main__":

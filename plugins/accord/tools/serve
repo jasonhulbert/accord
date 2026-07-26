@@ -41,6 +41,7 @@ def load_renderer():
 _RENDERER = load_renderer()
 build_html = _RENDERER.build_html
 collect_documents = _RENDERER.collect_documents
+font_css = _RENDERER.font_css
 parse_events = _RENDERER.parse_events
 
 
@@ -52,8 +53,12 @@ INDEX_TEMPLATE = """<!doctype html>
 <meta http-equiv="refresh" content="2">
 <title>Accord records</title>
 <style>
+__FONT_CSS__
   :root {
     color-scheme: dark;
+    --font-sans: "IBM Plex Sans", sans-serif;
+    --font-mono: "IBM Plex Mono", monospace;
+    --page-gutter: 16px;
     --paper: #000;
     --ink: #f4f4ef;
     --muted: #8c8c88;
@@ -66,24 +71,27 @@ INDEX_TEMPLATE = """<!doctype html>
     margin: 0;
     background: var(--paper);
     color: var(--ink);
-    font: 15px/1.55 "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif;
+    font: 15px/1.55 var(--font-sans);
   }
-  main { width: min(1000px, calc(100% - 32px)); margin: 0 auto; padding: 0 0 64px; }
-  header { padding: 42px 0 30px; border-bottom: 1px solid var(--line); }
+  main { width: min(1000px, calc(100% - (2 * var(--page-gutter)))); margin: 0 auto; padding: 0 0 64px; }
+  :focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
+  header { padding: 48px 0 32px; border-bottom: 1px solid var(--line); }
   h1, h2 { font-weight: 600; letter-spacing: -0.04em; }
-  h1 { margin: 0 0 10px; font-size: clamp(2.2rem, 7vw, 4.6rem); line-height: .95; }
-  h2 { margin: 0; font-size: 1.35rem; }
-  .intro { max-width: 650px; color: var(--muted); font-size: 1.05rem; }
+  h1 { margin: 0 0 12px; font-size: clamp(2.2rem, 7vw, 4.6rem); line-height: .95; }
+  h2 { margin: 0; font-size: 1.35rem; line-height: 1.1; }
+  .intro { max-width: 650px; margin: 0; color: var(--muted); font-size: 1.05rem; }
   .records { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
-  .record { padding: 18px 0; border-bottom: 1px solid var(--line); }
+  .record { padding: 20px 0; border-bottom: 1px solid var(--line); }
   .record-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+  .record h2 { display: flex; align-items: center; gap: 10px; }
   .record a { color: var(--ink); text-decoration-thickness: .08em; text-underline-offset: .15em; }
-  .meta { margin: 5px 0 0; color: var(--muted); font: 11px/1.4 "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif; letter-spacing: .04em; text-transform: uppercase; }
-  .error { margin: 12px 0 0; color: var(--muted); font: 11px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace; overflow-wrap: anywhere; }
-  .status-mark { display: inline-block; width: 8px; height: 8px; margin-right: 9px; background: var(--running); vertical-align: .08em; }
+  .meta { margin: 8px 0 0; color: var(--muted); font: 11px/1.45 var(--font-mono); letter-spacing: .02em; text-transform: uppercase; }
+  .record > .meta { margin-left: 18px; }
+  .error { margin: 12px 0 0; color: var(--muted); font: 11px/1.45 var(--font-mono); overflow-wrap: anywhere; }
+  .status-mark { flex: 0 0 8px; width: 8px; height: 8px; background: var(--running); }
   .status-mark-error { background: var(--danger); }
-  .empty { padding: 18px 0; color: var(--muted); border-bottom: 1px solid var(--line); }
-  @media (max-width: 560px) { main { width: min(100% - 22px, 1000px); } }
+  .empty { margin: 0; padding: 20px 0; color: var(--muted); border-bottom: 1px solid var(--line); }
+  @media (max-width: 560px) { header { padding-top: 40px; } }
 </style>
 </head>
 <body>
@@ -106,22 +114,32 @@ ERROR_TEMPLATE = """<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Accord record needs attention</title>
 <style>
-  :root { color-scheme: dark; --paper: #000; --ink: #f4f4ef; --muted: #8c8c88; --line: #383836; --danger: #bd7772; }
-  body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.55 "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif; }
-  main { width: min(760px, calc(100% - 32px)); margin: 0 auto; padding: 0 0 64px; }
-  h1 { font-weight: 600; letter-spacing: -0.04em; padding-top: 42px; }
-  p { color: var(--muted); }
+__FONT_CSS__
+  :root { color-scheme: dark; --font-sans: "IBM Plex Sans", sans-serif; --font-mono: "IBM Plex Mono", monospace; --page-gutter: 16px; --paper: #000; --ink: #f4f4ef; --muted: #8c8c88; --line: #383836; --danger: #bd7772; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.55 var(--font-sans); }
+  main { width: min(760px, calc(100% - (2 * var(--page-gutter)))); margin: 0 auto; padding: 0 0 64px; }
   a { color: var(--ink); }
-  pre { padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); color: var(--muted); background: transparent; white-space: pre-wrap; overflow-wrap: anywhere; }
-  .status-mark { display: inline-block; width: 8px; height: 8px; margin-right: 9px; background: var(--danger); vertical-align: .08em; }
+  :focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
+  .view-nav { padding: 16px 0; border-bottom: 1px solid var(--line); color: var(--muted); font: 11px/1.4 var(--font-sans); letter-spacing: .08em; text-transform: uppercase; }
+  .error-panel { padding: 48px 0 0; }
+  h1 { display: flex; align-items: center; gap: 12px; margin: 0 0 16px; font-size: clamp(2rem, 5vw, 3rem); font-weight: 600; line-height: 1; letter-spacing: -0.04em; }
+  .error-copy { margin-left: 20px; }
+  .intro { margin: 0 0 24px; color: var(--muted); }
+  pre { margin: 0; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); color: var(--muted); background: transparent; white-space: pre-wrap; overflow-wrap: anywhere; font: 12px/1.5 var(--font-mono); }
+  .status-mark { flex: 0 0 8px; width: 8px; height: 8px; background: var(--danger); }
 </style>
 </head>
 <body>
 <main>
-  <p><a href="/">All records</a></p>
-  <h1><span class="status-mark" aria-hidden="true"></span>__HEADING__</h1>
-  <p>Accord could not display this record. The record was not changed.</p>
-  <pre>__ERROR__</pre>
+  <nav class="view-nav"><a href="/">All records</a></nav>
+  <section class="error-panel">
+    <h1><span class="status-mark" aria-hidden="true"></span>__HEADING__</h1>
+    <div class="error-copy">
+      <p class="intro">Accord could not display this record. The record was not changed.</p>
+      <pre>__ERROR__</pre>
+    </div>
+  </section>
 </main>
 </body>
 </html>
@@ -151,7 +169,10 @@ def index_content(accord_root: Path) -> str:
     records = record_logs(accord_root)
     if not records:
         content = '<p class="empty">No Accord records were found for this project yet.</p>'
-        return INDEX_TEMPLATE.replace("__CONTENT__", content)
+        return (
+            INDEX_TEMPLATE.replace("__FONT_CSS__", font_css())
+            .replace("__CONTENT__", content)
+        )
 
     cards = []
     for record in records:
@@ -182,13 +203,17 @@ def index_content(accord_root: Path) -> str:
         )
 
     content = '<ul class="records">' + "".join(cards) + "</ul>"
-    return INDEX_TEMPLATE.replace("__CONTENT__", content)
+    return (
+        INDEX_TEMPLATE.replace("__FONT_CSS__", font_css())
+        .replace("__CONTENT__", content)
+    )
 
 
 def error_page(heading: str, message: str) -> str:
     """Render an escaped, actionable record error page."""
     return (
-        ERROR_TEMPLATE.replace("__HEADING__", escape(heading))
+        ERROR_TEMPLATE.replace("__FONT_CSS__", font_css())
+        .replace("__HEADING__", escape(heading))
         .replace("__ERROR__", escape(message))
     )
 

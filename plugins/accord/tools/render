@@ -8,10 +8,39 @@ The output embeds its events and all CSS and JavaScript. It fetches nothing.
 
 from __future__ import annotations
 
+import base64
+from functools import lru_cache
 import json
 import sys
 from html import escape
 from pathlib import Path
+
+
+FONT_ROOT = Path(__file__).resolve().parent.parent / "assets" / "fonts"
+FONT_SPECS = (
+    ("IBM Plex Sans", "IBMPlexSans-Regular.woff2", 400),
+    ("IBM Plex Sans", "IBMPlexSans-SemiBold.woff2", 600),
+    ("IBM Plex Sans", "IBMPlexSans-Bold.woff2", 700),
+    ("IBM Plex Mono", "IBMPlexMono-Regular.woff2", 400),
+)
+
+
+@lru_cache(maxsize=1)
+def font_css() -> str:
+    """Embed the shipped IBM Plex faces so every rendered page stays offline."""
+    faces = []
+    for family, filename, weight in FONT_SPECS:
+        encoded = base64.b64encode((FONT_ROOT / filename).read_bytes()).decode("ascii")
+        faces.append(
+            "  @font-face {\n"
+            f'    font-family: "{family}";\n'
+            f"    src: url(data:font/woff2;base64,{encoded}) format(\"woff2\");\n"
+            f"    font-weight: {weight};\n"
+            "    font-style: normal;\n"
+            "    font-display: swap;\n"
+            "  }"
+        )
+    return "\n".join(faces)
 
 
 TEMPLATE = r"""<!doctype html>
@@ -21,8 +50,13 @@ TEMPLATE = r"""<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>__TITLE__</title>
 <style>
+__FONT_CSS__
   :root {
     color-scheme: dark;
+    --font-sans: "IBM Plex Sans", sans-serif;
+    --font-mono: "IBM Plex Mono", monospace;
+    --page-gutter: 16px;
+    --event-pad-top: 20px;
     --paper: #000;
     --ink: #f4f4ef;
     --muted: #8c8c88;
@@ -40,38 +74,45 @@ TEMPLATE = r"""<!doctype html>
     margin: 0;
     background: var(--paper);
     color: var(--ink);
-    font: 15px/1.55 "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif;
+    font: 15px/1.55 var(--font-sans);
   }
   main {
-    width: min(1000px, calc(100% - 32px));
+    width: min(1000px, calc(100% - (2 * var(--page-gutter))));
     margin: 0 auto;
     padding: 0 0 64px;
   }
   .view-nav {
-    padding: 14px 0;
+    padding: 16px 0;
     border-bottom: 1px solid var(--line);
     color: var(--muted);
-    font: 11px/1.4 "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif;
+    font: 11px/1.4 var(--font-sans);
     letter-spacing: .08em;
     text-transform: uppercase;
   }
   .view-nav a { color: var(--ink); }
-  header { padding: 42px 0 30px; border-bottom: 1px solid var(--line); }
+  :focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
+  header { padding: 48px 0 32px; border-bottom: 1px solid var(--line); }
   h1, h2 { font-weight: 600; letter-spacing: -0.04em; }
-  h1 { margin: 0 0 10px; font-size: clamp(2.2rem, 7vw, 4.6rem); line-height: .95; }
-  h2 { margin: 0; font-size: 1.45rem; }
-  .intro { max-width: 650px; color: var(--muted); font-size: 1.05rem; }
+  h1 { margin: 0 0 12px; font-size: clamp(2.2rem, 7vw, 4.6rem); line-height: .95; }
+  h2 { margin: 0; font-size: 1.45rem; line-height: 1.1; }
+  .intro { max-width: 650px; margin: 0; color: var(--muted); font-size: 1.05rem; }
   .task { margin-top: 0; }
   .task-head {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: baseline;
-    justify-content: space-between;
-    gap: 16px;
+    gap: 24px;
     margin: 0;
-    padding: 20px 0 12px;
+    padding: 24px 0 16px;
     border-bottom: 1px solid var(--line);
   }
-  .count { color: var(--muted); font-size: .88rem; }
+  .task-head h2 { overflow-wrap: anywhere; }
+  .count {
+    color: var(--muted);
+    font: 11px/1.4 var(--font-mono);
+    letter-spacing: .02em;
+    white-space: nowrap;
+  }
   .timeline { position: relative; margin-left: 12px; }
   .timeline::before {
     content: "";
@@ -103,7 +144,7 @@ TEMPLATE = r"""<!doctype html>
     z-index: 1;
     width: 9px;
     height: 9px;
-    margin-top: 20px;
+    margin-top: calc(var(--event-pad-top) + 3px);
     background: var(--running);
   }
   .event[data-type="completion"] .dot,
@@ -121,7 +162,7 @@ TEMPLATE = r"""<!doctype html>
     border-color: var(--danger);
   }
   .card {
-    padding: 20px 0 22px;
+    padding: var(--event-pad-top) 0 24px;
     border: 0;
     background: transparent;
   }
@@ -129,18 +170,23 @@ TEMPLATE = r"""<!doctype html>
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 7px 10px;
+    gap: 8px 12px;
     margin-bottom: 8px;
     color: var(--muted);
-    font: 11px/1.4 "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif;
+    font: 11px/1.4 var(--font-sans);
     letter-spacing: .04em;
     text-transform: uppercase;
+  }
+  .meta time {
+    font-family: var(--font-mono);
+    letter-spacing: 0;
+    text-transform: none;
   }
   .type {
     color: var(--ink);
     font-weight: 700;
   }
-  .summary { margin: 0; font-size: 1rem; }
+  .summary { margin: 0; font-size: 1rem; line-height: 1.55; }
   .document-open {
     margin: 0;
     padding: 0;
@@ -149,6 +195,7 @@ TEMPLATE = r"""<!doctype html>
     background: transparent;
     font: inherit;
     font-size: 1rem;
+    line-height: 1.55;
     text-align: left;
     text-decoration: underline;
     text-decoration-thickness: .08em;
@@ -156,18 +203,22 @@ TEMPLATE = r"""<!doctype html>
     cursor: pointer;
   }
   .detail {
-    margin: 11px 0 0;
-    padding-top: 10px;
+    margin: 12px 0 0;
+    padding-top: 12px;
     border-top: 1px solid var(--line);
     color: var(--muted);
     font-size: .92rem;
   }
   .detail strong { color: var(--ink); font-weight: 600; }
+  .event.document .detail {
+    font: 11px/1.45 var(--font-mono);
+    letter-spacing: 0;
+  }
   .refs {
-    margin: 10px 0 0;
-    padding-left: 18px;
+    margin: 12px 0 0;
+    padding-left: 20px;
     color: var(--muted);
-    font: 11px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
+    font: 11px/1.45 var(--font-mono);
   }
   .legend {
     display: flex;
@@ -175,16 +226,20 @@ TEMPLATE = r"""<!doctype html>
     gap: 16px;
     margin-top: 20px;
     color: var(--muted);
-    font: 11px/1.4 "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif;
+    font: 11px/1.4 var(--font-sans);
     letter-spacing: .04em;
     text-transform: uppercase;
   }
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
   .legend span::before {
     content: "";
-    display: inline-block;
+    flex: 0 0 8px;
     width: 8px;
     height: 8px;
-    margin-right: 6px;
     background: var(--legend-color);
   }
   .legend-human { --legend-color: var(--human); }
@@ -192,43 +247,57 @@ TEMPLATE = r"""<!doctype html>
   .legend-supporting-agent { --legend-color: var(--supporting-agent); }
   dialog {
     width: min(780px, calc(100% - 24px));
+    max-width: none;
     max-height: calc(100% - 24px);
+    margin: auto;
     padding: 0;
     border: 1px solid var(--line);
     color: var(--ink);
     background: var(--paper);
   }
   dialog::backdrop { background: rgb(0 0 0 / .78); }
-  .dialog-frame { padding: 22px clamp(18px, 4vw, 34px) 36px; }
+  .dialog-frame { padding: 24px clamp(20px, 4vw, 32px) 40px; }
   .dialog-actions {
     display: flex;
     justify-content: flex-end;
-    margin: 0 0 18px;
+    margin: 0 0 24px;
   }
   .dialog-close {
-    padding: 7px 10px;
+    padding: 8px 12px;
     border: 1px solid var(--line);
     color: var(--ink);
     background: transparent;
-    font: 11px/1.4 "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif;
+    font: 11px/1.4 var(--font-sans);
     letter-spacing: .04em;
     text-transform: uppercase;
     cursor: pointer;
   }
   .document-meta {
-    margin: 0 0 22px;
+    margin: 0 0 24px;
     color: var(--muted);
-    font: 11px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+    font: 11px/1.4 var(--font-mono);
   }
+  .document-body { line-height: 1.6; }
   .document-body h1,
   .document-body h2,
   .document-body h3,
   .document-body h4,
   .document-body h5,
   .document-body h6 {
-    margin: 1.6em 0 .55em;
+    margin: 1.5em 0 .5em;
+    font-weight: 600;
+    line-height: 1.2;
     letter-spacing: -.025em;
   }
+  .document-body h1 {
+    font-size: clamp(2.25rem, 7vw, 3.75rem);
+    line-height: 1;
+  }
+  .document-body h2 { font-size: 1.35rem; }
+  .document-body h3 { font-size: 1.1rem; line-height: 1.3; }
+  .document-body h4,
+  .document-body h5,
+  .document-body h6 { font-size: 1rem; line-height: 1.3; }
   .document-body h1:first-child { margin-top: 0; }
   .document-body p,
   .document-body ul,
@@ -243,16 +312,17 @@ TEMPLATE = r"""<!doctype html>
     color: var(--muted);
   }
   .document-body pre {
-    padding: 14px;
+    padding: 16px;
     border: 1px solid var(--line);
     overflow-x: auto;
     white-space: pre-wrap;
-    font: 13px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+    font: 13px/1.5 var(--font-mono);
   }
   @media (max-width: 560px) {
-    main { width: min(100% - 22px, 1000px); }
-    .event { gap: 14px; }
-    .card { padding: 18px 0 20px; }
+    header { padding-top: 40px; }
+    .task-head { gap: 16px; }
+    .event { gap: 16px; }
+    .dialog-frame { padding: 20px 20px 32px; }
   }
 </style>
 </head>
@@ -684,6 +754,7 @@ def build_html(
         .replace("__HEADING__", escape(heading))
         .replace("__INTRO__", escape(intro))
         .replace("__NAV__", nav)
+        .replace("__FONT_CSS__", font_css())
         .replace("__LIVE_SCRIPT__", live_script)
         .replace("__DOCUMENTS__", embedded_documents)
         .replace("__DATA__", embedded)

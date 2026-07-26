@@ -16,6 +16,7 @@ PLUGIN_ROOT = REPO_ROOT / "plugins" / "accord"
 VALIDATE = PLUGIN_ROOT / "tools" / "validate"
 RENDER = PLUGIN_ROOT / "tools" / "render"
 EXAMPLE = PLUGIN_ROOT / "spec" / "examples" / "rate-limiting.jsonl"
+FONT_ROOT = PLUGIN_ROOT / "assets" / "fonts"
 
 
 class ToolTests(unittest.TestCase):
@@ -92,6 +93,38 @@ class ToolTests(unittest.TestCase):
         self.assertIn("rate-limiting", html)
         self.assertIn("A factual view of what changed", html)
         self.assertNotIn("https://", html)
+
+    def test_renderer_carries_the_chosen_typography_without_a_network_or_system_font(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "record.html"
+            result = self.run_tool(RENDER, str(EXAMPLE), "-o", str(output))
+            html = output.read_text()
+
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(html.count("@font-face"), 4)
+        self.assertEqual(html.count("data:font/woff2;base64,"), 4)
+        self.assertIn('font-family: "IBM Plex Sans"', html)
+        self.assertIn('font-family: "IBM Plex Mono"', html)
+        self.assertIn('--font-sans: "IBM Plex Sans", sans-serif', html)
+        self.assertIn('--font-mono: "IBM Plex Mono", monospace', html)
+        self.assertIn("font: 15px/1.55 var(--font-sans)", html)
+        self.assertIn("font: 13px/1.5 var(--font-mono)", html)
+        self.assertNotIn("Avenir", html)
+        self.assertNotIn("ui-monospace", html)
+        self.assertNotIn("https://", html)
+
+    def test_shipped_font_assets_preserve_the_license_that_allows_distribution(self):
+        license_text = (FONT_ROOT / "LICENSE.txt").read_text()
+        expected_fonts = {
+            "IBMPlexSans-Regular.woff2",
+            "IBMPlexSans-SemiBold.woff2",
+            "IBMPlexSans-Bold.woff2",
+            "IBMPlexMono-Regular.woff2",
+        }
+
+        self.assertTrue(expected_fonts.issubset(path.name for path in FONT_ROOT.iterdir()))
+        self.assertIn("SIL OPEN FONT LICENSE Version 1.1", license_text)
+        self.assertIn('Reserved Font Name "Plex"', license_text)
 
     def test_renderer_places_task_documents_after_the_events_that_reference_them(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -196,7 +229,7 @@ class ToolTests(unittest.TestCase):
             "schema": "1",
             "type": "note",
             "actor": "agent",
-            "summary": "__TITLE__ __HEADING__ __INTRO__ __NAV__ __LIVE_SCRIPT__",
+            "summary": "__TITLE__ __HEADING__ __INTRO__ __NAV__ __FONT_CSS__ __LIVE_SCRIPT__",
         }
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "record.jsonl"
@@ -211,11 +244,12 @@ class ToolTests(unittest.TestCase):
             "__HEADING__",
             "__INTRO__",
             "__NAV__",
+            "__FONT_CSS__",
             "__LIVE_SCRIPT__",
         ):
             self.assertIn(placeholder, html)
 
-    def test_renderer_preserves_the_black_surface_and_state_marks(self):
+    def test_renderer_preserves_the_black_surface_and_precise_timeline_geometry(self):
         valid = {
             "ts": "2026-07-23T12:00:00Z",
             "task": "test",
@@ -242,11 +276,31 @@ class ToolTests(unittest.TestCase):
         self.assertIn("--supporting-agent:", html)
         self.assertIn(".event::after", html)
         self.assertIn("left: 4px", html)
-        self.assertIn("margin-top: 20px", html)
+        self.assertIn("--event-pad-top: 20px", html)
+        self.assertIn("margin-top: calc(var(--event-pad-top) + 3px)", html)
+        self.assertIn("padding: var(--event-pad-top) 0 24px", html)
+        self.assertNotIn(".card { padding: 18px", html)
         self.assertIn('<span class="legend-human">Human</span>', html)
         self.assertIn('<span class="legend-agent">Agent</span>', html)
         self.assertIn('<span class="legend-supporting-agent">Supporting agent</span>', html)
         self.assertNotIn("border-radius:", html)
+
+    def test_renderer_assigns_type_by_meaning_and_uses_an_explicit_heading_rhythm(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "record.html"
+            result = self.run_tool(RENDER, str(EXAMPLE), "-o", str(output))
+            html = output.read_text()
+
+        self.assertEqual(result.returncode, 0)
+        self.assertIn(".meta time {", html)
+        self.assertIn("font-family: var(--font-mono)", html)
+        self.assertIn(".event.document .detail {", html)
+        self.assertIn("h2 { margin: 0; font-size: 1.45rem; line-height: 1.1; }", html)
+        self.assertIn(".document-body h1 {", html)
+        self.assertIn(".document-body h2 {", html)
+        self.assertIn("dialog {", html)
+        self.assertIn("max-width: none", html)
+        self.assertIn(":focus-visible", html)
 
 
 if __name__ == "__main__":
