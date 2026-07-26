@@ -155,14 +155,22 @@ of session.
 
 ## Inspect a live record
 
-When you want to see the work itself while an Accord is active, start the
-bundled local view from the project root:
+When you want to see the work itself while an Accord is active, run the
+user-facing command from the target project root:
 
 ```text
-tools/serve
+accord serve
+```
+
+Plugin hosts that expose plugin `bin` commands make this available when the
+plugin is installed. If your host does not expose it, install the launcher once
+from the installed plugin directory. From a source checkout, run:
+
+```text
+plugins/accord/tools/install-launcher
 ```
 
 The view lists the project's records, lets you choose one, and refreshes as new
 events are appended. It binds to localhost, opens a browser when possible, and
-stops when you press `Ctrl-C`. Use `tools/serve --task TASK` when the task is
-already known, or `--no-open` when you only need the printed URL.
+stops when you press `Ctrl-C`. Use `accord serve --task TASK` when the task is
+already known, or `accord serve --no-open` when you only need the printed URL.

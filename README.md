@@ -52,7 +52,8 @@ plugins/accord/                installable plugin root
   hooks/                       shared read-only lifecycle hooks
   templates/                   agreement, report, and learning-note templates
   spec/                        record and check-in specifications
-  tools/                       location, validate, render, and serve
+  bin/                         stable user-facing command launcher
+  tools/                       location, validate, render, serve, and install-launcher
 tests/                         framework, hook, and tool behavior tests
 ```
 
@@ -84,17 +85,29 @@ remains at that root.
 
 `plugins/accord/tools/validate` checks a record against the shared schema.
 `plugins/accord/tools/render` creates a self-contained HTML timeline.
-`plugins/accord/tools/serve` starts a live, localhost-only view of the current
-project's records. From the project root, run:
+`plugins/accord/bin/accord` is the stable user-facing launcher. Plugin hosts
+that expose plugin `bin` commands make `accord` available after installation.
+If your host does not expose it, install the launcher once from the installed
+plugin directory with `tools/install-launcher`. From a source checkout, the
+equivalent is:
 
 ```text
-plugins/accord/tools/serve
+plugins/accord/tools/install-launcher
 ```
 
-It opens the record list in a browser and refreshes while work continues. Use
-`--task TASK` to open one record directly, `--no-open` to print the URL without
-opening a browser, and `Ctrl-C` to stop the server. The server reads records but
-does not change them.
+It places the launcher in the user-local executable directory and reports any
+`PATH` setup still needed. From any target project root, run:
+
+```text
+accord serve
+```
+
+The command opens the record list in a browser and refreshes while work
+continues. Use `accord serve --task TASK` to open one record directly,
+`accord serve --no-open` to print the URL without opening a browser, and
+`Ctrl-C` to stop the server. The server reads records but does not change them.
+The bundled `tools/serve` remains available as the implementation entry point
+for maintainers and direct plugin inspection.
 
 The plugin bundles two read-only lifecycle hooks through
 `plugins/accord/hooks/hooks.json`, shared by Claude Code and Codex.

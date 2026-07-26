@@ -22,11 +22,13 @@ question is open, wait for human direction. Otherwise orient the human to the
 current state and continue within the agreement.
 
 When the human asks to inspect an Accord in progress, make the work itself
-available with the bundled `tools/serve` command from the target project's
-root. It opens a localhost view of the project's records and refreshes as new
-events arrive. If several records exist, let the human choose one or pass
-`--task TASK`; do not silently choose an agreement. The server is read-only and
-stops with the terminal process.
+available with the user-facing `accord serve` command from the target project's
+root when the launcher is installed. It opens a localhost view of the
+project's records and refreshes as new events arrive. If several records
+exist, let the human choose one or pass `--task TASK`; do not silently choose
+an agreement. The server is read-only and stops with the terminal process.
+The bundled `tools/serve` remains the direct fallback when the launcher is not
+available.
 
 If no agreement covers the work, inspect enough of the project and request to
 offer informed counsel. Draft from `templates/agreement.md`. Name material

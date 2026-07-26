@@ -1,6 +1,6 @@
 {
   "name": "accord",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A narrative framework for substantial human-agent work: agree on purpose, authority, review, and reserved judgment, then adapt together as evidence changes the work.",
   "author": {
     "name": "jasonhulbert"

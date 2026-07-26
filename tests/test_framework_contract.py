@@ -206,9 +206,9 @@ class FrameworkContractTests(unittest.TestCase):
         claude_marketplace = json.loads(self.read(".claude-plugin/marketplace.json"))
 
         self.assertEqual(codex_manifest["name"], "accord")
-        self.assertEqual(codex_manifest["version"], "0.1.0")
+        self.assertEqual(codex_manifest["version"], "0.1.1")
         self.assertEqual(claude_manifest["name"], "accord")
-        self.assertEqual(claude_manifest["version"], "0.1.0")
+        self.assertEqual(claude_manifest["version"], "0.1.1")
         self.assertEqual(codex_marketplace["name"], "accord")
         self.assertEqual(
             codex_marketplace["plugins"][0]["source"]["path"],
