@@ -43,9 +43,9 @@ risk, authority, or judgment you kept. Expect evidence and counsel with the
 question. Your direction resolves that judgment and puts the work back in
 motion.
 
-The record in Accord's per-project home store keeps material events visible
-across sessions. It is memory, not surveillance. Failed attempts belong beside
-successful ones because later judgment needs both.
+The agent keeps the work's record outside the project workspace so material
+events remain visible across sessions. It is memory, not surveillance. Failed
+attempts belong beside successful ones because later judgment needs both.
 
 ## Review while change remains practical
 
@@ -142,6 +142,8 @@ Accord keeps its records outside the project workspace. From the project root,
 `tools/location` prints its record directory. The default location is
 `~/.accord/projects/{project-key}/`; `{project-key}` is derived from that
 project's root so records from similarly named projects do not collide.
+Each body of work has a technical task ID used only in paths and interfaces.
+`{task}` stands for that ID below.
 
 - `~/.accord/projects/{project-key}/{task}/agreement.md` — the accepted understanding and later
   amendments;
@@ -155,8 +157,8 @@ of session.
 
 ## Inspect a live record
 
-When you want to see the work itself while an Accord is active, run the
-user-facing command from the target project root:
+To inspect active work under Accord, run the user-facing command from the
+target project root:
 
 ```text
 accord serve
@@ -172,5 +174,6 @@ plugins/accord/tools/install-launcher
 
 The view lists the project's records, lets you choose one, and refreshes as new
 events are appended. It binds to localhost, opens a browser when possible, and
-stops when you press `Ctrl-C`. Use `accord serve --task TASK` when the task is
-already known, or `accord serve --no-open` when you only need the printed URL.
+stops when you press `Ctrl-C`. Use `accord serve --task TASK` when the task ID
+is already known, or `accord serve --no-open` when you only need the printed
+URL.

@@ -91,9 +91,13 @@ the things they do in ordinary language: **agree**, **work**, **delegate**,
 **investigate**, **implement**, **verify**, **review**, **ask**, **answer**,
 **change direction**, and **record**.
 
-Use **Accord** as the name and central idea. Accord is the mutual understanding
-that makes purposeful delegation possible. A written agreement records it; the
-document is not the accord itself.
+Use **Accord** for the framework and the creed-driven way of working it defines.
+Do not use it as the name of a particular body of work. Accord governs the
+work. The agreement gives trust a shape by recording the work's accepted
+purpose, bounds, and division of authority. The record preserves what happened.
+
+Use **accord** in its ordinary sense for mutual understanding. A written
+agreement records that understanding; the document is not the accord itself.
 
 Keep **creed** for the durable point of view shared by the roles. A creed states
 what each role owes the work and the other roles. It should not become a
@@ -101,6 +105,7 @@ procedure with more inspiring punctuation.
 
 Prefer a small, stable vocabulary:
 
+- **work** for the bounded undertaking carried under one agreement;
 - **agreement** for the accepted purpose, bounds, authority, risks, resources,
   review points, and reserved decisions;
 - **check-in** for a human-initiated conversation during the work;
@@ -112,6 +117,9 @@ Prefer a small, stable vocabulary:
 
 These are ordinary terms, not a replacement mythology. Do not force them into
 sentences where simpler language is more natural.
+
+Use **task ID** only where a record or interface needs a technical identifier.
+In narrative prose, name the work.
 
 Review is what the human does with the work. A review point names where the
 agreement reserves that judgment. Neither is a phase, deliverable, or ceremony

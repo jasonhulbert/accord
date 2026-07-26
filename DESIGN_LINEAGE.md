@@ -37,8 +37,9 @@ Every private term had to be translated before a new user could apply it.
 Fictional language could leak into work products or encourage behavior because
 it fit the story rather than the responsibility.
 
-Accord removes that translation tax. Human, agent, supporting agent, agreement,
-review, question, direction, and record say directly what they mean.
+Accord removes that translation tax. Human, agent, supporting agent, creed,
+work, agreement, review, question, direction, and record say directly what they
+mean.
 
 The rewrite does not reject narrative. It keeps the argument inside each
 responsibility: the pressure that makes it matter, the failure invited when it

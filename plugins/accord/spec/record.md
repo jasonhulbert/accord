@@ -1,9 +1,10 @@
 # The Accord record
 
-Each active agreement keeps an append-only record at
+Each body of work under Accord has an append-only record at
 `{store}/{task}/record.jsonl`, where `{store}` is the project directory printed
-by `tools/location` under `~/.accord/projects/`. One JSON object occupies each
-nonblank line.
+by `tools/location` under `~/.accord/projects/`. The agent opens the record
+after the human accepts the agreement; one JSON object occupies each nonblank
+line.
 
 The record describes what happened. It does not score the agent, prescribe the
 next action, or turn earlier experience into a rule.
@@ -12,10 +13,16 @@ next action, or turn earlier experience into a rule.
 
 - **Append only.** Corrections are later events with references to what they
   correct. Previously valid lines do not change.
-- **Readable alone.** Every event carries its task id, actor, time, type, and a
-  plain summary. Records from several tasks can be combined without a join.
+- **Readable alone.** Every event carries its task ID, actor, time, type, and a
+  plain summary. Records with different task IDs can be combined without a
+  join.
 - **Narrative first.** Structured fields support validation and comparison.
   Context that does not need structure stays in `summary`.
+- **Language is evidence.** The words in a record show what was said and done;
+  they do not define Accord's vocabulary. When a term is ambiguous, the agent
+  reads it against the agreement, surrounding events, and actual work. If an
+  ambiguity affecting purpose, authority, or state cannot be resolved from that
+  evidence, the question returns to the human.
 - **Small vocabulary.** The event set covers the responsibilities in the creed.
   A material event that fits no specific type is a `note`.
 
@@ -26,12 +33,12 @@ Every event has:
 | Field | Required | Meaning |
 |---|---|---|
 | `ts` | yes | ISO 8601 timestamp |
-| `task` | yes | task id, matching `{task}` in `{store}/{task}/` |
+| `task` | yes | task ID, matching `{task}` in `{store}/{task}/` |
 | `schema` | yes | schema version, currently `"1"` |
 | `type` | yes | one of the twelve event types below |
 | `actor` | yes | `human`, `agent`, or `supporting-agent` |
 | `summary` | yes | plain-language account of what happened |
-| `refs` | no | task-relative paths or ids the event points to |
+| `refs` | no | record-relative paths or event IDs the event points to |
 
 Three types require one additional field: `attempt.outcome`,
 `question.subject`, and `direction.decision`. No other structured payload is
@@ -57,10 +64,8 @@ defined.
 Changing the event or actor set changes the shared record contract. It requires
 human agreement, not an implementation choice made in passing.
 
-Schema version `"1"` also accepts `investigator` so records written before the
-supporting-agent role was adopted remain valid. New events use
-`supporting-agent`; append-only history is not rewritten to adopt new
-vocabulary.
+`investigator` remains valid in stored schema version `"1"` records. New events
+use `supporting-agent`; valid history is not rewritten.
 
 ## Documents and events
 

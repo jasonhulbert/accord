@@ -1,7 +1,7 @@
 # Reading Accord records
 
 Because every record line is self-describing, combining records under
-`~/.accord/projects/*/*/record.jsonl` creates a cross-task corpus without join
+`~/.accord/projects/*/*/record.jsonl` creates a cross-record corpus without join
 logic. It can support descriptive questions such as:
 
 - how often reserved questions return to the human, and about which subjects;

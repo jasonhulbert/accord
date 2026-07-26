@@ -34,6 +34,116 @@ class FrameworkContractTests(unittest.TestCase):
             agreement,
         )
 
+    def test_accord_names_the_framework_not_a_body_of_work(self):
+        style = self.prose("ACCORD_STYLE_GUIDE.md")
+        skill = self.prose("plugins/accord/skills/accord/SKILL.md")
+        check_in = self.prose("plugins/accord/skills/check-in/SKILL.md")
+        guide = self.prose("GUIDE.md")
+        readme = self.prose("README.md")
+
+        self.assertIn(
+            "Use **Accord** for the framework and the creed-driven way of working",
+            style,
+        )
+        self.assertIn(
+            "Do not use it as the name of a particular body of work", style
+        )
+        self.assertIn(
+            "**work** for the bounded undertaking carried under one agreement",
+            style,
+        )
+        self.assertIn("asks to resume work under it", skill)
+        self.assertIn("inspect work in progress under Accord", skill)
+        self.assertIn(
+            "Requires active work under an accepted agreement", check_in
+        )
+        self.assertIn("To inspect active work under Accord", guide)
+        self.assertIn("for one body of work before it begins", readme)
+        self.assertIn(
+            "Accord governs the work. The agreement gives trust a shape", readme
+        )
+        self.assertIn(
+            "The agent keeps the work's record outside the project workspace",
+            guide,
+        )
+        self.assertIn(
+            "read it together with the record, reports, learning notes, and "
+            "actual work",
+            skill,
+        )
+        self.assertIn("resume the work within the agreement", skill)
+        self.assertIn("use Accord to reach an agreement for the work", check_in)
+
+        conceptual_prose = " ".join((skill, check_in, guide, readme))
+        for misuse in (
+            "resume one",
+            "an Accord in progress",
+            "Requires an existing Accord",
+            "begin an Accord",
+            "while an Accord is active",
+        ):
+            self.assertNotIn(misuse, conceptual_prose)
+
+        framework_prose = " ".join(
+            self.prose(path)
+            for path in (
+                "ACCORD_STYLE_GUIDE.md",
+                "GUIDE.md",
+                "README.md",
+                "AGENTS.md",
+                "plugins/accord/creed/agent.md",
+                "plugins/accord/creed/human.md",
+                "plugins/accord/creed/supporting-agent.md",
+                "plugins/accord/skills/accord/SKILL.md",
+                "plugins/accord/skills/check-in/SKILL.md",
+                "plugins/accord/templates/agreement.md",
+                "plugins/accord/templates/report.md",
+                "plugins/accord/templates/learning-note.md",
+                "plugins/accord/spec/record.md",
+                "plugins/accord/spec/check-in.md",
+                "plugins/accord/spec/analysis.md",
+            )
+        )
+        self.assertNotRegex(
+            framework_prose,
+            r"\b(?:an|another|each|one|existing|new|active) Accord\b",
+        )
+        self.assertNotRegex(
+            framework_prose,
+            r"\b(?:begin|resume|complete|end|inspect) "
+            r"(?:an|the|this|that|existing|new) Accord\b",
+        )
+
+    def test_record_language_is_evidence_not_vocabulary_authority(self):
+        record = self.prose("plugins/accord/spec/record.md")
+
+        self.assertIn(
+            "Each body of work under Accord has an append-only record", record
+        )
+        self.assertIn(
+            "The agent opens the record after the human accepts the agreement",
+            record,
+        )
+        self.assertIn(
+            "The words in a record show what was said and done; they do not "
+            "define Accord's vocabulary",
+            record,
+        )
+        self.assertIn(
+            "reads it against the agreement, surrounding events, and actual work",
+            record,
+        )
+        self.assertIn(
+            "ambiguity affecting purpose, authority, or state cannot be resolved",
+            record,
+        )
+        self.assertIn("the question returns to the human", record)
+        self.assertIn(
+            "`investigator` remains valid in stored schema version `\"1\"` records",
+            record,
+        )
+        self.assertNotIn("before the supporting-agent role was adopted", record)
+
     def test_review_returns_reserved_judgment_without_returning_implementation(self):
         agent = self.prose("plugins/accord/creed/agent.md")
         human = self.prose("plugins/accord/creed/human.md")
@@ -254,17 +364,17 @@ class FrameworkContractTests(unittest.TestCase):
             },
         )
 
-    def test_replaced_actor_name_does_not_invalidate_append_only_history(self):
+    def test_stored_actor_name_does_not_invalidate_append_only_history(self):
         schema = json.loads(self.read("plugins/accord/spec/record.schema.json"))
         record = self.prose("plugins/accord/spec/record.md")
 
         self.assertIn("supporting-agent", schema["properties"]["actor"]["enum"])
         self.assertIn("investigator", schema["properties"]["actor"]["enum"])
         self.assertIn(
-            "records written before the supporting-agent role was adopted remain valid",
+            "`investigator` remains valid in stored schema version `\"1\"` records",
             record,
         )
-        self.assertIn("append-only history is not rewritten", record)
+        self.assertIn("valid history is not rewritten", record)
 
     def test_templates_hold_substance_without_choreographing_conversation(self):
         for name in ("agreement.md", "report.md", "learning-note.md"):
@@ -273,9 +383,14 @@ class FrameworkContractTests(unittest.TestCase):
             self.assertNotIn("Step 1", template)
 
         agreement = self.read("plugins/accord/templates/agreement.md")
+        report = self.read("plugins/accord/templates/report.md")
+        learning = self.read("plugins/accord/templates/learning-note.md")
         self.assertIn("## What matters", agreement)
         self.assertIn("## Where we meet", agreement)
         self.assertIn("## Questions kept by the human", agreement)
+        self.assertIn("# Agreement: {work}", agreement)
+        self.assertIn("# Report: {work} — {date}", report)
+        self.assertIn("# Learning note: {work} — {date}", learning)
 
     def test_record_analysis_cannot_become_agent_scoring(self):
         analysis = self.read("plugins/accord/spec/analysis.md")

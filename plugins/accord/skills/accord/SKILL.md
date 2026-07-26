@@ -1,6 +1,6 @@
 ---
 name: accord
-description: Run substantial work under Accord. Use when the user invokes Accord, asks to resume one, or wants a purpose-led agreement for consequential work whose implementation path is not fully known. Do not use for small, routine, or fully specified tasks.
+description: Run substantial work under Accord. Use when the user invokes Accord, asks to resume work under it, or wants a purpose-led agreement for consequential work whose implementation path is not fully known. Do not use for small, routine, or fully specified tasks.
 ---
 
 # Accord
@@ -16,15 +16,15 @@ acting. Do not delegate these readings.
 
 Run `tools/location` from the target project's root to locate its record store.
 It prints a directory under `~/.accord/projects/`; use that exact directory.
-If an existing agreement there covers the request, resume from it. Read its
-agreement, record, reports, learning notes, and actual work. If a reserved
-question is open, wait for human direction. Otherwise orient the human to the
-current state and continue within the agreement.
+If an agreement there covers the request, read it together with the record,
+reports, learning notes, and actual work. If a reserved question is open, wait
+for human direction. Otherwise orient the human to the current state and resume
+the work within the agreement.
 
-When the human asks to inspect an Accord in progress, make the work itself
-available with the user-facing `accord serve` command from the target project's
-root when the launcher is installed. It opens a localhost view of the
-project's records and refreshes as new events arrive. If several records
+When the human asks to inspect work in progress under Accord, make the work
+itself available with the user-facing `accord serve` command from the target
+project's root when the launcher is installed. It opens a localhost view of
+the project's records and refreshes as new events arrive. If several records
 exist, let the human choose one or pass `--task TASK`; do not silently choose
 an agreement. The server is read-only and stops with the terminal process.
 The bundled `tools/serve` remains the direct fallback when the launcher is not
@@ -47,7 +47,7 @@ has not seen. Begin only after a subsequent human message explicitly accepts
 the presented agreement. A question, revision, or acknowledgment continues the
 dialogue. If intent is unclear, ask whether the agreement is accepted.
 
-After acceptance, create:
+After acceptance, choose a technical task ID and create:
 
 ```text
 {store}/{task}/

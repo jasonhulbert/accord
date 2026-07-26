@@ -50,10 +50,10 @@ When contributing:
 
 ## Amendment discipline
 
-- Creed improvements leave through plugin upgrades. Project learning stays in
-  that project's Accord record and learning notes.
-- Mid-task changes belong in the task's agreement. Lessons belong in learning
-  notes. Only durable role responsibilities belong in the creed.
+- Creed improvements leave through plugin upgrades. Learning from particular
+  work stays in its Accord record and learning notes.
+- Changes made while work is active belong in its agreement. Lessons belong in
+  learning notes. Only durable role responsibilities belong in the creed.
 - Changes to event types, actors, or the shared vocabulary require human
   agreement. They are not incidental implementation decisions.
 - Templates name what a conversation or record contains, never a required

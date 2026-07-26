@@ -93,7 +93,7 @@ class CliTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             project, home, store = self.make_project(root)
-            self.write_record(store, "An existing Accord is still visible.")
+            self.write_record(store, "Existing work is still visible.")
             launcher = self.install(home, root / "bin")
             process = subprocess.Popen(
                 [str(launcher), "serve", "--no-open", "--port", "0"],
@@ -111,7 +111,7 @@ class CliTests(unittest.TestCase):
             with urlopen(url.rstrip("/") + "/task/rate-limit", timeout=3) as response:
                 page = response.read().decode()
 
-        self.assertIn("An existing Accord is still visible.", page)
+        self.assertIn("Existing work is still visible.", page)
 
     def test_installed_command_follows_a_newer_plugin_version(self):
         with tempfile.TemporaryDirectory() as directory:

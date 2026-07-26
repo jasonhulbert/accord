@@ -1,6 +1,6 @@
 ---
 name: check-in
-description: Use when the user invokes this skill or speaks first during active work under Accord, including statuses, accounts, counsel, reviews, new context, changed terms, questions, and answers to open questions. Requires an existing Accord.
+description: Use when the user invokes this skill or speaks first during active work under Accord, including statuses, accounts, counsel, reviews, new context, changed terms, questions, and answers to open questions. Requires active work under an accepted agreement.
 ---
 
 # Check in
@@ -13,8 +13,8 @@ the creed has not been read in this session, read `creed/agent.md` and
 
 Run `tools/location` from the target project's root to find its record store
 under `~/.accord/projects/`. Find the agreement there that covers the message.
-If several could, ask which one. If none does, say so plainly and offer to begin
-an Accord.
+If several could, ask which one. If none does, say so plainly and offer to use
+Accord to reach an agreement for the work.
 
 Read the agreement, record, reports, learning notes, and actual work before
 responding. Do not reconstruct the state from memory or from the most recent

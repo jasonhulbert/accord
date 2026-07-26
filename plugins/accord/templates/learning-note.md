@@ -1,4 +1,4 @@
-# Learning note: {project} — {date}
+# Learning note: {work} — {date}
 
 A learning note preserves what another session should not have to rediscover.
 It offers evidence for later judgment, not rules that bind later work.

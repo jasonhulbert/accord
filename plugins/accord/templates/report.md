@@ -1,4 +1,4 @@
-# Report: {task} — {date}
+# Report: {work} — {date}
 
 A report orients the human to the work. It keeps failure and uncertainty
 visible, points to what can be inspected, and carries the agent's counsel. It

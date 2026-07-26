@@ -278,7 +278,9 @@ class LocalServer(ThreadingHTTPServer):
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n", 1)[0])
-    parser.add_argument("--task", help="open one task instead of the record list")
+    parser.add_argument(
+        "--task", help="open one record by task ID instead of the record list"
+    )
     parser.add_argument(
         "--port",
         type=int,

@@ -10,6 +10,10 @@ without turning the human into a passive observer. The human keeps judgment over
 purpose, consequential risk, resources, and the choices that should not be
 delegated. Review happens while the work can still change.
 
+Accord governs the work. The agreement gives trust a shape by recording the
+work's accepted purpose, bounds, and division of authority. The record
+preserves what happened.
+
 New to the framework? Start with [GUIDE.md](GUIDE.md).
 
 ## The operating model
@@ -17,11 +21,11 @@ New to the framework? Start with [GUIDE.md](GUIDE.md).
 - **Creed** (`plugins/accord/creed/`) — the durable point of view for the human,
   agent, and supporting agent. It states responsibility and authority without
   prescribing implementation.
-- **Agreement** — the understanding reached for one task before work begins:
-  purpose, evidence of success, first approach, resources, risks, room to act,
-  review points, and questions kept by the human.
-- **Record** — an append-only factual account that lets later sessions resume
-  from evidence instead of memory.
+- **Agreement** — the understanding reached for one body of work before it
+  begins: purpose, evidence of success, first approach, resources, risks, room
+  to act, review points, and questions kept by the human.
+- **Record** — an append-only factual account of what happened in the work,
+  letting later sessions resume from evidence instead of memory.
 - **Reports** — durable orientation to work, evidence, failure, uncertainty, and
   counsel. A report points to the work; it never substitutes for inspection.
 - **Learning notes** — context that may help later judgment. Evidence, not
@@ -70,7 +74,9 @@ plugin directly during development with
 
 The plugin needs no target-project configuration. Its records live in the
 user's hidden home store, outside the target project. `tools/location` prints
-the exact directory for a target project. An accepted agreement creates:
+the exact directory for a target project. After acceptance, the agent stores
+the agreement and opens the work's record in a directory named by a technical
+task ID:
 
 ```text
 ~/.accord/projects/{project-key}/{task}/
@@ -103,8 +109,8 @@ accord serve
 ```
 
 The command opens the record list in a browser and refreshes while work
-continues. Use `accord serve --task TASK` to open one record directly,
-`accord serve --no-open` to print the URL without opening a browser, and
+continues. Use `accord serve --task TASK` to open one record directly by task
+ID, `accord serve --no-open` to print the URL without opening a browser, and
 `Ctrl-C` to stop the server. The server reads records but does not change them.
 The bundled `tools/serve` remains available as the implementation entry point
 for maintainers and direct plugin inspection.
@@ -113,8 +119,8 @@ The plugin bundles two read-only lifecycle hooks through
 `plugins/accord/hooks/hooks.json`, shared by Claude Code and Codex.
 `SessionStart` supplies a factual index of Accord records after startup, resume,
 or compaction. `PostToolUse` validates records after a shell or file-editing tool
-names a path in `~/.accord`. The hooks do not choose an active agreement, infer
-events, or write to the record.
+names a path in `~/.accord`. The hooks do not decide which agreement covers the
+current work, infer events, or write to the record.
 
 ## Development
 

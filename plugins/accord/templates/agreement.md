@@ -1,4 +1,4 @@
-# Agreement: {task}
+# Agreement: {work}
 
 This agreement gives trust a shape. It records the understanding reached by the
 human and agent before the work begins. It names purpose, authority, and
