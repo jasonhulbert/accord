@@ -268,8 +268,6 @@ class ToolTests(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0)
         self.assertIn("--paper: #000", html)
-        self.assertIn("--running:", html)
-        self.assertIn("--warning:", html)
         self.assertIn("--danger:", html)
         self.assertIn("--human:", html)
         self.assertIn("--agent:", html)
@@ -284,6 +282,73 @@ class ToolTests(unittest.TestCase):
         self.assertIn('<span class="legend-agent">Agent</span>', html)
         self.assertIn('<span class="legend-supporting-agent">Supporting agent</span>', html)
         self.assertNotIn("border-radius:", html)
+
+    def test_renderer_uses_actor_as_the_only_meaning_of_event_color(self):
+        events = [
+            {
+                "ts": "2026-07-27T12:00:00Z",
+                "task": "test",
+                "schema": "1",
+                "type": "attempt",
+                "actor": "human",
+                "summary": "A failed attempt attributed to the human.",
+                "outcome": "failed",
+            },
+            {
+                "ts": "2026-07-27T12:01:00Z",
+                "task": "test",
+                "schema": "1",
+                "type": "completion",
+                "actor": "agent",
+                "summary": "A completion event attributed to the agent.",
+            },
+            {
+                "ts": "2026-07-27T12:02:00Z",
+                "task": "test",
+                "schema": "1",
+                "type": "question",
+                "actor": "supporting-agent",
+                "summary": "A question attributed to the supporting agent.",
+                "subject": "color-source",
+            },
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "record.jsonl"
+            output = Path(directory) / "record.html"
+            path.write_text("".join(json.dumps(item) + "\n" for item in events))
+            result = self.run_tool(RENDER, str(path), "-o", str(output))
+            html = output.read_text()
+
+        self.assertEqual(result.returncode, 0)
+        self.assertIn(
+            '.event[data-actor="human"] .dot { background: var(--human); }',
+            html,
+        )
+        self.assertIn(
+            '.event[data-actor="agent"] .dot { background: var(--agent); }',
+            html,
+        )
+        self.assertIn('.event[data-actor="supporting-agent"] .dot {', html)
+        self.assertNotIn('.event[data-type="completion"] .dot', html)
+        self.assertNotIn('.event[data-type="question"] .dot', html)
+        self.assertNotIn('.event[data-outcome="succeeded"] .dot', html)
+        self.assertNotIn('.event[data-outcome="failed"] .dot', html)
+        self.assertNotIn("--running:", html)
+        self.assertNotIn("--success:", html)
+        self.assertNotIn("--warning:", html)
+
+    def test_renderer_keeps_documents_neutral_and_reserves_danger_for_view_errors(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "record.html"
+            result = self.run_tool(RENDER, str(EXAMPLE), "-o", str(output))
+            html = output.read_text()
+
+        self.assertEqual(result.returncode, 0)
+        self.assertIn(".event.document .dot {", html)
+        self.assertIn("background: var(--paper)", html)
+        self.assertIn("border: 2px solid var(--ink)", html)
+        self.assertIn('.event.document[data-error="true"] .dot {', html)
+        self.assertIn("border-color: var(--danger)", html)
 
     def test_renderer_assigns_type_by_meaning_and_uses_an_explicit_heading_rhythm(self):
         with tempfile.TemporaryDirectory() as directory:

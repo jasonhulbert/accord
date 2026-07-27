@@ -61,9 +61,6 @@ __FONT_CSS__
     --ink: #f4f4ef;
     --muted: #8c8c88;
     --line: #383836;
-    --running: #879b8a;
-    --success: #a9bd72;
-    --warning: #b9a06a;
     --danger: #bd7772;
     --human: #bd9a7a;
     --agent: #8da6ad;
@@ -145,15 +142,13 @@ __FONT_CSS__
     width: 9px;
     height: 9px;
     margin-top: calc(var(--event-pad-top) + 3px);
-    background: var(--running);
+    background: var(--muted);
   }
-  .event[data-type="completion"] .dot,
-  .event[data-outcome="succeeded"] .dot { background: var(--success); }
-  .event[data-type="approach-change"] .dot,
-  .event[data-type="question"] .dot,
-  .event[data-type="review"] .dot { background: var(--warning); }
-  .event[data-type="end"] .dot,
-  .event[data-outcome="failed"] .dot { background: var(--danger); }
+  .event[data-actor="human"] .dot { background: var(--human); }
+  .event[data-actor="agent"] .dot { background: var(--agent); }
+  .event[data-actor="supporting-agent"] .dot {
+    background: var(--supporting-agent);
+  }
   .event.document .dot {
     background: var(--paper);
     border: 2px solid var(--ink);
