@@ -43,11 +43,11 @@ class FrameworkContractTests(unittest.TestCase):
         agreement = self.prose("plugins/accord/templates/agreement.md")
         guide = self.prose("GUIDE.md")
 
-        self.assertIn("Completion closes an agreement", agent)
+        self.assertIn("Closing the agreement belongs to the human", agent)
         self.assertIn("Reach a new agreement for later work", skill)
         self.assertIn("do not reopen or append", skill)
         self.assertIn("A closed agreement counts as none", check_in)
-        self.assertIn("A `completion` event is terminal", record)
+        self.assertIn("Completion is terminal", record)
         self.assertIn("A later message cannot be a check-in", check_in_spec)
         self.assertIn("A completed agreement stays closed", guide)
 
@@ -60,7 +60,7 @@ class FrameworkContractTests(unittest.TestCase):
         )
 
         creed_boundary = agent.split(
-            "### Let completed work remain complete.", 1
+            "### Let the human close the work.", 1
         )[1].split("### Leave a record another session can trust.", 1)[0]
         accord_entry = skill.split(
             "Run `tools/location` from the target project's root", 1
@@ -71,7 +71,7 @@ class FrameworkContractTests(unittest.TestCase):
             "For a possible check-in, run `tools/location`", 1
         )[1].split("For an open question", 1)[0]
 
-        self.assertLessEqual(len(creed_boundary.split()), 45)
+        self.assertLessEqual(len(creed_boundary.split()), 105)
         self.assertLessEqual(len(accord_entry.split()), 110)
         self.assertLessEqual(len(check_in_entry.split()), 75)
 
@@ -194,7 +194,7 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertIn("then waits", agent)
         self.assertIn("The agent remains responsible for how that judgment", human)
         self.assertIn(
-            "stop before making or foreclosing the reserved choice", skill
+            "stop before making or foreclosing the human's choice", skill
         )
         self.assertIn("Responsibility for implementation remains yours", skill)
 
@@ -292,9 +292,50 @@ class FrameworkContractTests(unittest.TestCase):
             skill_prose,
         )
         self.assertIn(
-            "present the completed work for review and ask the question",
+            "ask explicitly whether it should be recorded as complete",
             skill_prose,
         )
+
+    def test_completion_requires_explicit_human_judgment(self):
+        agent = self.prose("plugins/accord/creed/agent.md")
+        human = self.prose("plugins/accord/creed/human.md")
+        skill = self.prose("plugins/accord/skills/accord/SKILL.md")
+        agreement = self.prose("plugins/accord/templates/agreement.md")
+        record = self.prose("plugins/accord/spec/record.md")
+
+        self.assertIn("it does not turn its own confidence into completion", agent)
+        self.assertIn(
+            "only the human decides whether the work should be recorded as complete",
+            human,
+        )
+        self.assertIn(
+            "Evidence, confidence, silence, and earlier authorization do not",
+            skill,
+        )
+        self.assertIn("Completion always remains a human judgment", agreement)
+        self.assertIn(
+            "The agent's evidence or judgment that the agreement has been "
+            "satisfied is not approval",
+            record,
+        )
+
+        example = [
+            json.loads(line)
+            for line in self.read(
+                "plugins/accord/spec/examples/rate-limiting.jsonl"
+            ).splitlines()
+            if line
+        ]
+        completion_index = next(
+            index
+            for index, event in enumerate(example)
+            if event["type"] == "completion"
+        )
+        approval = example[completion_index - 1]
+
+        self.assertEqual(approval["type"], "direction")
+        self.assertEqual(approval["actor"], "human")
+        self.assertIn("Record the rate-limiting work as complete", approval["decision"])
 
     def test_delegation_moves_work_without_fragmenting_accountability(self):
         supporting_agent = self.prose(

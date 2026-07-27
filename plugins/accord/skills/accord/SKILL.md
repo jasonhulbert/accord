@@ -84,15 +84,17 @@ direction arrives.
 
 ## Present work for review
 
-At an agreed review point, make the work itself available for inspection. Write
-a report from `templates/report.md` that names the judgment sought, choices
-still open, what will grow harder to change, and the agent's counsel. Append
-`review`, `report`, and `question` events, then stop before making or foreclosing
-the reserved choice.
+At an agreed review point, or when the outcome and evidence appear to satisfy
+the agreement, make the work itself available for inspection. Write a report
+from `templates/report.md` that names the judgment sought, choices still open,
+what will grow harder to change, and the agent's counsel. Append `review`,
+`report`, and `question` events, then stop before making or foreclosing the
+human's choice.
 
-Tell the human which work is ready for review and ask the question the agreement
-kept human. Do not name the review as though it were a phase, deliverable, or
-piece of work for the human to approve.
+Tell the human which work is ready for review and ask the question kept human.
+When you believe the work is complete, ask explicitly whether it should be
+recorded as complete. Do not name the review as though it were a phase,
+deliverable, or piece of work for the human to approve.
 
 Read later human messages against the open question. A request for more
 evidence or a follow-up question is a `check-in`; the reserved judgment remains
@@ -105,7 +107,8 @@ implementation remains yours.
 
 An internal pause for testing or reflection is not a review. Authority returns
 to the human only where the agreement reserves it, where the human requests a
-review, or where a consequential question exceeds the agreement.
+review, where a consequential question exceeds the agreement, or where the
+agent seeks the human's judgment that the work is complete.
 
 ## Keep the record
 
@@ -120,10 +123,9 @@ inform later judgment; they do not become rules.
 Apply `spec/check-in.md` whenever the human speaks first. Invoking the
 `check-in` skill does not make incidental conversation a check-in.
 
-Record `completion` when the agreement's outcome and evidence are satisfied and
-no reserved completion judgment remains. If the agreement keeps that judgment
-human, present the completed work for review and ask the question. Record `end`
-when the work stops without completion. Preserve unresolved facts plainly in
-either case.
+The human's explicit direction that the work should be recorded as complete
+allows you to append `completion`. Evidence, confidence, silence, and earlier
+authorization do not. Record `end` when the work stops without that approval,
+and preserve unresolved facts plainly in either case.
 
 Improve Accord at its source, not in an installed copy.

@@ -36,6 +36,10 @@ Name the work and judgment at each point. A number may help locate it, but
 “Review 3” is not a substitute for saying what will be ready and what the human
 will decide.
 
+Completion always remains a human judgment. Name the outcome and evidence the
+agent will bring when it believes the agreement has been satisfied. The record
+closes as complete only after the human explicitly agrees.
+
 ## What we can spend
 
 Time, budget, tools, access, dependencies, and other resources available to the
@@ -54,7 +58,8 @@ approach without seeking further direction.
 ## Questions kept by the human
 
 Choices that return to the human before the agent acts, including the judgment
-reserved at each agreed review point.
+reserved at each agreed review point and whether the work should be recorded as
+complete.
 
 ## Amendments
 

@@ -73,6 +73,10 @@ approval, the agreement gave the agent no room. If the first meaningful review
 arrives after every consequential choice has hardened, the human never held
 meaningful judgment.
 
+Completion is the final judgment kept human. When the agent believes the
+agreement has been satisfied, it presents the work and its evidence. The record
+closes as complete only when you explicitly agree.
+
 ## Check in when you need to
 
 You do not have to wait for a scheduled review. Invoke `check-in`, or simply
@@ -111,7 +115,8 @@ for you.
 time and attention.
 
 **Judge the outcome without demanding a straight line.** Failed attempts and
-changed approaches may be evidence that the agent was paying attention.
+changed approaches may be evidence that the agent was paying attention. Decide
+plainly when the work should be recorded as complete.
 
 **Choose again when the evidence changes.** Only the human can decide whether
 an outcome remains worth its cost.

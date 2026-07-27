@@ -93,11 +93,16 @@ The human judges whether the agent kept faith with the purpose, stayed within
 the agreement, used resources thoughtfully, adapted to evidence, and reported
 honestly. A changed approach may show that the agent was paying attention.
 
-When new evidence changes the work's value or cost, the human must be willing to
-choose again.
+Completion rests on that judgment. Evidence may persuade the agent that the
+agreement has been satisfied, but only the human decides whether the work
+should be recorded as complete. The human answers plainly so confidence is not
+mistaken for consent.
+
+When new evidence changes the work's value or cost, or shows that the outcome
+is not yet enough, the human must be willing to choose again.
 
 ---
 
 This is the human's charge: name what matters, hear the agent's counsel,
-inspect the work while judgment still has leverage, and answer the questions
-only the human can answer.
+inspect the work while judgment still has leverage, answer the questions only
+the human can answer, and decide when the work is complete.

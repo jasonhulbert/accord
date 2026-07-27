@@ -57,7 +57,7 @@ defined.
 | `direction` | The human answers an open question. `decision` carries the answer. |
 | `check-in` | Human input that meets the consequential boundary in `spec/check-in.md`. |
 | `approach-change` | The approach changes while the purpose remains. |
-| `completion` | The work satisfies the agreement's stated outcome and evidence, closing the agreement and record. |
+| `completion` | The human has explicitly approved recording the work as complete, closing the agreement and record. |
 | `end` | The work ends without completion. |
 | `note` | A factual event that fits no more specific type. |
 
@@ -67,9 +67,14 @@ human agreement, not an implementation choice made in passing.
 `investigator` remains valid in stored schema version `"1"` records. New events
 use `supporting-agent`; valid history is not rewritten.
 
-A `completion` event is terminal. No later request reopens the agreement, and no
-later event is appended to that record. Related work receives a new agreement
-and record.
+A `completion` event follows the human's explicit approval, ordinarily recorded
+as `direction`. The agent's evidence or judgment that the agreement has been
+satisfied is not approval. Validation proves that an event is well formed; the
+preceding record shows whether authority to close was given.
+
+Completion is terminal. No later request reopens the agreement, and no later
+event is appended to that record. Related work receives a new agreement and
+record.
 
 ## Documents and events
 

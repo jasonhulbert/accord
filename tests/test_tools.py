@@ -32,7 +32,7 @@ class ToolTests(unittest.TestCase):
         result = self.run_tool(VALIDATE, str(EXAMPLE))
 
         self.assertEqual(result.returncode, 0)
-        self.assertIn("16 lines valid", result.stdout)
+        self.assertIn("21 lines valid", result.stdout)
         self.assertEqual(result.stderr, "")
 
     def test_validator_rejects_type_specific_fields_on_other_events(self):
@@ -88,7 +88,7 @@ class ToolTests(unittest.TestCase):
             html = output.read_text()
 
         self.assertEqual(result.returncode, 0)
-        self.assertIn("rendered 16 events", result.stdout)
+        self.assertIn("rendered 21 events", result.stdout)
         self.assertIn("<title>Accord record</title>", html)
         self.assertIn("rate-limiting", html)
         self.assertIn("A factual view of what changed", html)
