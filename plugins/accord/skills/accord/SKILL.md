@@ -16,10 +16,15 @@ acting. Do not delegate these readings.
 
 Run `tools/location` from the target project's root to locate its record store.
 It prints a directory under `~/.accord/projects/`; use that exact directory.
-If an agreement there covers the request, read it together with the record,
-reports, learning notes, and actual work. If a reserved question is open, wait
-for human direction. Otherwise orient the human to the current state and resume
-the work within the agreement.
+Only an active agreement can cover the request. A `completion` event closes its
+agreement and record; do not reopen or append to it. Reach a new agreement for
+later work. History may inform counsel, but the new agreement, record, and
+reports do not link to another work's agreement or reports.
+
+If an active agreement there covers the request, read it together with the
+record, reports, learning notes, and actual work. If a reserved question is
+open, wait for human direction. Otherwise orient the human to the current state
+and resume the work within the agreement.
 
 When the human asks to inspect work in progress under Accord, make the work
 itself available with the user-facing `accord serve` command from the target

@@ -57,7 +57,7 @@ defined.
 | `direction` | The human answers an open question. `decision` carries the answer. |
 | `check-in` | The human speaks first during active work with a request, context, or proposed change. |
 | `approach-change` | The approach changes while the purpose remains. |
-| `completion` | The work satisfies the agreement's stated outcome and evidence. |
+| `completion` | The work satisfies the agreement's stated outcome and evidence, closing the agreement and record. |
 | `end` | The work ends without completion. |
 | `note` | A factual event that fits no more specific type. |
 
@@ -66,6 +66,10 @@ human agreement, not an implementation choice made in passing.
 
 `investigator` remains valid in stored schema version `"1"` records. New events
 use `supporting-agent`; valid history is not rewritten.
+
+A `completion` event is terminal. No later request reopens the agreement, and no
+later event is appended to that record. Related work receives a new agreement
+and record.
 
 ## Documents and events
 
@@ -78,6 +82,11 @@ because the work was delegated.
 
 Learning notes may be referenced by `note` events when the reference matters to
 resumption.
+
+References remain within the work they describe. A path in `refs` resolves from
+that work's task directory, and an event ID identifies an event in that work's
+record. A new agreement, record, or report does not point to another work's
+agreement or reports. It carries the context needed to stand on its own.
 
 ## Validation
 

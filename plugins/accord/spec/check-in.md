@@ -7,6 +7,10 @@ not know, or propose a change to the agreement.
 The meaning belongs to the message, not to whether the `check-in` skill was
 invoked by name.
 
+A `completion` event ends the active work. A later message cannot be a check-in
+to that agreement and is not appended to its record. If the message calls for
+more work under Accord, the agent begins the conversation for a new agreement.
+
 Before treating a message as a check-in, read the record for an open `question`.
 A clear answer to that question is `direction`, not `check-in`. A follow-up
 question while judgment remains open is a check-in; it does not resolve the

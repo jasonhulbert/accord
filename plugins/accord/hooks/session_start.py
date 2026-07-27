@@ -6,6 +6,7 @@ from __future__ import annotations
 import sys
 
 from hook_support import (
+    contains_event_type,
     display_path,
     event_count_and_last,
     find_accord_root,
@@ -45,6 +46,7 @@ def main() -> int:
         task_dir = log.parent
         valid, validation_output = validate_log(log)
         count, last = event_count_and_last(log)
+        completion = valid and contains_event_type(log, "completion")
         agreement = task_dir / "agreement.md"
         learning = list(task_dir.glob("learning*.md"))
         reports = list((task_dir / "reports").glob("*.md"))
@@ -53,6 +55,7 @@ def main() -> int:
             f"agreement={'agreement.md' if agreement.is_file() else 'missing'}; "
             f"record={'valid' if valid else 'INVALID'} "
             f"({count} events; last {last}); "
+            f"completion={'recorded' if completion else 'none'}; "
             f"learning={latest_named_file(learning)}; "
             f"reports={latest_named_file(reports)}"
         )
@@ -63,9 +66,17 @@ def main() -> int:
                 for line in validation_excerpt(validation_output, accord_root)
             )
 
-    lines.append(
-        "Before resuming work, read its agreement, record, reports, learning "
-        "notes, and actual state."
+    lines.extend(
+        [
+            (
+                "A completion event closes its agreement and record. Begin a "
+                "new agreement for later work."
+            ),
+            (
+                "Before resuming active work, read its agreement, record, "
+                "reports, learning notes, and actual state."
+            ),
+        ]
     )
     print("\n".join(lines))
     return 0

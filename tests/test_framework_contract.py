@@ -34,6 +34,47 @@ class FrameworkContractTests(unittest.TestCase):
             agreement,
         )
 
+    def test_completion_closes_authority_without_erasing_history(self):
+        agent = self.prose("plugins/accord/creed/agent.md")
+        skill = self.prose("plugins/accord/skills/accord/SKILL.md")
+        check_in = self.prose("plugins/accord/skills/check-in/SKILL.md")
+        record = self.prose("plugins/accord/spec/record.md")
+        check_in_spec = self.prose("plugins/accord/spec/check-in.md")
+        agreement = self.prose("plugins/accord/templates/agreement.md")
+        guide = self.prose("GUIDE.md")
+
+        self.assertIn("Completion closes an agreement", agent)
+        self.assertIn("Reach a new agreement for later work", skill)
+        self.assertIn("do not reopen or append", skill)
+        self.assertIn("A closed agreement counts as none", check_in)
+        self.assertIn("A `completion` event is terminal", record)
+        self.assertIn("A later message cannot be a check-in", check_in_spec)
+        self.assertIn("A completed agreement stays closed", guide)
+
+        self.assertIn("History may inform judgment", agent)
+        self.assertIn("History may inform counsel", skill)
+        self.assertIn("The agreement stands on its own", agreement)
+        self.assertIn(
+            "does not point to another work's agreement or reports",
+            record,
+        )
+
+        creed_boundary = agent.split(
+            "### Let completed work remain complete.", 1
+        )[1].split("### Leave a record another session can trust.", 1)[0]
+        accord_entry = skill.split(
+            "Run `tools/location` from the target project's root", 1
+        )[1].split(
+            "When the human asks to inspect work in progress under Accord", 1
+        )[0]
+        check_in_entry = check_in.split(
+            "Run `tools/location` from the target project's root", 1
+        )[1].split("Read the agreement, record, reports", 1)[0]
+
+        self.assertLessEqual(len(creed_boundary.split()), 45)
+        self.assertLessEqual(len(accord_entry.split()), 110)
+        self.assertLessEqual(len(check_in_entry.split()), 75)
+
     def test_accord_names_the_framework_not_a_body_of_work(self):
         style = self.prose("ACCORD_STYLE_GUIDE.md")
         skill = self.prose("plugins/accord/skills/accord/SKILL.md")

@@ -10,9 +10,16 @@ clarify uncertain work, not make ordinary work feel important.
 ## How the work begins
 
 Invoke the `accord` skill in the project where the work belongs. If an existing
-agreement already covers it, the agent reads the record and actual work before
-resuming. Otherwise the agent inspects enough context to draft an agreement and
-offer counsel.
+active agreement already covers it, the agent reads the record and actual work
+before resuming. A completed agreement stays closed. Later work begins with a
+new agreement, even when it follows closely from what came before.
+
+Earlier work may inform the agent's counsel, but it does not lend authority to
+the new work. The new agreement and record stand on their own rather than
+linking to earlier agreements or reports.
+
+When no active agreement covers the request, the agent inspects enough context
+to draft an agreement and offer counsel.
 
 The draft names:
 

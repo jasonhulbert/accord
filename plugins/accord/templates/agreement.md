@@ -4,6 +4,9 @@ This agreement gives trust a shape. It records the understanding reached by the
 human and agent before the work begins. It names purpose, authority, and
 reserved judgment without trying to predict every implementation choice.
 
+The agreement stands on its own. It does not rely on direct references or links
+to agreements or reports from other work.
+
 ## What matters
 
 Why the work is worth doing. What it must accomplish and what it must not

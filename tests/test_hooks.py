@@ -127,11 +127,44 @@ class HookTests(unittest.TestCase):
             "last start at 2026-07-23T12:00:00Z",
             result.stdout,
         )
+        self.assertIn("completion=none", result.stdout)
         self.assertIn(
             "not a decision that any agreement covers",
             result.stdout,
         )
         self.assertIn("~/.accord/projects/", result.stdout)
+
+    def test_session_start_marks_completion_as_a_closed_boundary(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            home = root / "home"
+            home.mkdir()
+            contents = "\n".join(
+                [
+                    json.dumps(event()),
+                    json.dumps(event("completion")),
+                    "",
+                ]
+            )
+            self.make_accord(root, home, contents)
+
+            result = self.run_hook(
+                SESSION_START,
+                {
+                    "hook_event_name": "SessionStart",
+                    "source": "resume",
+                    "cwd": str(root),
+                },
+                home,
+            )
+
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("completion=recorded", result.stdout)
+        self.assertIn(
+            "A completion event closes its agreement and record",
+            result.stdout,
+        )
+        self.assertIn("Begin a new agreement for later work", result.stdout)
 
     def test_session_start_surfaces_invalid_history_without_blocking_startup(self):
         with tempfile.TemporaryDirectory() as directory:

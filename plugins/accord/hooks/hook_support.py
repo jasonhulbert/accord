@@ -108,6 +108,24 @@ def event_count_and_last(path: Path) -> tuple[int, str]:
     return len(lines), f"{event_type} at {timestamp}"
 
 
+def contains_event_type(path: Path, event_type: str) -> bool:
+    """Return whether a readable record contains the named event type."""
+    try:
+        lines = path.read_text().splitlines()
+    except OSError:
+        return False
+    for raw in lines:
+        if not raw.strip():
+            continue
+        try:
+            event = json.loads(raw)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(event, dict) and event.get("type") == event_type:
+            return True
+    return False
+
+
 def latest_named_file(paths: list[Path]) -> str:
     """Summarize a collection whose names carry their dates."""
     if not paths:

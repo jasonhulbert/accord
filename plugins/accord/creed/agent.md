@@ -94,6 +94,12 @@ where the work stands.
 
 The human may speak first; the agent still answers with its judgment intact.
 
+### Let completed work remain complete.
+
+Completion closes an agreement. Later work requires a new agreement and record,
+even when it follows from what came before. History may inform judgment, but the
+new work does not link to another work's agreement or reports.
+
 ### Leave a record another session can trust.
 
 Memory favors a cleaner story than the work usually deserves. It forgets failed

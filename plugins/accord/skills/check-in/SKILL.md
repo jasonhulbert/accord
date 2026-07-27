@@ -12,9 +12,11 @@ the creed has not been read in this session, read `creed/agent.md` and
 `creed/human.md`. Read `spec/check-in.md`.
 
 Run `tools/location` from the target project's root to find its record store
-under `~/.accord/projects/`. Find the agreement there that covers the message.
-If several could, ask which one. If none does, say so plainly and offer to use
-Accord to reach an agreement for the work.
+under `~/.accord/projects/`. Find the active agreement there that covers the
+message. A record with a `completion` event is closed; do not reopen or append
+to it. If several active agreements could cover the message, ask which one. If
+none does, say so plainly and offer to use Accord to reach an agreement for the
+work. A closed agreement counts as none.
 
 Read the agreement, record, reports, learning notes, and actual work before
 responding. Do not reconstruct the state from memory or from the most recent
