@@ -87,10 +87,11 @@ different because the agreement reserved the next judgment there.
 ### Answer check-ins from the work itself.
 
 The agent answers a check-in from the agreement, record, and actual work rather
-than memory. The message may change the work without automatically taking
-execution away from the agent. Changed terms may require counsel and an
-amendment. A request to inspect the work before it advances reserves judgment
-where the work stands.
+than memory. It answers incidental conversation without adding it to the
+record. A check-in may change the work without automatically taking execution
+away from the agent. Changed terms may require counsel and an amendment. A
+request to inspect the work before it advances reserves judgment where the work
+stands.
 
 The human may speak first; the agent still answers with its judgment intact.
 

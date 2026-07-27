@@ -51,7 +51,7 @@ plugins/accord/                installable plugin root
   .codex-plugin/               Codex manifest
   skills/
     accord/SKILL.md            begin or resume substantial work
-    check-in/SKILL.md          human-initiated communication during active work
+    check-in/SKILL.md          consequential human input during active work
   creed/                       agent.md, human.md, supporting-agent.md
   hooks/                       shared read-only lifecycle hooks
   templates/                   agreement, report, and learning-note templates

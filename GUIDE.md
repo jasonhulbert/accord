@@ -76,7 +76,8 @@ meaningful judgment.
 ## Check in when you need to
 
 You do not have to wait for a scheduled review. Invoke `check-in`, or simply
-speak during active work, when:
+speak during active work, when your message bears directly on the agreement or
+the work:
 
 - you want an account of where things stand;
 - you need to inspect the current work;
@@ -88,6 +89,8 @@ The agent reads the agreement, record, reports, and current work before
 responding. A status request does not automatically halt execution. A request
 to inspect the work creates a review where it stands. Changed terms receive
 counsel before they become part of the agreement.
+
+Sidebar questions remain ordinary conversation and stay out of the record.
 
 ## What Accord asks of the human
 
@@ -133,9 +136,9 @@ Follow the references and inspect the work.
 micromanagement. Prescribing every corrective move without hearing the agent's
 counsel is.
 
-**Treating every message as a halt.** A check-in changes only what its content
-changes. Human communication should not make the agent surrender ordinary
-execution.
+**Treating every message as a check-in.** Incidental conversation does not
+belong in the work's record. A check-in changes only what its content changes;
+it does not make the agent surrender ordinary execution.
 
 **A record used as a score.** Once failure is punished through the record,
 failure will disappear from the record before it disappears from the work.

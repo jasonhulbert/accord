@@ -68,8 +68,8 @@ class FrameworkContractTests(unittest.TestCase):
             "When the human asks to inspect work in progress under Accord", 1
         )[0]
         check_in_entry = check_in.split(
-            "Run `tools/location` from the target project's root", 1
-        )[1].split("Read the agreement, record, reports", 1)[0]
+            "For a possible check-in, run `tools/location`", 1
+        )[1].split("For an open question", 1)[0]
 
         self.assertLessEqual(len(creed_boundary.split()), 45)
         self.assertLessEqual(len(accord_entry.split()), 110)
@@ -235,24 +235,36 @@ class FrameworkContractTests(unittest.TestCase):
         )
         self.assertIn("then report and ask again", skill)
 
-    def test_check_in_can_request_review_without_making_every_message_a_halt(self):
+    def test_check_in_can_request_review_without_recording_every_message(self):
         agent = self.prose("plugins/accord/creed/agent.md")
         human = self.prose("plugins/accord/creed/human.md")
-        check_in_spec = self.read("plugins/accord/spec/check-in.md")
-        check_in_skill = self.read("plugins/accord/skills/check-in/SKILL.md")
+        check_in_spec = self.prose("plugins/accord/spec/check-in.md")
+        check_in_skill = self.prose("plugins/accord/skills/check-in/SKILL.md")
+        record = self.prose("plugins/accord/spec/record.md")
 
-        self.assertIn("A clear answer to that question is `direction`", check_in_spec)
+        self.assertIn(
+            "A clear answer to an open `question` is `direction`", check_in_spec
+        )
+        self.assertIn(
+            "Acceptance of the initial agreement is `start`, not `check-in`",
+            check_in_spec,
+        )
         self.assertIn("A request to inspect the work", check_in_spec)
         self.assertIn("reserves judgment where the work stands", check_in_spec)
-        self.assertIn(
-            "does not halt work merely because the human spoke first", check_in_spec
-        )
+        self.assertIn("does not halt work by itself", check_in_spec)
+        self.assertIn("ordinary conversation, not a check-in", check_in_spec)
+        self.assertIn("do not append an event", check_in_spec)
+        self.assertIn("accepts an amendment or authorizes", check_in_spec)
+        self.assertIn("materially affects the agreement", check_in_spec)
+        self.assertIn("directly asks about, provides feedback on", check_in_spec)
+        self.assertIn("meets the consequential boundary", record)
         self.assertIn("Changed terms may require counsel and an", agent)
+        self.assertIn("answers incidental conversation without adding it", agent)
         self.assertIn("reserves judgment where the work stands", agent)
         self.assertIn("seek the agent's counsel", human)
+        self.assertIn("Incidental questions remain ordinary conversation", human)
         self.assertIn("A request for counsel", check_in_spec)
-        self.assertIn("accounts, counsel, reviews", check_in_skill)
-        self.assertIn("Follow `spec/check-in.md`", check_in_skill)
+        self.assertIn("before treating the message as a check-in", check_in_skill)
 
     def test_internal_pause_does_not_become_an_approval_gate(self):
         agent = self.read("plugins/accord/creed/agent.md")

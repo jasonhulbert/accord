@@ -55,7 +55,7 @@ defined.
 | `report` | A reference event indexing a report in `refs`. |
 | `question` | A consequential choice returns to the human. `subject` names the judgment sought. |
 | `direction` | The human answers an open question. `decision` carries the answer. |
-| `check-in` | The human speaks first during active work with a request, context, or proposed change. |
+| `check-in` | Human input that meets the consequential boundary in `spec/check-in.md`. |
 | `approach-change` | The approach changes while the purpose remains. |
 | `completion` | The work satisfies the agreement's stated outcome and evidence, closing the agreement and record. |
 | `end` | The work ends without completion. |

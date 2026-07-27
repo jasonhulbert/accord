@@ -1,26 +1,34 @@
 # A check-in
 
-A check-in is the human speaking first while work is active. It may ask for an
-account or counsel, request an unscheduled review, bring context the agent could
-not know, or propose a change to the agreement.
+A check-in is human-initiated input during active work that:
 
-The meaning belongs to the message, not to whether the `check-in` skill was
-invoked by name.
+- accepts an amendment or authorizes proposed or recommended work;
+- provides direction or context that materially affects the agreement or
+  current course; or
+- directly asks about, provides feedback on, or challenges work done within the
+  agreement.
+
+An incidental or sidebar message is ordinary conversation, not a check-in. If
+that is clear without consulting the work, answer normally and leave the record
+alone. Invoking the `check-in` skill does not change the message's meaning.
 
 A `completion` event ends the active work. A later message cannot be a check-in
 to that agreement and is not appended to its record. If the message calls for
 more work under Accord, the agent begins the conversation for a new agreement.
 
-Before treating a message as a check-in, read the record for an open `question`.
-A clear answer to that question is `direction`, not `check-in`. A follow-up
-question while judgment remains open is a check-in; it does not resolve the
-reserved judgment or authorize the work that depends on it.
-
 ## Answer from the work
 
-Record the check-in with the human's words verbatim or near them. Then read the
-agreement, record, prior reports, learning notes, and actual state of the work.
-The response should come from that evidence rather than memory.
+When the boundary depends on the work, read the agreement, record, reports,
+learning notes, and actual state before classifying the message. If it does not
+meet the boundary, answer normally and do not append an event.
+
+More specific events retain their meaning. Acceptance of the initial agreement
+is `start`, not `check-in`. A clear answer to an open `question` is `direction`,
+not `check-in`. A direct follow-up while judgment remains open is a check-in; it
+does not authorize the work that depends on that judgment.
+
+Record a qualifying check-in with the human's words verbatim or near them.
+Respond from the evidence rather than memory.
 
 The shape of the message determines what follows:
 
@@ -31,13 +39,10 @@ The shape of the message determines what follows:
 - **A request to inspect the work** reserves judgment where the work stands.
   Make the work inspectable, report, ask for the requested judgment, and wait
   for direction.
-- **New context** gets the agent's judgment about what it changes. If it changes
-  nothing material, say so and continue within the agreement.
+- **New context** gets the agent's judgment about what it changes.
 - **Changed terms** get counsel about cost, risk, and consequences. Record an
   accepted amendment before continuing under it.
 
-A check-in does not halt work merely because the human spoke first. Work waits
-when the human requests review or a halt, closes authority the agreement had
-left open, or leaves a reserved question unanswered.
-
-An existing reserved judgment remains open until the human gives direction.
+A check-in does not halt work by itself. Work waits when the human requests
+review or a halt, closes authority the agreement had left open, or leaves a
+reserved question unanswered.

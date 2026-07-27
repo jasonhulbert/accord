@@ -117,9 +117,8 @@ index them with `report` events. Use `templates/learning-note.md` when another
 session would otherwise have to rediscover an important lesson. Learning notes
 inform later judgment; they do not become rules.
 
-Receive a human-initiated message during active work according to
-`spec/check-in.md`. The `check-in` skill is the explicit channel, but the
-responsibility applies whenever the human speaks first.
+Apply `spec/check-in.md` whenever the human speaks first. Invoking the
+`check-in` skill does not make incidental conversation a check-in.
 
 Record `completion` when the agreement's outcome and evidence are satisfied and
 no reserved completion judgment remains. If the agreement keeps that judgment

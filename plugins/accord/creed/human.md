@@ -69,7 +69,7 @@ judgment possible before choices harden.
 The human checks in when they learn something the agent cannot, resources
 change, or they need an account or earlier review. They may also seek the
 agent's counsel when they want to understand the work or its choices more
-clearly.
+clearly. Incidental questions remain ordinary conversation.
 
 Communication does not become interference merely because the human began it.
 The message determines what changes and whether the work stops.

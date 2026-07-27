@@ -108,7 +108,7 @@ Prefer a small, stable vocabulary:
 - **work** for the bounded undertaking carried under one agreement;
 - **agreement** for the accepted purpose, bounds, authority, risks, resources,
   review points, and reserved decisions;
-- **check-in** for a human-initiated conversation during the work;
+- **check-in** for consequential human input during the work;
 - **review** for the human's inspection and judgment while change remains
   practical;
 - **question** for a consequential choice the agreement leaves with the human;
