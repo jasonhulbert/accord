@@ -1,0 +1,4 @@
+interface:
+  display_name: "Visual explanation"
+  short_description: "Show cross-cutting Accord work at a glance"
+  default_prompt: "Use $visual-explanation to show the relationships and exceptions in this work."

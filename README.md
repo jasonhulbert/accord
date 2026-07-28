@@ -44,6 +44,8 @@ the repository root are contributor-facing.
 ```text
 GUIDE.md                       practical human-facing guide
 ACCORD_STYLE_GUIDE.md          voice and writing standard
+package.json                   contributor-only web build dependencies
+web/                           web-view sources and build script
 .claude-plugin/                Claude Code marketplace catalog
 .agents/plugins/               Codex marketplace catalog
 plugins/accord/                installable plugin root
@@ -52,6 +54,8 @@ plugins/accord/                installable plugin root
   skills/
     accord/SKILL.md            begin or resume substantial work
     check-in/SKILL.md          consequential human input during active work
+    visual-explanation/SKILL.md
+                               visual accounts of cross-cutting work
   creed/                       agent.md, human.md, supporting-agent.md
   hooks/                       shared read-only lifecycle hooks
   templates/                   agreement, report, and learning-note templates
@@ -67,7 +71,7 @@ tests/                         framework, hook, and tool behavior tests
 (`/plugin marketplace add <repo>` then `/plugin install accord`), or load the
 plugin directly during development with
 `claude --plugin-dir <path-to-repo>/plugins/accord`. Its skills are
-`/accord:accord` and `/accord:check-in`.
+`/accord:accord`, `/accord:check-in`, and `/accord:visual-explanation`.
 
 **Codex.** Add this repository as a plugin marketplace
 (`codex plugin marketplace add <repo>`) and install `accord`.
@@ -83,6 +87,7 @@ task ID:
   agreement.md
   record.jsonl
   reports/
+  diagrams/
 ```
 
 The project key is derived from the project root, so two projects with the same
@@ -90,7 +95,10 @@ directory name keep separate records. The path stays stable while the project
 remains at that root.
 
 `plugins/accord/tools/validate` checks a record against the shared schema.
-`plugins/accord/tools/render` creates a self-contained HTML timeline.
+`plugins/accord/tools/render` creates an offline HTML timeline with a sibling
+asset directory. Serve the generated directory locally rather than opening its
+HTML through `file://`. Referenced visual explanations under `diagrams/` render
+Mermaid blocks locally while keeping their source available for inspection.
 `plugins/accord/bin/accord` is the stable user-facing launcher. Plugin hosts
 that expose plugin `bin` commands make `accord` available after installation.
 If your host does not expose it, install the launcher once from the installed
@@ -123,6 +131,19 @@ names a path in `~/.accord`. The hooks do not decide which agreement covers the
 current work, infer events, or write to the record.
 
 ## Development
+
+The installable plugin contains a generated web distribution and has no Node
+runtime dependency. Contributors rebuild that distribution from the separate
+HTML, CSS, and JavaScript sources with:
+
+```text
+npm ci
+npm run build:web
+```
+
+`npm run check:web` fails when the checked-in distribution differs from its
+sources or when the pinned Mermaid structure no longer supports Accord's
+flowchart-and-sequence build.
 
 Run the full behavior suite:
 

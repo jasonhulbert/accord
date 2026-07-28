@@ -96,6 +96,19 @@ counsel before they become part of the agreement.
 
 Sidebar questions remain ordinary conversation and stay out of the record.
 
+## Ask to see what prose has scattered
+
+When behavior crosses many files or features, invoke `visual-explanation` or
+ask the agent to show its flow or relationships. The agent traces the actual
+work and prepares the smallest useful visual account.
+
+Prose names the question and scope. Diagrams expose repeated paths, exceptions,
+and relationships. Prose returns the reader to uncertainty and the
+implementation references that deserve closer inspection.
+
+The request leaves authority where the agreement placed it. A picture alone
+does not create a review.
+
 ## What Accord asks of the human
 
 **Name why, not only what.** A result can satisfy a request and still fail its
@@ -164,6 +177,7 @@ Each body of work has a technical task ID used only in paths and interfaces.
   amendments;
 - `~/.accord/projects/{project-key}/{task}/record.jsonl` — the append-only factual record;
 - `~/.accord/projects/{project-key}/{task}/reports/` — durable reports and review orientation;
+- `~/.accord/projects/{project-key}/{task}/diagrams/` — referenced visual explanations of the work;
 - `~/.accord/projects/{project-key}/{task}/learning-*.md` — context another session should not have to
   rediscover.
 

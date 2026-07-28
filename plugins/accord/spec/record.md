@@ -78,12 +78,19 @@ record.
 
 ## Documents and events
 
-Agreements and reports are markdown-primary: the document carries the
-conversation and its voice, while `start` and `report` events point to it.
+Agreements, reports, and visual explanations are markdown-primary: the document
+carries the conversation and its voice. `start` and `report` point to agreements
+and reports. A visual explanation lives under `diagrams/` and is referenced by
+the event that explains why it exists. It has no event type of its own.
+
 Investigations, attempts, reviews, questions, directions, check-ins, approach
 changes, completion, and endings are record-primary. A supporting agent records
 the kind of work it did rather than receiving a separate event type merely
 because the work was delegated.
+
+A visual explanation lets prose and fenced `mermaid` blocks carry one account.
+Its scope, evidence, and uncertainty keep the picture honest. It does not
+replace the plain event summary or the implementation beneath it.
 
 Learning notes may be referenced by `note` events when the reference matters to
 resumption.
