@@ -266,6 +266,26 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertIn("A request for counsel", check_in_spec)
         self.assertIn("before treating the message as a check-in", check_in_skill)
 
+    def test_visual_explanation_supports_judgment_without_inventing_a_new_event(self):
+        skill = self.prose(
+            "plugins/accord/skills/visual-explanation/SKILL.md"
+        )
+        record = self.prose("plugins/accord/spec/record.md")
+        guide = self.prose("GUIDE.md")
+
+        self.assertLess(len(skill.split()), 250)
+        self.assertIn("another way to understand the work", skill)
+        self.assertIn("Let picture and prose work together", skill)
+        self.assertIn("where seeing helps more than reading", skill)
+        self.assertIn("implemented behavior, intent, and inference", skill)
+        self.assertIn("smallest set", skill)
+        self.assertIn("neither reopens closed work nor creates a review", skill)
+        self.assertIn("not an event of its own", skill)
+        self.assertNotIn("Read `creed/", skill)
+        self.assertNotIn("Read `spec/", skill)
+        self.assertIn("does not replace the plain event summary", record)
+        self.assertIn("leaves authority where the agreement placed it", guide)
+
     def test_internal_pause_does_not_become_an_approval_gate(self):
         agent = self.read("plugins/accord/creed/agent.md")
         skill = self.read("plugins/accord/skills/accord/SKILL.md")
@@ -499,6 +519,19 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertIn("ACCORD_STYLE_GUIDE.md", agents)
         self.assertIn("literal", agents)
         self.assertIn("Improve Accord at its source", skill)
+
+    def test_web_build_stays_contributor_only_and_reproducible(self):
+        package = json.loads(self.read("package.json"))
+        readme = self.read("README.md")
+
+        self.assertTrue(package["private"])
+        self.assertEqual(package["devDependencies"]["mermaid"], "11.16.0")
+        self.assertIn("build:web", package["scripts"])
+        self.assertIn("check:web", package["scripts"])
+        self.assertIn("generated web distribution", readme)
+        self.assertIn("no Node\nruntime dependency", readme)
+        self.assertIn("npm ci", readme)
+        self.assertIn("npm run check:web", readme)
 
 
 if __name__ == "__main__":

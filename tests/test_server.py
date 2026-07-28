@@ -140,6 +140,16 @@ class ServerTests(unittest.TestCase):
             self.assertIn("The learning is visible.", page)
             self.assertIn('document.querySelector("dialog[open]")', page)
             self.assertIn("font: 13px/1.5 var(--font-mono)", page)
+            self.assertIn(
+                'import mermaid from "/assets/web/mermaid/mermaid.js"',
+                page,
+            )
+
+            status, mermaid_entry = self.get(
+                url.rstrip("/") + "/assets/web/mermaid/mermaid.js"
+            )
+            self.assertEqual(status, 200)
+            self.assertIn("export", mermaid_entry)
 
             record = store / "rate-limit" / "record.jsonl"
             with record.open("a") as handle:

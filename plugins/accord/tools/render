@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Render record.jsonl files into a self-contained HTML timeline.
+"""Render record.jsonl files into an offline HTML timeline and local assets.
 
 Usage: tools/render <record.jsonl> [more.jsonl ...] [-o record.html]
 
-The output embeds its events and all CSS and JavaScript. It fetches nothing.
+The output embeds its events and presentation code. Mermaid modules are copied
+to a sibling asset directory. The generated directory fetches nothing.
 """
 
 from __future__ import annotations
@@ -11,12 +12,15 @@ from __future__ import annotations
 import base64
 from functools import lru_cache
 import json
+import shutil
 import sys
 from html import escape
 from pathlib import Path
 
 
 FONT_ROOT = Path(__file__).resolve().parent.parent / "assets" / "fonts"
+WEB_ROOT = Path(__file__).resolve().parent.parent / "assets" / "web"
+VIEW_TEMPLATE = WEB_ROOT / "record.html"
 FONT_SPECS = (
     ("IBM Plex Sans", "IBMPlexSans-Regular.woff2", 400),
     ("IBM Plex Sans", "IBMPlexSans-SemiBold.woff2", 600),
@@ -43,526 +47,10 @@ def font_css() -> str:
     return "\n".join(faces)
 
 
-TEMPLATE = r"""<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>__TITLE__</title>
-<style>
-__FONT_CSS__
-  :root {
-    color-scheme: dark;
-    --font-sans: "IBM Plex Sans", sans-serif;
-    --font-mono: "IBM Plex Mono", monospace;
-    --page-gutter: 16px;
-    --event-pad-top: 20px;
-    --paper: #000;
-    --ink: #f4f4ef;
-    --muted: #8c8c88;
-    --line: #383836;
-    --danger: #bd7772;
-    --human: #bd9a7a;
-    --agent: #8da6ad;
-    --supporting-agent: #a394b8;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: var(--paper);
-    color: var(--ink);
-    font: 15px/1.55 var(--font-sans);
-  }
-  main {
-    width: min(1000px, calc(100% - (2 * var(--page-gutter))));
-    margin: 0 auto;
-    padding: 0 0 64px;
-  }
-  .view-nav {
-    padding: 16px 0;
-    border-bottom: 1px solid var(--line);
-    color: var(--muted);
-    font: 11px/1.4 var(--font-sans);
-    letter-spacing: .08em;
-    text-transform: uppercase;
-  }
-  .view-nav a { color: var(--ink); }
-  :focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
-  header { padding: 48px 0 32px; border-bottom: 1px solid var(--line); }
-  h1, h2 { font-weight: 600; letter-spacing: -0.04em; }
-  h1 { margin: 0 0 12px; font-size: clamp(2.2rem, 7vw, 4.6rem); line-height: .95; }
-  h2 { margin: 0; font-size: 1.45rem; line-height: 1.1; }
-  .intro { max-width: 650px; margin: 0; color: var(--muted); font-size: 1.05rem; }
-  .task { margin-top: 0; }
-  .task-head {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: baseline;
-    gap: 24px;
-    margin: 0;
-    padding: 24px 0 16px;
-    border-bottom: 1px solid var(--line);
-  }
-  .task-head h2 { overflow-wrap: anywhere; }
-  .count {
-    color: var(--muted);
-    font: 11px/1.4 var(--font-mono);
-    letter-spacing: .02em;
-    white-space: nowrap;
-  }
-  .timeline { position: relative; margin-left: 12px; }
-  .timeline::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 4px;
-    width: 1px;
-    background: var(--line);
-  }
-  .event {
-    position: relative;
-    display: grid;
-    grid-template-columns: 10px minmax(0, 1fr);
-    gap: 20px;
-    padding: 0;
-  }
-  .event::after {
-    content: "";
-    position: absolute;
-    left: 4px;
-    right: 0;
-    bottom: 0;
-    height: 1px;
-    background: var(--line);
-  }
-  .dot {
-    position: relative;
-    z-index: 1;
-    width: 9px;
-    height: 9px;
-    margin-top: calc(var(--event-pad-top) + 3px);
-    background: var(--muted);
-  }
-  .event[data-actor="human"] .dot { background: var(--human); }
-  .event[data-actor="agent"] .dot { background: var(--agent); }
-  .event[data-actor="supporting-agent"] .dot {
-    background: var(--supporting-agent);
-  }
-  .event.document .dot {
-    background: var(--paper);
-    border: 2px solid var(--ink);
-  }
-  .event.document[data-error="true"] .dot {
-    border-color: var(--danger);
-  }
-  .card {
-    padding: var(--event-pad-top) 0 24px;
-    border: 0;
-    background: transparent;
-  }
-  .meta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px 12px;
-    margin-bottom: 8px;
-    color: var(--muted);
-    font: 11px/1.4 var(--font-sans);
-    letter-spacing: .04em;
-    text-transform: uppercase;
-  }
-  .meta time {
-    font-family: var(--font-mono);
-    letter-spacing: 0;
-    text-transform: none;
-  }
-  .type {
-    color: var(--ink);
-    font-weight: 700;
-  }
-  .summary { margin: 0; font-size: 1rem; line-height: 1.55; }
-  .document-open {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    color: var(--ink);
-    background: transparent;
-    font: inherit;
-    font-size: 1rem;
-    line-height: 1.55;
-    text-align: left;
-    text-decoration: underline;
-    text-decoration-thickness: .08em;
-    text-underline-offset: .15em;
-    cursor: pointer;
-  }
-  .detail {
-    margin: 12px 0 0;
-    padding-top: 12px;
-    border-top: 1px solid var(--line);
-    color: var(--muted);
-    font-size: .92rem;
-  }
-  .detail strong { color: var(--ink); font-weight: 600; }
-  .event.document .detail {
-    font: 11px/1.45 var(--font-mono);
-    letter-spacing: 0;
-  }
-  .refs {
-    margin: 12px 0 0;
-    padding-left: 20px;
-    color: var(--muted);
-    font: 11px/1.45 var(--font-mono);
-  }
-  .legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-top: 20px;
-    color: var(--muted);
-    font: 11px/1.4 var(--font-sans);
-    letter-spacing: .04em;
-    text-transform: uppercase;
-  }
-  .legend span {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .legend span::before {
-    content: "";
-    flex: 0 0 8px;
-    width: 8px;
-    height: 8px;
-    background: var(--legend-color);
-  }
-  .legend-human { --legend-color: var(--human); }
-  .legend-agent { --legend-color: var(--agent); }
-  .legend-supporting-agent { --legend-color: var(--supporting-agent); }
-  dialog {
-    width: min(780px, calc(100% - 24px));
-    max-width: none;
-    max-height: calc(100% - 24px);
-    margin: auto;
-    padding: 0;
-    border: 1px solid var(--line);
-    color: var(--ink);
-    background: var(--paper);
-  }
-  dialog::backdrop { background: rgb(0 0 0 / .78); }
-  .dialog-frame { padding: 24px clamp(20px, 4vw, 32px) 40px; }
-  .dialog-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin: 0 0 24px;
-  }
-  .dialog-close {
-    padding: 8px 12px;
-    border: 1px solid var(--line);
-    color: var(--ink);
-    background: transparent;
-    font: 11px/1.4 var(--font-sans);
-    letter-spacing: .04em;
-    text-transform: uppercase;
-    cursor: pointer;
-  }
-  .document-meta {
-    margin: 0 0 24px;
-    color: var(--muted);
-    font: 11px/1.4 var(--font-mono);
-  }
-  .document-body { line-height: 1.6; }
-  .document-body h1,
-  .document-body h2,
-  .document-body h3,
-  .document-body h4,
-  .document-body h5,
-  .document-body h6 {
-    margin: 1.5em 0 .5em;
-    font-weight: 600;
-    line-height: 1.2;
-    letter-spacing: -.025em;
-  }
-  .document-body h1 {
-    font-size: clamp(2.25rem, 7vw, 3.75rem);
-    line-height: 1;
-  }
-  .document-body h2 { font-size: 1.35rem; }
-  .document-body h3 { font-size: 1.1rem; line-height: 1.3; }
-  .document-body h4,
-  .document-body h5,
-  .document-body h6 { font-size: 1rem; line-height: 1.3; }
-  .document-body h1:first-child { margin-top: 0; }
-  .document-body p,
-  .document-body ul,
-  .document-body ol,
-  .document-body blockquote,
-  .document-body pre { margin: 0 0 1em; }
-  .document-body ul,
-  .document-body ol { padding-left: 24px; }
-  .document-body blockquote {
-    padding-left: 16px;
-    border-left: 1px solid var(--line);
-    color: var(--muted);
-  }
-  .document-body pre {
-    padding: 16px;
-    border: 1px solid var(--line);
-    overflow-x: auto;
-    white-space: pre-wrap;
-    font: 13px/1.5 var(--font-mono);
-  }
-  @media (max-width: 560px) {
-    header { padding-top: 40px; }
-    .task-head { gap: 16px; }
-    .event { gap: 16px; }
-    .dialog-frame { padding: 20px 20px 32px; }
-  }
-</style>
-</head>
-<body>
-<main>
-  <nav class="view-nav">__NAV__</nav>
-  <header>
-    <h1>__HEADING__</h1>
-    <p class="intro">__INTRO__</p>
-    <div class="legend">
-      <span class="legend-human">Human</span>
-      <span class="legend-agent">Agent</span>
-      <span class="legend-supporting-agent">Supporting agent</span>
-    </div>
-  </header>
-  <div id="tasks"></div>
-</main>
-<dialog id="document-dialog">
-  <div class="dialog-frame">
-    <form class="dialog-actions" method="dialog">
-      <button class="dialog-close" type="submit">Close</button>
-    </form>
-    <p class="document-meta" id="document-meta"></p>
-    <article class="document-body" id="document-body"></article>
-  </div>
-</dialog>
-<script>
-const EVENTS = __DATA__;
-const DOCUMENTS = __DOCUMENTS__;
-const tasks = new Map();
-for (const event of EVENTS) {
-  if (!tasks.has(event.task)) tasks.set(event.task, []);
-  tasks.get(event.task).push(event);
-}
-const documentsByTask = new Map();
-for (const documentItem of DOCUMENTS) {
-  if (!tasks.has(documentItem.task)) tasks.set(documentItem.task, []);
-  if (!documentsByTask.has(documentItem.task)) {
-    documentsByTask.set(documentItem.task, []);
-  }
-  documentsByTask.get(documentItem.task).push(documentItem);
-}
-
-function element(tag, className, text) {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (text !== undefined) node.textContent = text;
-  return node;
-}
-
-function label(value) {
-  return String(value).replaceAll("-", " ");
-}
-
-function addDetail(card, event) {
-  const details = [];
-  if (event.outcome) details.push(["Outcome", event.outcome]);
-  if (event.subject) details.push(["Question", event.subject]);
-  if (event.decision) details.push(["Direction", event.decision]);
-  for (const [name, value] of details) {
-    const line = element("p", "detail");
-    const strong = element("strong", "", name + ": ");
-    line.append(strong, document.createTextNode(value));
-    card.appendChild(line);
-  }
-  if (event.refs && event.refs.length) {
-    const list = element("ul", "refs");
-    for (const ref of event.refs) {
-      list.appendChild(element("li", "", ref));
-    }
-    card.appendChild(list);
-  }
-}
-
-function renderMarkdown(content, container) {
-  container.replaceChildren();
-  const lines = String(content).replaceAll("\r", "").split("\n");
-  let paragraph = [];
-  let list = null;
-  let quote = [];
-  let code = [];
-  let inCode = false;
-
-  function appendParagraph() {
-    if (!paragraph.length) return;
-    container.appendChild(element("p", "", paragraph.join(" ")));
-    paragraph = [];
-  }
-
-  function appendQuote() {
-    if (!quote.length) return;
-    container.appendChild(element("blockquote", "", quote.join("\n")));
-    quote = [];
-  }
-
-  function endList() {
-    list = null;
-  }
-
-  for (const line of lines) {
-    if (line.startsWith("```")) {
-      appendParagraph();
-      appendQuote();
-      endList();
-      if (inCode) {
-        const pre = element("pre");
-        pre.appendChild(element("code", "", code.join("\n")));
-        container.appendChild(pre);
-        code = [];
-      }
-      inCode = !inCode;
-      continue;
-    }
-    if (inCode) {
-      code.push(line);
-      continue;
-    }
-
-    const heading = line.match(/^(#{1,6})\s+(.+)$/);
-    const unordered = line.match(/^\s*[-*]\s+(.+)$/);
-    const ordered = line.match(/^\s*\d+\.\s+(.+)$/);
-    if (heading) {
-      appendParagraph();
-      appendQuote();
-      endList();
-      container.appendChild(
-        element("h" + heading[1].length, "", heading[2])
-      );
-    } else if (unordered || ordered) {
-      appendParagraph();
-      appendQuote();
-      const tag = unordered ? "ul" : "ol";
-      if (!list || list.tagName.toLowerCase() !== tag) {
-        list = element(tag);
-        container.appendChild(list);
-      }
-      list.appendChild(element("li", "", (unordered || ordered)[1]));
-    } else if (line.startsWith(">")) {
-      appendParagraph();
-      endList();
-      quote.push(line.replace(/^>\s?/, ""));
-    } else if (!line.trim()) {
-      appendParagraph();
-      appendQuote();
-      endList();
-    } else {
-      appendQuote();
-      endList();
-      paragraph.push(line.trim());
-    }
-  }
-  if (inCode && code.length) {
-    const pre = element("pre");
-    pre.appendChild(element("code", "", code.join("\n")));
-    container.appendChild(pre);
-  }
-  appendParagraph();
-  appendQuote();
-}
-
-const documentDialog = document.getElementById("document-dialog");
-const documentMeta = document.getElementById("document-meta");
-const documentBody = document.getElementById("document-body");
-
-function openDocument(documentItem) {
-  documentMeta.textContent = label(documentItem.kind) + " · " + documentItem.ref;
-  renderMarkdown(documentItem.content, documentBody);
-  documentDialog.showModal();
-}
-
-function documentRow(documentItem) {
-  const row = element("article", "event document");
-  row.dataset.type = "document";
-  row.dataset.kind = documentItem.kind;
-  if (documentItem.error) row.dataset.error = "true";
-  row.appendChild(element("span", "dot"));
-
-  const card = element("div", "card");
-  const meta = element("div", "meta");
-  meta.append(
-    element("span", "type", "document"),
-    element("span", "", label(documentItem.kind))
-  );
-  const button = element("button", "document-open", documentItem.title);
-  button.type = "button";
-  button.addEventListener("click", () => openDocument(documentItem));
-  card.append(meta, button, element("p", "detail", documentItem.ref));
-  row.appendChild(card);
-  return row;
-}
-
-const root = document.getElementById("tasks");
-for (const [taskName, events] of tasks) {
-  const documents = documentsByTask.get(taskName) || [];
-  const section = element("section", "task");
-  const head = element("div", "task-head");
-  const itemCount = events.length + " " + (events.length === 1 ? "event" : "events");
-  const documentCount = documents.length
-    ? " · " + documents.length + " " + (documents.length === 1 ? "document" : "documents")
-    : "";
-  head.append(
-    element("h2", "", taskName),
-    element("span", "count", itemCount + documentCount)
-  );
-  section.appendChild(head);
-
-  const timeline = element("div", "timeline");
-  for (const [eventIndex, event] of events.entries()) {
-    const row = element("article", "event");
-    row.dataset.actor = event.actor;
-    row.dataset.type = event.type;
-    if (event.outcome) row.dataset.outcome = event.outcome;
-    row.appendChild(element("span", "dot"));
-
-    const card = element("div", "card");
-    const meta = element("div", "meta");
-    meta.append(
-      element("span", "type", label(event.type)),
-      element("span", "", label(event.actor)),
-      element("time", "", event.ts)
-    );
-    card.append(
-      meta,
-      element("p", "summary", event.summary)
-    );
-    addDetail(card, event);
-    row.appendChild(card);
-    timeline.appendChild(row);
-    for (const documentItem of documents.filter(
-      item => item.after === eventIndex
-    )) {
-      timeline.appendChild(documentRow(documentItem));
-    }
-  }
-  for (const documentItem of documents.filter(item => item.after === null)) {
-    timeline.appendChild(documentRow(documentItem));
-  }
-  section.appendChild(timeline);
-  root.appendChild(section);
-}
-</script>
-__LIVE_SCRIPT__
-</body>
-</html>
-"""
+@lru_cache(maxsize=1)
+def view_template() -> str:
+    """Read the generated web distribution consumed by static and live views."""
+    return VIEW_TEMPLATE.read_text()
 
 
 def parse_args(argv: list[str]) -> tuple[list[str], str] | None:
@@ -653,6 +141,16 @@ def collect_documents(files: list[str], events: list[dict]) -> list[dict]:
         candidates.extend(
             ("learning", path) for path in sorted(task_dir.glob("learning*.md"))
         )
+        for event in task_events:
+            for ref in event.get("refs", []):
+                ref_path = Path(ref)
+                if (
+                    len(ref_path.parts) >= 2
+                    and ref_path.parts[0] == "diagrams"
+                    and ".." not in ref_path.parts
+                    and ref_path.suffix == ".md"
+                ):
+                    candidates.append(("visual-explanation", task_dir / ref_path))
 
         for kind, path in candidates:
             ref = path.relative_to(task_dir).as_posix()
@@ -671,12 +169,14 @@ def collect_documents(files: list[str], events: list[dict]) -> list[dict]:
                 "agreement": "start",
                 "report": "report",
                 "learning": "note",
+                "visual-explanation": None,
             }[kind]
             after = next(
                 (
                     index
                     for index, event in enumerate(task_events)
-                    if event["type"] == preferred_type
+                    if preferred_type is not None
+                    and event["type"] == preferred_type
                     and ref in event.get("refs", [])
                 ),
                 None,
@@ -725,6 +225,7 @@ def build_html(
     ),
     nav: str = "",
     live: bool = False,
+    asset_base: str = "/assets/web",
 ) -> str:
     """Build the shared record page for static or live delivery."""
     embedded = json.dumps(events, separators=(",", ":")).replace("<", "\\u003c")
@@ -745,11 +246,12 @@ def build_html(
         else ""
     )
     return (
-        TEMPLATE.replace("__TITLE__", escape(title))
+        view_template().replace("__TITLE__", escape(title))
         .replace("__HEADING__", escape(heading))
         .replace("__INTRO__", escape(intro))
         .replace("__NAV__", nav)
         .replace("__FONT_CSS__", font_css())
+        .replace("__ASSET_BASE__", asset_base)
         .replace("__LIVE_SCRIPT__", live_script)
         .replace("__DOCUMENTS__", embedded_documents)
         .replace("__DATA__", embedded)
@@ -765,9 +267,20 @@ def main(argv: list[str]) -> int:
     if events is None:
         return 1
 
-    html = build_html(events, documents=collect_documents(files, events))
+    output_path = Path(output)
+    asset_name = output_path.stem + ".assets"
+    html = build_html(
+        events,
+        documents=collect_documents(files, events),
+        asset_base=asset_name,
+    )
     try:
-        Path(output).write_text(html)
+        output_path.write_text(html)
+        shutil.copytree(
+            WEB_ROOT / "mermaid",
+            output_path.with_name(asset_name),
+            dirs_exist_ok=True,
+        )
     except OSError as error:
         print(f"{output}: cannot write: {error}", file=sys.stderr)
         return 2

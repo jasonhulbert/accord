@@ -76,7 +76,7 @@ class ToolTests(unittest.TestCase):
             result.stdout,
         )
 
-    def test_renderer_creates_a_self_contained_literal_timeline(self):
+    def test_renderer_creates_an_offline_literal_timeline_and_local_assets(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "record.html"
             result = self.run_tool(
@@ -86,13 +86,23 @@ class ToolTests(unittest.TestCase):
                 str(output),
             )
             html = output.read_text()
+            assets = Path(directory) / "record.assets"
+            asset_exists = (assets / "mermaid.js").is_file()
+            output_size = output.stat().st_size
 
         self.assertEqual(result.returncode, 0)
         self.assertIn("rendered 21 events", result.stdout)
         self.assertIn("<title>Accord record</title>", html)
         self.assertIn("rate-limiting", html)
         self.assertIn("A factual view of what changed", html)
-        self.assertNotIn("https://", html)
+        self.assertIn("default-src 'none'", html)
+        self.assertIn(
+            'import mermaid from "record.assets/mermaid/mermaid.js"',
+            html,
+        )
+        self.assertTrue(asset_exists)
+        self.assertLess(output_size, 500_000)
+        self.assertNotRegex(html, r'<(?:script|link)[^>]+(?:src|href)="https://')
 
     def test_renderer_carries_the_chosen_typography_without_a_network_or_system_font(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -111,7 +121,7 @@ class ToolTests(unittest.TestCase):
         self.assertIn("font: 13px/1.5 var(--font-mono)", html)
         self.assertNotIn("Avenir", html)
         self.assertNotIn("ui-monospace", html)
-        self.assertNotIn("https://", html)
+        self.assertNotRegex(html, r'<(?:script|link)[^>]+(?:src|href)="https://')
 
     def test_shipped_font_assets_preserve_the_license_that_allows_distribution(self):
         license_text = (FONT_ROOT / "LICENSE.txt").read_text()
@@ -125,6 +135,31 @@ class ToolTests(unittest.TestCase):
         self.assertTrue(expected_fonts.issubset(path.name for path in FONT_ROOT.iterdir()))
         self.assertIn("SIL OPEN FONT LICENSE Version 1.1", license_text)
         self.assertIn('Reserved Font Name "Plex"', license_text)
+
+    def test_generated_web_distribution_is_split_pinned_and_licensed(self):
+        web_root = PLUGIN_ROOT / "assets" / "web"
+        javascript = list(web_root.rglob("*.js"))
+
+        self.assertGreater(len(javascript), 2)
+        self.assertTrue((web_root / "mermaid" / "mermaid.js").is_file())
+        self.assertLess(max(path.stat().st_size for path in javascript), 600_000)
+        self.assertLess(
+            sum(path.stat().st_size for path in web_root.rglob("*") if path.is_file()),
+            2_000_000,
+        )
+        self.assertIn("The MIT License", (web_root / "LICENSE.txt").read_text())
+        self.assertIn("Mermaid 11.16.0", (web_root / "README.md").read_text())
+
+    def test_generated_web_distribution_matches_its_sources(self):
+        result = subprocess.run(
+            ["npm", "run", "check:web"],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_renderer_places_task_documents_after_the_events_that_reference_them(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -195,6 +230,51 @@ class ToolTests(unittest.TestCase):
         self.assertEqual(html.count('"after":2'), 2)
         self.assertIn("documentDialog.showModal()", html)
         self.assertIn("renderMarkdown(documentItem.content", html)
+
+    def test_renderer_anchors_only_referenced_visual_explanations(self):
+        with tempfile.TemporaryDirectory() as directory:
+            task = Path(directory) / "task"
+            diagrams = task / "diagrams"
+            diagrams.mkdir(parents=True)
+            record = task / "record.jsonl"
+            explanation = diagrams / "entitlements.md"
+            unreferenced = diagrams / "draft.md"
+            explanation.write_text(
+                "# Entitlement enforcement\n\n"
+                "Implemented behavior across the affected features.\n\n"
+                "```mermaid\n"
+                "flowchart LR\n"
+                "  Request --> Entitlement\n"
+                "  Entitlement --> Feature\n"
+                "```\n"
+            )
+            unreferenced.write_text("# Draft\n\n```mermaid\nflowchart LR\nA --> B\n```\n")
+            item = {
+                "ts": "2026-07-28T12:00:00Z",
+                "task": "task",
+                "schema": "1",
+                "type": "investigation",
+                "actor": "agent",
+                "summary": "Mapped implemented entitlement enforcement for inspection.",
+                "refs": ["diagrams/entitlements.md"],
+            }
+            record.write_text(json.dumps(item) + "\n")
+            output = Path(directory) / "record.html"
+
+            result = self.run_tool(RENDER, str(record), "-o", str(output))
+            html = output.read_text()
+
+        self.assertEqual(result.returncode, 0)
+        self.assertIn('"kind":"visual-explanation"', html)
+        self.assertIn('"title":"Entitlement enforcement"', html)
+        self.assertIn('"after":0', html)
+        self.assertIn("flowchart LR", html)
+        self.assertNotIn('"title":"Draft"', html)
+        self.assertIn('securityLevel: "strict"', html)
+        self.assertIn("themeVariables: {", html)
+        self.assertIn('fontFamily: \'"IBM Plex Sans", sans-serif\'', html)
+        self.assertIn("Mermaid source", html)
+        self.assertIn("Accord could not render this diagram.", html)
 
     def test_renderer_rejects_incomplete_events_before_rendering(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -281,7 +361,8 @@ class ToolTests(unittest.TestCase):
         self.assertIn('<span class="legend-human">Human</span>', html)
         self.assertIn('<span class="legend-agent">Agent</span>', html)
         self.assertIn('<span class="legend-supporting-agent">Supporting agent</span>', html)
-        self.assertNotIn("border-radius:", html)
+        page_css = html.split("</style>", 1)[0]
+        self.assertNotIn("border-radius:", page_css)
 
     def test_renderer_uses_actor_as_the_only_meaning_of_event_color(self):
         events = [
