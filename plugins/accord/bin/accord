@@ -12,6 +12,17 @@ from pathlib import Path
 # The installer replaces this hint with the plugin root it was run from.
 PLUGIN_ROOT_HINT: str | None = None
 LAUNCHER_MARKER = "# Accord launcher; managed by Accord's installer."
+REQUIRED_RUNTIME_PATHS = (
+    Path("tools/serve"),
+    Path("tools/render"),
+    Path("storage.py"),
+    Path("assets/web/record.html"),
+    Path("assets/web/mermaid/mermaid.js"),
+    Path("assets/fonts/IBMPlexMono-Regular.woff2"),
+    Path("assets/fonts/IBMPlexSans-Bold.woff2"),
+    Path("assets/fonts/IBMPlexSans-Regular.woff2"),
+    Path("assets/fonts/IBMPlexSans-SemiBold.woff2"),
+)
 
 
 def version_key(path: Path) -> tuple[tuple[int, int | str], ...]:
@@ -75,11 +86,10 @@ def candidate_roots() -> list[Path]:
 
 
 def find_server() -> Path | None:
-    """Find the current installed server without relying on one cache version."""
+    """Find a complete installed server without relying on one cache version."""
     for root in candidate_roots():
-        server = root / "tools" / "serve"
-        if server.is_file():
-            return server
+        if all((root / path).is_file() for path in REQUIRED_RUNTIME_PATHS):
+            return root / "tools" / "serve"
     return None
 
 
@@ -99,8 +109,8 @@ def main(argv: list[str]) -> int:
     server = find_server()
     if server is None:
         print(
-            "cannot find the installed Accord web server; "
-            "rerun the Accord launcher installer",
+            "cannot find a complete Accord plugin installation; "
+            "update or reinstall Accord, then rerun the Accord launcher installer",
             file=sys.stderr,
         )
         return 2

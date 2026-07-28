@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -430,9 +431,9 @@ class FrameworkContractTests(unittest.TestCase):
         claude_marketplace = json.loads(self.read(".claude-plugin/marketplace.json"))
 
         self.assertEqual(codex_manifest["name"], "accord")
-        self.assertEqual(codex_manifest["version"], "0.1.1")
+        self.assertEqual(codex_manifest["version"], "0.1.2")
         self.assertEqual(claude_manifest["name"], "accord")
-        self.assertEqual(claude_manifest["version"], "0.1.1")
+        self.assertEqual(claude_manifest["version"], "0.1.2")
         self.assertEqual(codex_marketplace["name"], "accord")
         self.assertEqual(
             codex_marketplace["plugins"][0]["source"]["path"],
@@ -532,6 +533,35 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertIn("no Node\nruntime dependency", readme)
         self.assertIn("npm ci", readme)
         self.assertIn("npm run check:web", readme)
+
+    def test_web_templates_are_eligible_for_source_and_plugin_shipping(self):
+        templates = (
+            REPO_ROOT / "web" / "record.html",
+            REPO_ROOT / "plugins" / "accord" / "assets" / "web" / "record.html",
+        )
+        for template in templates:
+            with self.subTest(template=template.relative_to(REPO_ROOT)):
+                result = subprocess.run(
+                    [
+                        "git",
+                        "check-ignore",
+                        "--no-index",
+                        "--quiet",
+                        str(template.relative_to(REPO_ROOT)),
+                    ],
+                    cwd=REPO_ROOT,
+                    check=False,
+                )
+
+                self.assertTrue(
+                    template.is_file(),
+                    "the source and shipped plugin both require their web template",
+                )
+                self.assertEqual(
+                    result.returncode,
+                    1,
+                    "web templates must not be excluded from source or plugin shipping",
+                )
 
 
 if __name__ == "__main__":
