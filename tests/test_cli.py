@@ -145,6 +145,45 @@ class CliTests(unittest.TestCase):
 
         self.assertIn("The launcher survived the update.", page)
 
+    def test_installed_command_prefers_newer_plugin_while_old_cache_remains(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            project, home, store = self.make_project(root)
+            self.write_record(store, "The updated view is required.")
+
+            family = root / "plugin-cache" / "accord"
+            old_root = family / "0.1.9"
+            new_root = family / "0.1.10"
+            shutil.copytree(REPO_ROOT / "plugins" / "accord", old_root)
+            shutil.copytree(REPO_ROOT / "plugins" / "accord", new_root)
+            launcher = self.install_from(home, root / "bin", old_root)
+
+            new_view = new_root / "assets" / "web" / "record.html"
+            new_view.write_text(
+                new_view.read_text().replace(
+                    "<title>__TITLE__</title>",
+                    "<title>__TITLE__</title><!-- updated-plugin-view -->",
+                )
+            )
+
+            process = subprocess.Popen(
+                [str(launcher), "serve", "--no-open", "--port", "0"],
+                cwd=project,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                env=os.environ | {"HOME": str(home)},
+            )
+            self.addCleanup(self.stop, process)
+            line = process.stdout.readline().strip() if process.stdout else ""
+
+            self.assertTrue(line.startswith("Accord web view: http://127.0.0.1:"), line)
+            url = line.removeprefix("Accord web view: ")
+            with urlopen(url.rstrip("/") + "/task/rate-limit", timeout=3) as response:
+                page = response.read().decode()
+
+        self.assertIn("updated-plugin-view", page)
+
     def test_installer_refuses_to_replace_an_unrelated_command(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

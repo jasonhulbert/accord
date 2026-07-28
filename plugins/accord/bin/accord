@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -13,19 +14,30 @@ PLUGIN_ROOT_HINT: str | None = None
 LAUNCHER_MARKER = "# Accord launcher; managed by Accord's installer."
 
 
+def version_key(path: Path) -> tuple[tuple[int, int | str], ...]:
+    """Sort version-like directory names by their numeric components."""
+    return tuple(
+        (1, int(part)) if part.isdigit() else (0, part.casefold())
+        for part in re.split(r"(\d+)", path.name)
+        if part
+    )
+
+
 def candidate_roots() -> list[Path]:
     """Return likely plugin roots, newest versioned roots first."""
     roots: list[Path] = []
 
     if PLUGIN_ROOT_HINT:
         hinted = Path(PLUGIN_ROOT_HINT).expanduser()
-        roots.append(hinted)
         if hinted.parent.is_dir():
             roots.extend(
                 candidate
-                for candidate in sorted(hinted.parent.iterdir(), reverse=True)
+                for candidate in sorted(
+                    hinted.parent.iterdir(), key=version_key, reverse=True
+                )
                 if candidate.is_dir()
             )
+        roots.append(hinted)
 
     here = Path(__file__).resolve()
     roots.append(here.parent.parent)
@@ -37,7 +49,9 @@ def candidate_roots() -> list[Path]:
         if family.is_dir():
             roots.extend(
                 candidate
-                for candidate in sorted(family.iterdir(), reverse=True)
+                for candidate in sorted(
+                    family.iterdir(), key=version_key, reverse=True
+                )
                 if candidate.is_dir()
             )
 
