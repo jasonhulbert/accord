@@ -35,9 +35,19 @@
   }
   .view-nav a { color: var(--ink); }
   :focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
-  header { padding: 48px 0 32px; border-bottom: 1px solid var(--line); }
+  .page-context {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--paper);
+  }
+  header {
+    padding: 32px 0 24px;
+    border-bottom: 1px solid var(--line);
+    background: var(--paper);
+  }
   h1, h2 { font-weight: 600; letter-spacing: -0.04em; }
-  h1 { margin: 0 0 12px; font-size: clamp(2.2rem, 7vw, 4.6rem); line-height: .95; }
+  h1 { margin: 0 0 10px; font-size: clamp(2rem, 5vw, 3.6rem); line-height: .98; }
   h2 { margin: 0; font-size: 1.45rem; line-height: 1.1; }
   .intro { max-width: 650px; margin: 0; color: var(--muted); font-size: 1.05rem; }
   .task { margin-top: 0; }
@@ -310,7 +320,7 @@
     margin: 12px 0 0;
   }
   @media (max-width: 560px) {
-    header { padding-top: 40px; }
+    header { padding-top: 24px; }
     .task-head { gap: 16px; }
     .event { gap: 16px; }
     .dialog-frame { padding: 20px 20px 32px; }
