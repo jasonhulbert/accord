@@ -184,6 +184,70 @@ class CliTests(unittest.TestCase):
 
         self.assertIn("updated-plugin-view", page)
 
+    def test_installed_command_skips_a_newer_incomplete_plugin(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            project, home, store = self.make_project(root)
+            self.write_record(store, "A complete installation is required.")
+
+            family = root / "plugin-cache" / "accord"
+            old_root = family / "0.1.1"
+            new_root = family / "0.1.2"
+            shutil.copytree(REPO_ROOT / "plugins" / "accord", old_root)
+            shutil.copytree(REPO_ROOT / "plugins" / "accord", new_root)
+            launcher = self.install_from(home, root / "bin", old_root)
+
+            old_view = old_root / "assets" / "web" / "record.html"
+            old_view.write_text(
+                old_view.read_text().replace(
+                    "<title>__TITLE__</title>",
+                    "<title>__TITLE__</title><!-- complete-plugin-view -->",
+                )
+            )
+            (new_root / "assets" / "web" / "record.html").unlink()
+
+            process = subprocess.Popen(
+                [str(launcher), "serve", "--no-open", "--port", "0"],
+                cwd=project,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                env=os.environ | {"HOME": str(home)},
+            )
+            self.addCleanup(self.stop, process)
+            line = process.stdout.readline().strip() if process.stdout else ""
+
+            self.assertTrue(line.startswith("Accord web view: http://127.0.0.1:"), line)
+            url = line.removeprefix("Accord web view: ")
+            with urlopen(url.rstrip("/") + "/task/rate-limit", timeout=3) as response:
+                page = response.read().decode()
+
+        self.assertIn("complete-plugin-view", page)
+        self.assertIn("A complete installation is required.", page)
+
+    def test_installed_command_rejects_an_incomplete_plugin_before_serving(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            project, home, _ = self.make_project(root)
+            plugin_root = root / "plugin-cache" / "accord" / "0.1.2"
+            shutil.copytree(REPO_ROOT / "plugins" / "accord", plugin_root)
+            launcher = self.install_from(home, root / "bin", plugin_root)
+            (plugin_root / "assets" / "web" / "record.html").unlink()
+
+            result = subprocess.run(
+                [str(launcher), "serve", "--no-open", "--port", "0"],
+                cwd=project,
+                text=True,
+                capture_output=True,
+                env=os.environ | {"HOME": str(home)},
+                timeout=3,
+            )
+
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(result.stdout, "")
+        self.assertIn("complete Accord plugin installation", result.stderr)
+        self.assertIn("update or reinstall Accord", result.stderr)
+
     def test_installer_refuses_to_replace_an_unrelated_command(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
