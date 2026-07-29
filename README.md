@@ -116,10 +116,11 @@ It places the launcher in the user-local executable directory and reports any
 accord serve
 ```
 
-The command opens the record list in a browser and refreshes while work
-continues. Use `accord serve --task TASK` to open one record directly by task
-ID, `accord serve --no-open` to print the URL without opening a browser, and
-`Ctrl-C` to stop the server. The server reads records but does not change them.
+The command opens the record list in a browser. Use the explicit refresh action
+when you want to see new events. Use `accord serve --task TASK` to open one
+record directly by task ID, `accord serve --no-open` to print the URL without
+opening a browser, and `Ctrl-C` to stop the server. The server reads records
+but does not change them.
 The bundled `tools/serve` remains available as the implementation entry point
 for maintainers and direct plugin inspection.
 

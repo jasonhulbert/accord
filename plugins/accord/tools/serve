@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Serve the current project's Accord records as a local live web view.
+"""Serve the current project's Accord records as a local web view.
 
 Usage: tools/serve [--task TASK] [--port PORT] [--no-open]
 
@@ -51,7 +51,6 @@ INDEX_TEMPLATE = """<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="refresh" content="2">
 <title>Accord records</title>
 <style>
 __FONT_CSS__
@@ -81,6 +80,7 @@ __FONT_CSS__
   h1 { margin: 0 0 12px; font-size: clamp(2.2rem, 7vw, 4.6rem); line-height: .95; }
   h2 { margin: 0; font-size: 1.35rem; line-height: 1.1; }
   .intro { max-width: 650px; margin: 0; color: var(--muted); font-size: 1.05rem; }
+  .refresh-link { color: var(--ink); }
   .records { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
   .record { padding: 20px 0; border-bottom: 1px solid var(--line); }
   .record-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
@@ -99,7 +99,8 @@ __FONT_CSS__
 <main>
   <header>
     <h1>Accord records</h1>
-    <p class="intro">Choose a record to inspect. This page refreshes while the work is in progress, so new events appear without rebuilding an HTML file.</p>
+    <p class="intro">Choose a record to inspect. Refresh the list when you want to see new events.</p>
+    <p><a class="refresh-link" href="/">Refresh the list</a></p>
   </header>
   __CONTENT__
 </main>
@@ -272,18 +273,21 @@ def make_handler(accord_root: Path):
                 if error:
                     self.send_html(error_page(task, error), 422)
                     return
-                nav = '<a href="/">All records</a> · live view'
+                refresh_url = f"/task/{quote(task, safe='')}"
+                nav = (
+                    '<a href="/">All records</a> · '
+                    f'<a href="{refresh_url}">Refresh</a> · manual refresh'
+                )
                 html = build_html(
                     events,
                     documents=collect_documents([str(record)], events),
                     title=f"{task} — Accord",
                     heading=task,
                     intro=(
-                        "A live view of this Accord record. It refreshes while "
-                        "the work is in progress."
+                        "A view of this Accord record. Refresh when you want to "
+                        "see new events."
                     ),
                     nav=nav,
-                    live=True,
                 )
                 self.send_html(html)
                 return

@@ -201,8 +201,8 @@ from the installed plugin directory. From a source checkout, run:
 plugins/accord/tools/install-launcher
 ```
 
-The view lists the project's records, lets you choose one, and refreshes as new
-events are appended. It binds to localhost, opens a browser when possible, and
-stops when you press `Ctrl-C`. Use `accord serve --task TASK` when the task ID
-is already known, or `accord serve --no-open` when you only need the printed
-URL.
+The view lists the project's records, lets you choose one, and provides an
+explicit refresh action for seeing newly appended events. It binds to localhost,
+opens a browser when possible, and stops when you press `Ctrl-C`.
+Use `accord serve --task TASK` when the task ID is already known. Use
+`accord serve --no-open` when you only need the printed URL.

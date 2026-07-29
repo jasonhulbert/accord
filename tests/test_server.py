@@ -87,7 +87,7 @@ class ServerTests(unittest.TestCase):
         except HTTPError as error:
             return error.code, error.read().decode()
 
-    def test_server_lists_records_and_refreshes_a_task_view_from_disk(self):
+    def test_server_lists_records_and_explicitly_refreshes_a_task_view_from_disk(self):
         with tempfile.TemporaryDirectory() as directory:
             project, home, store = self.make_project(Path(directory))
             self.write_record(
@@ -119,7 +119,8 @@ class ServerTests(unittest.TestCase):
             self.assertIn("Accord records", index)
             self.assertIn('href="/task/rate-limit"', index)
             self.assertIn('href="/task/second-task"', index)
-            self.assertIn("This page refreshes", index)
+            self.assertIn("Refresh the list", index)
+            self.assertNotIn('<meta http-equiv="refresh"', index)
             self.assertIn("--paper: #000", index)
             self.assertIn("status-mark", index)
             self.assertEqual(index.count("@font-face"), 4)
@@ -138,7 +139,10 @@ class ServerTests(unittest.TestCase):
             self.assertIn("The agreement is visible.", page)
             self.assertIn("The report is visible.", page)
             self.assertIn("The learning is visible.", page)
-            self.assertIn('document.querySelector("dialog[open]")', page)
+            self.assertIn('<a href="/task/rate-limit">Refresh</a>', page)
+            self.assertNotIn("window.location.reload", page)
+            self.assertNotIn("setTimeout", page)
+            self.assertNotIn('document.querySelector("dialog[open]")', page)
             self.assertIn("font: 13px/1.5 var(--font-mono)", page)
             self.assertIn(
                 'import mermaid from "/assets/web/mermaid/mermaid.js"',

@@ -49,7 +49,7 @@ def font_css() -> str:
 
 @lru_cache(maxsize=1)
 def view_template() -> str:
-    """Read the generated web distribution consumed by static and live views."""
+    """Read the generated web distribution consumed by static and served views."""
     return VIEW_TEMPLATE.read_text()
 
 
@@ -224,27 +224,13 @@ def build_html(
         "human, and how the work responded to evidence."
     ),
     nav: str = "",
-    live: bool = False,
     asset_base: str = "/assets/web",
 ) -> str:
-    """Build the shared record page for static or live delivery."""
+    """Build the shared record page for static or served delivery."""
     embedded = json.dumps(events, separators=(",", ":")).replace("<", "\\u003c")
     embedded_documents = json.dumps(
         documents or [], separators=(",", ":")
     ).replace("<", "\\u003c")
-    live_script = (
-        "<script>"
-        "function refreshWhenIdle() {"
-        " setTimeout(() => {"
-        '  if (document.querySelector("dialog[open]")) refreshWhenIdle();'
-        "  else window.location.reload();"
-        " }, 2000);"
-        "}"
-        "refreshWhenIdle();"
-        "</script>"
-        if live
-        else ""
-    )
     return (
         view_template().replace("__TITLE__", escape(title))
         .replace("__HEADING__", escape(heading))
@@ -252,7 +238,7 @@ def build_html(
         .replace("__NAV__", nav)
         .replace("__FONT_CSS__", font_css())
         .replace("__ASSET_BASE__", asset_base)
-        .replace("__LIVE_SCRIPT__", live_script)
+        .replace("__LIVE_SCRIPT__", "")
         .replace("__DOCUMENTS__", embedded_documents)
         .replace("__DATA__", embedded)
     )
