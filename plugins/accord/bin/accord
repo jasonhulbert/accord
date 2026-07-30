@@ -28,6 +28,12 @@ ARCHIVE_RUNTIME_PATHS = (
     Path("tools/validate"),
     Path("storage.py"),
 )
+LIST_RUNTIME_PATHS = (
+    Path("tools/list"),
+    Path("tools/validate"),
+    Path("storage.py"),
+    Path("spec/record.schema.json"),
+)
 
 
 def version_key(path: Path) -> tuple[tuple[int, int | str], ...]:
@@ -103,6 +109,7 @@ def usage() -> str:
         [
             "Usage:",
             "  accord serve [--archived] [--task TASK] [--port PORT] [--no-open]",
+            "  accord list",
             "  accord archive [--force] TASK",
             "  accord restore TASK",
         ]
@@ -113,25 +120,31 @@ def main(argv: list[str]) -> int:
     if not argv or argv == ["--help"] or argv == ["-h"]:
         print(usage())
         return 0 if argv else 2
-    if argv[0] not in {"serve", "archive", "restore"}:
+    if argv[0] not in {"serve", "list", "archive", "restore"}:
         print(f"unknown command: {argv[0]}", file=sys.stderr)
         print(usage(), file=sys.stderr)
         return 2
 
-    required_paths = (
-        SERVE_RUNTIME_PATHS if argv[0] == "serve" else ARCHIVE_RUNTIME_PATHS
-    )
+    if argv[0] == "serve":
+        required_paths = SERVE_RUNTIME_PATHS
+    elif argv[0] == "list":
+        required_paths = LIST_RUNTIME_PATHS
+    else:
+        required_paths = ARCHIVE_RUNTIME_PATHS
     plugin_root = find_plugin_root(required_paths)
     if plugin_root is None:
         print(
             "cannot find a complete Accord plugin installation; "
-            "update or reinstall Accord, then rerun the Accord launcher installer",
+            "update or reinstall Accord, then rerun the Accord command installer",
             file=sys.stderr,
         )
         return 2
 
     if argv[0] == "serve":
         tool = plugin_root / "tools" / "serve"
+        arguments = argv[1:]
+    elif argv[0] == "list":
+        tool = plugin_root / "tools" / "list"
         arguments = argv[1:]
     else:
         tool = plugin_root / "tools" / "archive"

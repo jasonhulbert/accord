@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install a stable ``accord`` launcher for the current plugin installation."""
+"""Install the stable ``accord`` command for the current plugin installation."""
 
 from __future__ import annotations
 
@@ -114,7 +114,7 @@ def main(argv: list[str]) -> int:
     try:
         installed = install(bin_dir, args.force)
     except (FileExistsError, OSError, RuntimeError) as error:
-        print(f"cannot install Accord launcher: {error}", file=sys.stderr)
+        print(f"cannot install Accord command: {error}", file=sys.stderr)
         return 2
 
     for path in installed:

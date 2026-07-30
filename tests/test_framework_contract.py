@@ -66,7 +66,7 @@ class FrameworkContractTests(unittest.TestCase):
         )
         self.assertIn(direct_boundary, skill)
 
-    def test_completion_closes_authority_without_erasing_history(self):
+    def test_closing_events_end_authority_without_erasing_history(self):
         agent = self.prose("plugins/accord/creed/agent.md")
         skill = self.prose("plugins/accord/skills/accord/SKILL.md")
         check_in = self.prose("plugins/accord/skills/check-in/SKILL.md")
@@ -75,13 +75,14 @@ class FrameworkContractTests(unittest.TestCase):
         agreement = self.prose("plugins/accord/templates/agreement.md")
         guide = self.prose("GUIDE.md")
 
-        self.assertIn("Closing the agreement belongs to the human", agent)
+        self.assertIn("Judging completion belongs to the human", agent)
         self.assertIn("Reach a new agreement for later work", skill)
         self.assertIn("do not reopen or append", skill)
         self.assertIn("A closed agreement counts as none", check_in)
-        self.assertIn("Completion is terminal", record)
+        self.assertIn("`completion` and `end` are terminal", record)
         self.assertIn("A later message cannot be a check-in", check_in_spec)
-        self.assertIn("A completed agreement stays closed", guide)
+        self.assertIn("A completed or ended agreement stays closed", guide)
+        self.assertIn("Ended work is closed without being complete", guide)
 
         self.assertIn("History may inform judgment", agent)
         self.assertIn("History may inform counsel", skill)
@@ -92,7 +93,7 @@ class FrameworkContractTests(unittest.TestCase):
         )
 
         creed_boundary = agent.split(
-            "### Let the human close the work.", 1
+            "### Let the human judge completion.", 1
         )[1].split("### Leave a record another session can trust.", 1)[0]
         accord_entry = skill.split(
             "Run `tools/location` from the target project's root", 1

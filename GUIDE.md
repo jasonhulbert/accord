@@ -11,8 +11,8 @@ clarify uncertain work, not make ordinary work feel important.
 
 Invoke the `accord` skill in the project where the work belongs. If an existing
 active agreement already covers it, the agent reads the record and actual work
-before resuming. A completed agreement stays closed. Later work begins with a
-new agreement, even when it follows closely from what came before.
+before resuming. A completed or ended agreement stays closed. Later work begins
+with a new agreement, even when it follows closely from what came before.
 
 Earlier work may inform the agent's counsel, but it does not lend authority to
 the new work. The new agreement and record stand on their own rather than
@@ -199,11 +199,11 @@ accord serve
 ```
 
 Plugin hosts that expose plugin `bin` commands make this available when the
-plugin is installed. If your host does not expose it, install the launcher once
+plugin is installed. If your host does not expose it, install the command once
 from the installed plugin directory. From a source checkout, run:
 
 ```text
-plugins/accord/tools/install-launcher
+plugins/accord/tools/install
 ```
 
 The view lists the project's records, lets you choose one, and provides an
@@ -212,21 +212,31 @@ opens a browser when possible, and stops when you press `Ctrl-C`.
 Use `accord serve --task TASK` when the task ID is already known. Use
 `accord serve --no-open` when you only need the printed URL.
 
+To see the current project's work without opening the web view, run:
+
+```text
+accord list
+```
+
+The list includes active and archived work. These labels name storage, not
+completion. Ended work is closed without being complete, and work archived with
+`--force` does not end in a closing event.
+
 ## Let history recede explicitly
 
 Routine context should keep attention on work that may still change. From the
-project root, move completed work out of the active record list:
+project root, move closed work out of the active record list:
 
 ```text
 accord archive TASK
 ```
 
-Accord moves only a valid task directory whose record ends in `completion`. It
-does not rewrite the record. Completion never triggers archival by itself.
-Only an explicit `accord archive TASK` command moves work. An attempt to
-archive incomplete work prints a deterministic `WARNING` and moves nothing.
-When the user intends to remove incomplete work from routine context anyway,
-they may make that override explicit:
+Accord moves only a valid task directory whose record ends in `completion` or
+`end`. It does not rewrite the record. A closing event never triggers archival
+by itself. Only an explicit `accord archive TASK` command moves work. An attempt
+to archive work with no closing event prints a deterministic `WARNING` and
+moves nothing. When the user intends to remove unclosed work from routine
+context anyway, they may make that override explicit:
 
 ```text
 accord archive --force TASK
@@ -235,12 +245,11 @@ accord archive --force TASK
 Forced archival prints:
 
 ```text
-WARNING: 'TASK' is not complete; archived because --force was provided.
+WARNING: 'TASK' does not end in a closing event; archived because --force was provided.
 ```
 
-It moves the task without changing its record, marking it complete, or closing
-its agreement. The flag does not bypass malformed-record, unsafe-path, or
-collision refusals.
+It moves the task without changing its record or closing its agreement. The
+flag does not bypass malformed-record, unsafe-path, or collision refusals.
 
 Archived work remains available when history is needed:
 
@@ -254,7 +263,7 @@ Return it to the active project store with:
 accord restore TASK
 ```
 
-Restoration reverses storage placement. It does not reopen completed work.
-Forced-archived incomplete work must be restored before it resumes. Restoration
-also refuses collisions. Neither command merges directories or deletes
-evidence.
+Restoration reverses storage placement. It does not reopen completed or ended
+work. Unclosed work archived with `--force` must be restored before it resumes.
+Restoration also refuses collisions. Neither command merges directories or
+deletes evidence.

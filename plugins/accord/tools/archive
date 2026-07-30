@@ -34,8 +34,8 @@ class ArchiveError(Exception):
     """A user-facing refusal that leaves stored work unchanged."""
 
 
-class IncompleteWorkWarning(ArchiveError):
-    """An explicit archive request targeted work that is not complete."""
+class UnclosedWorkWarning(ArchiveError):
+    """An archive request targeted work without a terminal closing event."""
 
 
 def validate_safe_task(task_dir: Path, task: str) -> None:
@@ -63,8 +63,8 @@ def validate_safe_task(task_dir: Path, task: str) -> None:
         ) from error
 
 
-def validate_completed(task_dir: Path, task: str) -> None:
-    """Require a valid record for this task whose terminal event is completion."""
+def validate_closed(task_dir: Path, task: str) -> None:
+    """Require a valid record ending in completion or end."""
     validate_safe_task(task_dir, task)
     record = task_dir / "record.jsonl"
     if record.is_symlink() or not record.is_file():
@@ -98,8 +98,8 @@ def validate_completed(task_dir: Path, task: str) -> None:
         raise ArchiveError(
             f"{task!r}: every record event must name the task directory"
         )
-    if not events or events[-1].get("type") != "completion":
-        raise IncompleteWorkWarning(task)
+    if not events or events[-1].get("type") not in {"completion", "end"}:
+        raise UnclosedWorkWarning(task)
 
 
 def rename_without_replace(source: Path, destination: Path) -> None:
@@ -171,14 +171,14 @@ def move_task(
     if source is None or destination is None:
         raise ArchiveError(f"{task!r}: task ID must be one path-safe name")
 
-    forced_incomplete = False
+    forced_unclosed = False
     if action == "archive":
         try:
-            validate_completed(source, task)
-        except IncompleteWorkWarning:
+            validate_closed(source, task)
+        except UnclosedWorkWarning:
             if not force:
                 raise
-            forced_incomplete = True
+            forced_unclosed = True
     else:
         validate_safe_task(source, task)
     try:
@@ -208,7 +208,7 @@ def move_task(
         raise
     except OSError as error:
         raise ArchiveError(f"{task!r}: could not be moved: {error}") from error
-    return source, destination, forced_incomplete
+    return source, destination, forced_unclosed
 
 
 def parse_command(argv: list[str]) -> tuple[str, str, bool] | None:
@@ -239,15 +239,16 @@ def main(argv: list[str]) -> int:
 
     action, task, force = command
     try:
-        _, destination, forced_incomplete = move_task(
+        _, destination, forced_unclosed = move_task(
             action,
             task,
             Path.cwd(),
             force,
         )
-    except IncompleteWorkWarning:
+    except UnclosedWorkWarning:
         print(
-            f"WARNING: {task!r} is not complete; nothing was archived.",
+            f"WARNING: {task!r} does not end in a closing event; "
+            "nothing was archived.",
             file=sys.stderr,
         )
         return 2
@@ -255,9 +256,9 @@ def main(argv: list[str]) -> int:
         print(f"cannot {action} Accord work: {error}", file=sys.stderr)
         return 2
 
-    if forced_incomplete:
+    if forced_unclosed:
         print(
-            f"WARNING: {task!r} is not complete; "
+            f"WARNING: {task!r} does not end in a closing event; "
             "archived because --force was provided.",
             file=sys.stderr,
         )

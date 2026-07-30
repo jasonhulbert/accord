@@ -127,55 +127,62 @@ class HookTests(unittest.TestCase):
             "last start at 2026-07-23T12:00:00Z",
             result.stdout,
         )
-        self.assertIn("completion=none", result.stdout)
+        self.assertIn("closing=none", result.stdout)
         self.assertIn(
             "not a decision that any agreement covers",
             result.stdout,
         )
         self.assertIn("~/.accord/projects/", result.stdout)
 
-    def test_session_start_marks_completion_as_a_closed_boundary(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            home = root / "home"
-            home.mkdir()
-            contents = "\n".join(
-                [
-                    json.dumps(event()),
-                    json.dumps(event("completion")),
-                    "",
-                ]
-            )
-            log = self.make_accord(root, home, contents)
-            archive_root = (
-                home
-                / ".accord"
-                / "archive"
-                / "projects"
-                / log.parents[1].name
-            )
+    def test_session_start_marks_each_closing_event_as_a_closed_boundary(self):
+        for closing_event in ("completion", "end"):
+            with self.subTest(closing_event=closing_event):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    home = root / "home"
+                    home.mkdir()
+                    contents = "\n".join(
+                        [
+                            json.dumps(event()),
+                            json.dumps(event(closing_event)),
+                            "",
+                        ]
+                    )
+                    log = self.make_accord(root, home, contents)
+                    archive_root = (
+                        home
+                        / ".accord"
+                        / "archive"
+                        / "projects"
+                        / log.parents[1].name
+                    )
 
-            result = self.run_hook(
-                SESSION_START,
-                {
-                    "hook_event_name": "SessionStart",
-                    "source": "resume",
-                    "cwd": str(root),
-                },
-                home,
-            )
-            still_active = log.is_file()
-            archived_automatically = (archive_root / "rate-limit").exists()
+                    result = self.run_hook(
+                        SESSION_START,
+                        {
+                            "hook_event_name": "SessionStart",
+                            "source": "resume",
+                            "cwd": str(root),
+                        },
+                        home,
+                    )
+                    still_active = log.is_file()
+                    archived_automatically = (
+                        archive_root / "rate-limit"
+                    ).exists()
 
-        self.assertEqual(result.returncode, 0)
-        self.assertIn("completion=recorded", result.stdout)
-        self.assertIn(
-            "A completion event closes its agreement and record",
-            result.stdout,
-        )
-        self.assertIn("Begin a new agreement for later work", result.stdout)
-        self.assertTrue(still_active)
-        self.assertFalse(archived_automatically)
+                self.assertEqual(result.returncode, 0)
+                self.assertIn(f"closing={closing_event}", result.stdout)
+                self.assertIn(
+                    "A completion or end event closes its agreement and record",
+                    result.stdout,
+                )
+                self.assertIn(
+                    "Begin a new agreement for later work",
+                    result.stdout,
+                )
+                self.assertTrue(still_active)
+                self.assertFalse(archived_automatically)
 
     def test_session_start_excludes_archived_history_from_routine_context(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -277,38 +284,40 @@ class HookTests(unittest.TestCase):
         self.assertEqual(result.stdout, "")
         self.assertEqual(result.stderr, "")
 
-    def test_recording_completion_does_not_archive_work_automatically(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            home = root / "home"
-            home.mkdir()
-            log = self.make_accord(
-                root,
-                home,
-                json.dumps(event("completion")) + "\n",
-            )
-            archive_root = (
-                home
-                / ".accord"
-                / "archive"
-                / "projects"
-                / log.parents[1].name
-            )
+    def test_recording_a_closing_event_does_not_archive_work_automatically(self):
+        for closing_event in ("completion", "end"):
+            with self.subTest(closing_event=closing_event):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    home = root / "home"
+                    home.mkdir()
+                    log = self.make_accord(
+                        root,
+                        home,
+                        json.dumps(event(closing_event)) + "\n",
+                    )
+                    archive_root = (
+                        home
+                        / ".accord"
+                        / "archive"
+                        / "projects"
+                        / log.parents[1].name
+                    )
 
-            result = self.run_hook(
-                POST_TOOL_USE,
-                {
-                    "hook_event_name": "PostToolUse",
-                    "tool_name": "Write",
-                    "tool_input": {"file_path": str(log)},
-                    "cwd": str(root),
-                },
-                home,
-            )
+                    result = self.run_hook(
+                        POST_TOOL_USE,
+                        {
+                            "hook_event_name": "PostToolUse",
+                            "tool_name": "Write",
+                            "tool_input": {"file_path": str(log)},
+                            "cwd": str(root),
+                        },
+                        home,
+                    )
 
-            self.assertEqual(result.returncode, 0)
-            self.assertTrue(log.is_file())
-            self.assertFalse((archive_root / "rate-limit").exists())
+                    self.assertEqual(result.returncode, 0)
+                    self.assertTrue(log.is_file())
+                    self.assertFalse((archive_root / "rate-limit").exists())
 
     def test_post_tool_use_checks_history_after_a_related_document_edit(self):
         with tempfile.TemporaryDirectory() as directory:

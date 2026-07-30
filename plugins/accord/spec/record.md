@@ -9,15 +9,15 @@ line.
 The record describes what happened. It does not score the agent, prescribe the
 next action, or turn earlier experience into a rule.
 
-After completion, the entire task directory may move to
+After work closes, the entire task directory may move to
 `~/.accord/archive/projects/{project-key}/{task}/`. Archival changes routine
 visibility, not the record. It does not add an event, rewrite history, or break
-the relative paths between the record and its documents. Completion does not
-trigger this move. Archival occurs only through an explicit user action.
+the relative paths between the record and its documents. A closing event does
+not trigger this move. Archival occurs only through an explicit user action.
 An explicit `--force` override may move work whose record does not end in
-`completion`. The move does not complete the work, close its agreement, or add
-an event to its record. The work remains outside routine discovery until an
-explicit restore returns it to the active project store.
+`completion` or `end`. The move does not complete or end the work, close its
+agreement, or add an event to its record. The work remains outside routine
+discovery until an explicit restore returns it to the active project store.
 
 ## Design
 
@@ -68,7 +68,7 @@ defined.
 | `check-in` | Human input that meets the consequential boundary in `spec/check-in.md`. |
 | `approach-change` | The approach changes while the purpose remains. |
 | `completion` | The human has explicitly approved recording the work as complete, closing the agreement and record. |
-| `end` | The work ends without completion. |
+| `end` | The work ends without completion, closing the agreement and record. |
 | `note` | A factual event that fits no more specific type. |
 
 Changing the event or actor set changes the shared record contract. It requires
@@ -82,9 +82,9 @@ as `direction`. The agent's evidence or judgment that the agreement has been
 satisfied is not approval. Validation proves that an event is well formed; the
 preceding record shows whether authority to close was given.
 
-Completion is terminal. No later request reopens the agreement, and no later
-event is appended to that record. Related work receives a new agreement and
-record.
+`completion` and `end` are terminal. No later request reopens the agreement,
+and no later event is appended to that record. Related work receives a new
+agreement and record.
 
 ## Documents and events
 

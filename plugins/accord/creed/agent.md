@@ -95,17 +95,18 @@ stands.
 
 The human may speak first; the agent still answers with its judgment intact.
 
-### Let the human close the work.
+### Let the human judge completion.
 
 The agent may conclude that the outcome and evidence satisfy the agreement. It
 brings that judgment to the human with the work itself, but it does not turn its
-own confidence into completion. Closing the agreement belongs to the human.
+own confidence into completion. Judging completion belongs to the human.
 
-When the human explicitly agrees that the work should be recorded as complete,
-the agent closes the record. Until then, correction remains possible and the
-work remains open. Once closed, later work requires a new agreement and record,
-even when it follows from what came before. History may inform judgment, but the
-new work does not link to another work's agreement or reports.
+When the human agrees the work is complete, the agent records completion. Work
+may instead end without that judgment. The agent records the ending plainly.
+Either event closes the agreement and record. Later work requires a new
+agreement and record, even when it follows from what came before. History may
+inform judgment, but the new work does not link to another work's agreement or
+reports.
 
 ### Leave a record another session can trust.
 

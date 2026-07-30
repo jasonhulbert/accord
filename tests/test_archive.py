@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Behavior tests for reversible archival of completed Accord work."""
+"""Behavior tests for reversible archival of closed Accord work."""
 
 from __future__ import annotations
 
@@ -105,31 +105,33 @@ class ArchiveTests(unittest.TestCase):
             if path.is_file()
         }
 
-    def test_archive_and_restore_move_the_complete_task_without_rewriting_it(self):
-        with tempfile.TemporaryDirectory() as directory:
-            project, home, active_root, archive_root = self.make_project(
-                Path(directory)
-            )
-            task_dir = self.write_task(
-                active_root,
-                [event("start"), event("completion")],
-            )
-            before = self.snapshot(task_dir)
+    def test_archive_accepts_each_closing_outcome_without_force(self):
+        for closing_event in ("completion", "end"):
+            with self.subTest(closing_event=closing_event):
+                with tempfile.TemporaryDirectory() as directory:
+                    project, home, active_root, archive_root = self.make_project(
+                        Path(directory)
+                    )
+                    task_dir = self.write_task(
+                        active_root,
+                        [event("start"), event(closing_event)],
+                    )
+                    before = self.snapshot(task_dir)
 
-            archived = self.run_archive(project, home, "archive")
+                    archived = self.run_archive(project, home, "archive")
 
-            self.assertEqual(archived.returncode, 0, archived.stderr)
-            self.assertFalse(task_dir.exists())
-            archived_task = archive_root / "finished-work"
-            self.assertEqual(self.snapshot(archived_task), before)
+                    self.assertEqual(archived.returncode, 0, archived.stderr)
+                    self.assertFalse(task_dir.exists())
+                    archived_task = archive_root / "finished-work"
+                    self.assertEqual(self.snapshot(archived_task), before)
 
-            restored = self.run_archive(project, home, "restore")
+                    restored = self.run_archive(project, home, "restore")
 
-            self.assertEqual(restored.returncode, 0, restored.stderr)
-            self.assertFalse(archived_task.exists())
-            self.assertEqual(self.snapshot(task_dir), before)
+                    self.assertEqual(restored.returncode, 0, restored.stderr)
+                    self.assertFalse(archived_task.exists())
+                    self.assertEqual(self.snapshot(task_dir), before)
 
-    def test_archive_warns_deterministically_and_keeps_incomplete_work_active(self):
+    def test_archive_warns_deterministically_and_keeps_unclosed_work_active(self):
         with tempfile.TemporaryDirectory() as directory:
             project, home, active_root, archive_root = self.make_project(
                 Path(directory)
@@ -141,14 +143,14 @@ class ArchiveTests(unittest.TestCase):
             self.assertEqual(result.returncode, 2)
             self.assertEqual(
                 result.stderr,
-                "WARNING: 'finished-work' is not complete; "
+                "WARNING: 'finished-work' does not end in a closing event; "
                 "nothing was archived.\n",
             )
             self.assertEqual(result.stdout, "")
             self.assertTrue(task_dir.is_dir())
             self.assertFalse((archive_root / "finished-work").exists())
 
-    def test_force_archives_incomplete_work_with_a_deterministic_warning(self):
+    def test_force_archives_unclosed_work_with_a_deterministic_warning(self):
         with tempfile.TemporaryDirectory() as directory:
             project, home, active_root, archive_root = self.make_project(
                 Path(directory)
@@ -161,7 +163,7 @@ class ArchiveTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(
                 result.stderr,
-                "WARNING: 'finished-work' is not complete; "
+                "WARNING: 'finished-work' does not end in a closing event; "
                 "archived because --force was provided.\n",
             )
             self.assertIn("Archived 'finished-work':", result.stdout)
