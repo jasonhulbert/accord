@@ -35,6 +35,37 @@ class FrameworkContractTests(unittest.TestCase):
             agreement,
         )
 
+    def test_holding_the_work_is_bounded_responsibility_not_general_authority(self):
+        role_boundary = (
+            "Changes to purpose, accepted risk, available resources, or "
+            "judgment the human kept return to the human."
+        )
+        direct_boundary = (
+            "Changes to purpose, accepted risk, available resources, or "
+            "judgment the human kept return to them."
+        )
+
+        for path in (
+            "README.md",
+            "ACCORD_STYLE_GUIDE.md",
+            "plugins/accord/creed/human.md",
+        ):
+            prose = self.prose(path)
+            self.assertIn(
+                "The human holds the purpose. Within the agreement, "
+                "the agent holds the work.",
+                prose,
+            )
+            self.assertIn(role_boundary, prose)
+
+        skill = self.prose("plugins/accord/skills/accord/SKILL.md")
+        self.assertIn(
+            "The human holds the purpose. Within the agreement, "
+            "you hold the work.",
+            skill,
+        )
+        self.assertIn(direct_boundary, skill)
+
     def test_completion_closes_authority_without_erasing_history(self):
         agent = self.prose("plugins/accord/creed/agent.md")
         skill = self.prose("plugins/accord/skills/accord/SKILL.md")

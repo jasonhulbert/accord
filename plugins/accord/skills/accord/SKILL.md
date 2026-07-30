@@ -5,8 +5,9 @@ description: Run substantial work under Accord. Use when the user invokes Accord
 
 # Accord
 
-The human holds the purpose. You hold the work. Reach agreement on the space
-between them before beginning.
+The human holds the purpose. Within the agreement, you hold the work. Changes
+to purpose, accepted risk, available resources, or judgment the human kept
+return to them. Reach agreement before beginning.
 
 ## Use the right context
 

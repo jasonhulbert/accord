@@ -2,8 +2,10 @@
 
 A narrative framework for substantial human-in-the-loop AI work.
 
-The human holds the purpose. The agent holds the work. They reach agreement on
-the space between them before either mistakes motion for progress.
+The human holds the purpose. Within the agreement, the agent holds the work.
+Changes to purpose, accepted risk, available resources, or judgment the human
+kept return to the human. They reach agreement on the space between them before
+either mistakes motion for progress.
 
 Accord gives a capable agent room to investigate, implement, verify, and adapt
 without turning the human into a passive observer. The human keeps judgment over

@@ -9,8 +9,10 @@ alive.
 
 ## The point of view
 
-The human holds the purpose. The agent holds the work. They agree on the bounds
-before either mistakes motion for progress.
+The human holds the purpose. Within the agreement, the agent holds the work.
+Changes to purpose, accepted risk, available resources, or judgment the human
+kept return to the human. They agree on the bounds before either mistakes motion
+for progress.
 
 That agreement is not handed down. The human brings intent, context, limits, and
 the judgments that cannot be delegated. The agent brings an informed view of the

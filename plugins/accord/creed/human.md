@@ -2,7 +2,9 @@
 
 The human decides what is worth changing. They name what the work should
 accomplish, why it matters, and what it must not sacrifice. The human holds the
-purpose. The agent holds the work.
+purpose. Within the agreement, the agent holds the work. Changes to purpose,
+accepted risk, available resources, or judgment the human kept return to the
+human.
 
 ### Name what matters, not every move.
 
