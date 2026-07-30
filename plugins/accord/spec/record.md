@@ -9,6 +9,16 @@ line.
 The record describes what happened. It does not score the agent, prescribe the
 next action, or turn earlier experience into a rule.
 
+After completion, the entire task directory may move to
+`~/.accord/archive/projects/{project-key}/{task}/`. Archival changes routine
+visibility, not the record. It does not add an event, rewrite history, or break
+the relative paths between the record and its documents. Completion does not
+trigger this move. Archival occurs only through an explicit user action.
+An explicit `--force` override may move work whose record does not end in
+`completion`. The move does not complete the work, close its agreement, or add
+an event to its record. The work remains outside routine discovery until an
+explicit restore returns it to the active project store.
+
 ## Design
 
 - **Append only.** Corrections are later events with references to what they

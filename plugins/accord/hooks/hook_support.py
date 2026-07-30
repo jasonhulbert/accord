@@ -14,7 +14,7 @@ PLUGIN_ROOT = Path(__file__).resolve().parent.parent
 VALIDATOR = PLUGIN_ROOT / "tools" / "validate"
 sys.path.insert(0, str(PLUGIN_ROOT))
 
-from storage import accord_home, accord_root_for  # noqa: E402
+from storage import accord_archive_root_for, accord_home, accord_root_for  # noqa: E402
 
 
 def read_payload() -> dict[str, Any]:
@@ -40,6 +40,12 @@ def find_accord_root(cwd: Path) -> Path | None:
     """Find this project's Accord directory in the user's hidden home store."""
     accord = accord_root_for(cwd)
     return accord if accord.is_dir() else None
+
+
+def find_archive_root(cwd: Path) -> Path | None:
+    """Find this project's archived Accord directory."""
+    archive = accord_archive_root_for(cwd)
+    return archive if archive.is_dir() else None
 
 
 def record_logs(accord_root: Path) -> list[Path]:
@@ -134,11 +140,29 @@ def latest_named_file(paths: list[Path]) -> str:
     return f"{len(paths)} (latest {latest.name})"
 
 
-def tool_input_mentions_accord(payload: dict[str, Any]) -> bool:
-    """Conservatively recognize tool calls that name Accord records."""
+def serialized_tool_input(payload: dict[str, Any]) -> str:
+    """Serialize tool input once for conservative path recognition."""
     tool_input = payload.get("tool_input")
     try:
-        serialized = json.dumps(tool_input, sort_keys=True)
+        return json.dumps(tool_input, sort_keys=True)
     except (TypeError, ValueError):
-        serialized = repr(tool_input)
+        return repr(tool_input)
+
+
+def tool_input_mentions_accord(payload: dict[str, Any]) -> bool:
+    """Conservatively recognize tool calls that name Accord records."""
+    serialized = serialized_tool_input(payload)
     return str(accord_home()) in serialized or "~/.accord" in serialized
+
+
+def roots_named_by_tool_input(
+    payload: dict[str, Any], roots: list[Path]
+) -> list[Path]:
+    """Narrow validation when tool input names a particular record root."""
+    serialized = serialized_tool_input(payload)
+    named = [
+        root
+        for root in roots
+        if str(root) in serialized or display_path(root) in serialized
+    ]
+    return named or roots

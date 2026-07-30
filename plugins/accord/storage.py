@@ -34,3 +34,40 @@ def accord_home() -> Path:
 def accord_root_for(cwd: Path) -> Path:
     """Return the record root reserved for the project containing ``cwd``."""
     return accord_home() / "projects" / project_key(project_root(cwd))
+
+
+def accord_archive_root_for(cwd: Path) -> Path:
+    """Return the archive root reserved for the project containing ``cwd``."""
+    return (
+        accord_home()
+        / "archive"
+        / "projects"
+        / project_key(project_root(cwd))
+    )
+
+
+def task_directory(root: Path, task: str) -> Path | None:
+    """Resolve a task ID to one direct child without accepting path syntax."""
+    if (
+        not task
+        or task in {".", ".."}
+        or "/" in task
+        or "\\" in task
+        or "\x00" in task
+    ):
+        return None
+    return root / task
+
+
+def symlink_component_below(base: Path, target: Path) -> Path | None:
+    """Return the first symlink below a logical storage root."""
+    try:
+        relative = target.relative_to(base)
+    except ValueError:
+        return target
+    current = base
+    for part in relative.parts:
+        current /= part
+        if current.is_symlink():
+            return current
+    return None

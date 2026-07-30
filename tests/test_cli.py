@@ -69,6 +69,17 @@ class CliTests(unittest.TestCase):
         task.mkdir(parents=True)
         (task / "record.jsonl").write_text(json.dumps(event(summary)) + "\n")
 
+    def write_completed_record(self, store: Path) -> None:
+        task = store / "rate-limit"
+        task.mkdir(parents=True)
+        started = event("The work began.")
+        started["type"] = "start"
+        completed = event("The human recorded the work as complete.")
+        completed["type"] = "completion"
+        (task / "record.jsonl").write_text(
+            json.dumps(started) + "\n" + json.dumps(completed) + "\n"
+        )
+
     def test_installer_creates_a_stable_command_outside_the_plugin_root(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -88,6 +99,70 @@ class CliTests(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0)
         self.assertIn("accord serve", result.stdout)
+        self.assertIn("accord archive", result.stdout)
+        self.assertIn("accord restore", result.stdout)
+
+    def test_installed_command_archives_and_restores_completed_work(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            project, home, store = self.make_project(root)
+            self.write_completed_record(store)
+            launcher = self.install(home, root / "bin")
+            environment = os.environ | {"HOME": str(home)}
+
+            archived = subprocess.run(
+                [str(launcher), "archive", "rate-limit"],
+                cwd=project,
+                text=True,
+                capture_output=True,
+                env=environment,
+            )
+            archive_root = (
+                home / ".accord" / "archive" / "projects" / store.name
+            )
+
+            self.assertEqual(archived.returncode, 0, archived.stderr)
+            self.assertFalse((store / "rate-limit").exists())
+            self.assertTrue((archive_root / "rate-limit").is_dir())
+
+            restored = subprocess.run(
+                [str(launcher), "restore", "rate-limit"],
+                cwd=project,
+                text=True,
+                capture_output=True,
+                env=environment,
+            )
+
+            self.assertEqual(restored.returncode, 0, restored.stderr)
+            self.assertTrue((store / "rate-limit").is_dir())
+            self.assertFalse((archive_root / "rate-limit").exists())
+
+    def test_installed_command_forwards_force_for_incomplete_work(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            project, home, store = self.make_project(root)
+            self.write_record(store, "This work remains incomplete.")
+            launcher = self.install(home, root / "bin")
+
+            result = subprocess.run(
+                [str(launcher), "archive", "--force", "rate-limit"],
+                cwd=project,
+                text=True,
+                capture_output=True,
+                env=os.environ | {"HOME": str(home)},
+            )
+            archive_root = (
+                home / ".accord" / "archive" / "projects" / store.name
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(
+                result.stderr,
+                "WARNING: 'rate-limit' is not complete; "
+                "archived because --force was provided.\n",
+            )
+            self.assertFalse((store / "rate-limit").exists())
+            self.assertTrue((archive_root / "rate-limit").is_dir())
 
     def test_installed_command_uses_the_target_project_cwd(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -144,6 +219,42 @@ class CliTests(unittest.TestCase):
                 page = response.read().decode()
 
         self.assertIn("The launcher survived the update.", page)
+
+    def test_serve_can_fall_back_to_a_plugin_from_before_archive_commands(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            project, home, store = self.make_project(root)
+            self.write_record(store, "Older serving remains compatible.")
+
+            family = root / "plugin-cache" / "accord"
+            old_root = family / "0.1.1"
+            new_root = family / "0.1.2"
+            shutil.copytree(REPO_ROOT / "plugins" / "accord", old_root)
+            shutil.copytree(REPO_ROOT / "plugins" / "accord", new_root)
+            (old_root / "tools" / "archive").unlink()
+            launcher = self.install_from(home, root / "bin", new_root)
+            shutil.rmtree(new_root)
+
+            process = subprocess.Popen(
+                [str(launcher), "serve", "--no-open", "--port", "0"],
+                cwd=project,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                env=os.environ | {"HOME": str(home)},
+            )
+            self.addCleanup(self.stop, process)
+            line = process.stdout.readline().strip() if process.stdout else ""
+
+            self.assertTrue(
+                line.startswith("Accord web view: http://127.0.0.1:"),
+                line,
+            )
+            url = line.removeprefix("Accord web view: ")
+            with urlopen(url.rstrip("/") + "/task/rate-limit", timeout=3) as response:
+                page = response.read().decode()
+
+        self.assertIn("Older serving remains compatible.", page)
 
     def test_installed_command_prefers_newer_plugin_while_old_cache_remains(self):
         with tempfile.TemporaryDirectory() as directory:

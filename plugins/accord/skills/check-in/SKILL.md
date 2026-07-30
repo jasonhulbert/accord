@@ -12,10 +12,10 @@ the message as a check-in.
 
 For a possible check-in, run `tools/location` from the target project's root.
 Find the active agreement that covers the message. A record with a `completion`
-event is closed; do not reopen or append to it. If several active agreements
-could cover the message, ask which one. If none does, say so plainly and offer
-to use Accord to reach an agreement for the work. A closed agreement counts as
-none.
+event is closed. If the message explicitly resumes work archived with
+`--force`, use the `accord` skill; never search archives speculatively. Ask
+which agreement when several fit. If none does, offer to use Accord to reach an
+agreement for the work. A closed agreement counts as none.
 
 For an open question, invoke the `accord` skill for agreement, resumption, and
 review handling. This handoff does not import hidden reading instructions.

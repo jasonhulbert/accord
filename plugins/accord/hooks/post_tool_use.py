@@ -7,10 +7,12 @@ import sys
 
 from hook_support import (
     display_path,
+    find_archive_root,
     find_accord_root,
     payload_cwd,
     read_payload,
     record_logs,
+    roots_named_by_tool_input,
     tool_input_mentions_accord,
     validate_log,
     validation_excerpt,
@@ -27,19 +29,26 @@ def main() -> int:
     if not tool_input_mentions_accord(payload):
         return 0
 
-    accord_root = find_accord_root(payload_cwd(payload))
-    if accord_root is None:
+    cwd = payload_cwd(payload)
+    roots = [
+        root
+        for root in (find_accord_root(cwd), find_archive_root(cwd))
+        if root is not None
+    ]
+    if not roots:
         return 0
+    roots = roots_named_by_tool_input(payload, roots)
 
     failures: list[str] = []
-    for log in record_logs(accord_root):
-        valid, output = validate_log(log)
-        if valid:
-            continue
-        failures.append(f"{display_path(log)} is invalid:")
-        failures.extend(
-            f"  {line}" for line in validation_excerpt(output, accord_root)
-        )
+    for root in roots:
+        for log in record_logs(root):
+            valid, output = validate_log(log)
+            if valid:
+                continue
+            failures.append(f"{display_path(log)} is invalid:")
+            failures.extend(
+                f"  {line}" for line in validation_excerpt(output, root)
+            )
 
     if not failures:
         return 0

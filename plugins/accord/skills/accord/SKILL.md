@@ -27,13 +27,13 @@ Run `tools/location` from the target project's root to locate its record store.
 It prints a directory under `~/.accord/projects/`; use that exact directory.
 Only an active agreement can cover the request. A `completion` event closes its
 agreement and record; do not reopen or append to it. Reach a new agreement for
-later work. History may inform counsel, but the new agreement, record, and
-reports do not link to another work's agreement or reports.
+later work. When the human explicitly resumes work archived with `--force`,
+run `accord restore TASK` first. Never search archives speculatively. History
+may inform counsel, but new records stand alone.
 
-If an active agreement there covers the request, read it together with the
-record, reports, learning notes, and actual work. If a reserved question is
-open, wait for human direction. Otherwise orient the human to the current state
-and resume the work within the agreement.
+For active work, read it together with the record, reports, learning notes, and
+actual work. Wait on an open reserved question. Otherwise orient the human and
+resume the work within the agreement.
 
 When the human asks to inspect work in progress under Accord, use the user-facing
 `accord serve` command from the target root when installed. It opens a read-only

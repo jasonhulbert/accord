@@ -23,7 +23,13 @@ from urllib.parse import quote, unquote, urlsplit
 PLUGIN_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PLUGIN_ROOT))
 
-from storage import accord_root_for  # noqa: E402
+from storage import (  # noqa: E402
+    accord_archive_root_for,
+    accord_home,
+    accord_root_for,
+    symlink_component_below,
+    task_directory,
+)
 
 
 def load_renderer():
@@ -160,29 +166,68 @@ def record_logs(accord_root: Path) -> list[Path]:
     )
 
 
-def record_for(accord_root: Path, task: str) -> Path | None:
+def record_for(
+    accord_root: Path, task: str, require_safe: bool = False
+) -> Path | None:
     """Resolve a task name only to a direct record under the project store."""
-    if not task or "/" in task or "\\" in task or task in {".", ".."}:
+    task_dir = task_directory(accord_root, task)
+    if task_dir is None:
         return None
-    for record in record_logs(accord_root):
-        if record.parent.name == task:
-            return record
-    return None
+    record = task_dir / "record.jsonl"
+    if require_safe and (
+        symlink_component_below(accord_home(), task_dir) is not None
+        or record.is_symlink()
+    ):
+        return None
+    return record if record.is_file() else None
 
 
-def index_content(accord_root: Path) -> str:
+def index_page(content: str, archived: bool) -> str:
+    """Place active or archived records in the shared index shell."""
+    page = (
+        INDEX_TEMPLATE.replace("__FONT_CSS__", font_css())
+        .replace("__CONTENT__", content)
+    )
+    if not archived:
+        return page
+    return (
+        page.replace(
+            "<title>Accord records</title>",
+            "<title>Archived Accord records</title>",
+        )
+        .replace(
+            "<h1>Accord records</h1>",
+            "<h1>Archived Accord records</h1>",
+        )
+        .replace(
+            "Choose a record to inspect.",
+            "Choose archived work to inspect.",
+        )
+    )
+
+
+def index_content(accord_root: Path, archived: bool = False) -> str:
     """Build the task chooser without selecting a record for the user."""
     records = record_logs(accord_root)
     if not records:
-        content = '<p class="empty">No Accord records were found for this project yet.</p>'
-        return (
-            INDEX_TEMPLATE.replace("__FONT_CSS__", font_css())
-            .replace("__CONTENT__", content)
+        kind = "archived records" if archived else "Accord records"
+        content = (
+            f'<p class="empty">No {kind} were found for this project yet.</p>'
         )
+        return index_page(content, archived)
 
     cards = []
     for record in records:
         task = record.parent.name
+        if archived and record_for(accord_root, task, True) is None:
+            cards.append(
+                '<li class="record invalid">'
+                f'<div class="record-head"><h2><span class="status-mark status-mark-error" aria-hidden="true"></span>{escape(task)}</h2>'
+                '<span class="meta">needs attention</span></div>'
+                '<p class="error">Unsafe archived storage entry was not read.</p>'
+                "</li>"
+            )
+            continue
         events, error = parse_events([str(record)])
         if error:
             cards.append(
@@ -209,10 +254,7 @@ def index_content(accord_root: Path) -> str:
         )
 
     content = '<ul class="records">' + "".join(cards) + "</ul>"
-    return (
-        INDEX_TEMPLATE.replace("__FONT_CSS__", font_css())
-        .replace("__CONTENT__", content)
-    )
+    return index_page(content, archived)
 
 
 def error_page(heading: str, message: str) -> str:
@@ -224,7 +266,7 @@ def error_page(heading: str, message: str) -> str:
     )
 
 
-def make_handler(accord_root: Path):
+def make_handler(accord_root: Path, archived: bool = False):
     """Create a request handler bound to one project's record root."""
 
     class RecordHandler(BaseHTTPRequestHandler):
@@ -260,7 +302,7 @@ def make_handler(accord_root: Path):
         def do_GET(self) -> None:  # noqa: N802
             path = urlsplit(self.path).path
             if path == "/":
-                self.send_html(index_content(accord_root))
+                self.send_html(index_content(accord_root, archived))
                 return
 
             if path.startswith("/assets/web/"):
@@ -269,7 +311,7 @@ def make_handler(accord_root: Path):
 
             if path.startswith("/task/"):
                 task = unquote(path.removeprefix("/task/"))
-                record = record_for(accord_root, task)
+                record = record_for(accord_root, task, archived)
                 if record is None:
                     self.send_html(error_page("Record not found", task), 404)
                     return
@@ -278,18 +320,34 @@ def make_handler(accord_root: Path):
                     self.send_html(error_page(task, error), 422)
                     return
                 refresh_url = f"/task/{quote(task, safe='')}"
+                all_records = (
+                    '<a href="/">All archived records</a>'
+                    if archived
+                    else '<a href="/">All records</a>'
+                )
                 nav = (
-                    '<a href="/">All records</a> · '
+                    f"{all_records} · "
                     f'<a href="{refresh_url}">Refresh</a> · manual refresh'
                 )
                 html = build_html(
                     events,
                     documents=collect_documents([str(record)], events),
-                    title=f"{task} — Accord",
+                    title=(
+                        f"{task} — Archived Accord"
+                        if archived
+                        else f"{task} — Accord"
+                    ),
                     heading=task,
                     intro=(
-                        "A view of this Accord record. Refresh when you want to "
-                        "see new events."
+                        (
+                            "A view of this archived Accord record. "
+                            "Restore it to reverse its storage placement."
+                        )
+                        if archived
+                        else (
+                            "A view of this Accord record. Refresh when you "
+                            "want to see new events."
+                        )
                     ),
                     nav=nav,
                 )
@@ -311,6 +369,11 @@ class LocalServer(ThreadingHTTPServer):
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n", 1)[0])
     parser.add_argument(
+        "--archived",
+        action="store_true",
+        help="show archived records instead of the active record list",
+    )
+    parser.add_argument(
         "--task", help="open one record by task ID instead of the record list"
     )
     parser.add_argument(
@@ -329,8 +392,12 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 
 def main(argv: list[str]) -> int:
     args = parse_args(argv)
-    accord_root = accord_root_for(Path.cwd())
-    if args.task and record_for(accord_root, args.task) is None:
+    accord_root = (
+        accord_archive_root_for(Path.cwd())
+        if args.archived
+        else accord_root_for(Path.cwd())
+    )
+    if args.task and record_for(accord_root, args.task, args.archived) is None:
         print(
             f"{args.task!r}: no Accord record found for this project",
             file=sys.stderr,
@@ -338,7 +405,10 @@ def main(argv: list[str]) -> int:
         return 2
 
     try:
-        server = LocalServer(("127.0.0.1", args.port), make_handler(accord_root))
+        server = LocalServer(
+            ("127.0.0.1", args.port),
+            make_handler(accord_root, args.archived),
+        )
     except OSError as error:
         print(f"cannot start local Accord web view: {error}", file=sys.stderr)
         return 2

@@ -184,7 +184,68 @@ class ServerTests(unittest.TestCase):
             self.assertTrue(url.endswith("/task/rate-limit"), url)
             status, page = self.get(url)
             self.assertEqual(status, 200)
-            self.assertIn("The selected record.", page)
+        self.assertIn("The selected record.", page)
+
+    def test_archived_records_require_explicit_archived_view(self):
+        with tempfile.TemporaryDirectory() as directory:
+            project, home, store = self.make_project(Path(directory))
+            archive_root = (
+                home / ".accord" / "archive" / "projects" / store.name
+            )
+            self.write_record(
+                archive_root,
+                "rate-limit",
+                json.dumps(event("Archived evidence.", "completion")) + "\n",
+            )
+
+            _, active_url = self.start_server(project, home)
+            status, active_index = self.get(active_url)
+            self.assertEqual(status, 200)
+            self.assertNotIn("rate-limit", active_index)
+
+            _, archive_url = self.start_server(project, home, "--archived")
+            status, archive_index = self.get(archive_url)
+            self.assertEqual(status, 200)
+            self.assertIn("Archived Accord records", archive_index)
+            self.assertIn('href="/task/rate-limit"', archive_index)
+
+            status, page = self.get(archive_url.rstrip("/") + "/task/rate-limit")
+            self.assertEqual(status, 200)
+            self.assertIn("Archived evidence.", page)
+            self.assertIn("reverse its storage placement", page)
+
+    def test_archived_view_refuses_a_symlinked_task_directory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            project, home, store = self.make_project(root)
+            external = root / "external-task"
+            self.write_record(
+                external.parent,
+                external.name,
+                json.dumps(event("External evidence.", "completion")) + "\n",
+            )
+            archive_root = (
+                home / ".accord" / "archive" / "projects" / store.name
+            )
+            archive_root.mkdir(parents=True)
+            try:
+                (archive_root / "rate-limit").symlink_to(
+                    external,
+                    target_is_directory=True,
+                )
+            except OSError as error:
+                self.skipTest(f"symlinks unavailable: {error}")
+
+            _, archive_url = self.start_server(project, home, "--archived")
+            index_status, index = self.get(archive_url)
+            status, page = self.get(
+                archive_url.rstrip("/") + "/task/rate-limit"
+            )
+
+        self.assertEqual(index_status, 200)
+        self.assertIn("Unsafe archived storage entry was not read.", index)
+        self.assertEqual(status, 404)
+        self.assertNotIn("External evidence.", page)
 
     def test_server_surfaces_malformed_records_in_the_index_and_task_view(self):
         with tempfile.TemporaryDirectory() as directory:

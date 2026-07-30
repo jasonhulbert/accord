@@ -1,0 +1,270 @@
+#!/usr/bin/env python3
+"""Move Accord work between active and archived storage.
+
+Usage:
+  tools/archive archive [--force] TASK
+  tools/archive restore TASK
+"""
+
+from __future__ import annotations
+
+import ctypes
+import errno
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+
+PLUGIN_ROOT = Path(__file__).resolve().parent.parent
+VALIDATOR = PLUGIN_ROOT / "tools" / "validate"
+sys.path.insert(0, str(PLUGIN_ROOT))
+
+from storage import (  # noqa: E402
+    accord_archive_root_for,
+    accord_home,
+    accord_root_for,
+    symlink_component_below,
+    task_directory,
+)
+
+
+class ArchiveError(Exception):
+    """A user-facing refusal that leaves stored work unchanged."""
+
+
+class IncompleteWorkWarning(ArchiveError):
+    """An explicit archive request targeted work that is not complete."""
+
+
+def validate_safe_task(task_dir: Path, task: str) -> None:
+    """Require a direct task tree that can be moved without following links."""
+    if not task_dir.exists():
+        raise ArchiveError(f"{task!r}: no Accord work found for this project")
+    unsafe_ancestor = symlink_component_below(accord_home(), task_dir)
+    if unsafe_ancestor is not None:
+        raise ArchiveError(
+            f"{task!r}: storage contains a symlink at {unsafe_ancestor}"
+        )
+    if not task_dir.is_dir():
+        raise ArchiveError(f"{task!r}: task directory is not a safe directory")
+    try:
+        for path in task_dir.rglob("*"):
+            if path.is_symlink() or not (path.is_file() or path.is_dir()):
+                relative = path.relative_to(task_dir)
+                raise ArchiveError(
+                    f"{task!r}: task contains an unsafe filesystem object at "
+                    f"{relative}"
+                )
+    except OSError as error:
+        raise ArchiveError(
+            f"{task!r}: task directory could not be inspected: {error}"
+        ) from error
+
+
+def validate_completed(task_dir: Path, task: str) -> None:
+    """Require a valid record for this task whose terminal event is completion."""
+    validate_safe_task(task_dir, task)
+    record = task_dir / "record.jsonl"
+    if record.is_symlink() or not record.is_file():
+        raise ArchiveError(f"{task!r}: record.jsonl is missing or unsafe")
+
+    try:
+        result = subprocess.run(
+            [sys.executable, str(VALIDATOR), str(record)],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=8,
+        )
+    except (OSError, subprocess.TimeoutExpired) as error:
+        raise ArchiveError(f"{task!r}: record validation could not run: {error}") from error
+    if result.returncode != 0:
+        detail = "\n".join(
+            part.strip() for part in (result.stdout, result.stderr) if part.strip()
+        )
+        raise ArchiveError(f"{task!r}: record is invalid\n{detail}")
+
+    try:
+        events = [
+            json.loads(line)
+            for line in record.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+    except (OSError, json.JSONDecodeError) as error:
+        raise ArchiveError(f"{task!r}: record could not be read: {error}") from error
+    if any(event.get("task") != task for event in events):
+        raise ArchiveError(
+            f"{task!r}: every record event must name the task directory"
+        )
+    if not events or events[-1].get("type") != "completion":
+        raise IncompleteWorkWarning(task)
+
+
+def rename_without_replace(source: Path, destination: Path) -> None:
+    """Rename atomically without replacing a destination where supported."""
+    if sys.platform == "win32":
+        os.rename(source, destination)
+        return
+
+    libc = ctypes.CDLL(None, use_errno=True)
+    source_bytes = os.fsencode(source)
+    destination_bytes = os.fsencode(destination)
+    result: int | None = None
+    if sys.platform == "darwin" and hasattr(libc, "renamex_np"):
+        renamex_np = libc.renamex_np
+        renamex_np.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_uint]
+        renamex_np.restype = ctypes.c_int
+        result = renamex_np(source_bytes, destination_bytes, 0x00000004)
+    elif hasattr(libc, "renameat2"):
+        renameat2 = libc.renameat2
+        renameat2.argtypes = [
+            ctypes.c_int,
+            ctypes.c_char_p,
+            ctypes.c_int,
+            ctypes.c_char_p,
+            ctypes.c_uint,
+        ]
+        renameat2.restype = ctypes.c_int
+        result = renameat2(
+            -100,
+            source_bytes,
+            -100,
+            destination_bytes,
+            0x00000001,
+        )
+    if result is None:
+        if destination.exists() or destination.is_symlink():
+            raise FileExistsError(
+                errno.EEXIST,
+                os.strerror(errno.EEXIST),
+                destination,
+            )
+        os.rename(source, destination)
+        return
+    if result != 0:
+        error_number = ctypes.get_errno()
+        raise OSError(
+            error_number,
+            os.strerror(error_number),
+            destination,
+        )
+
+
+def move_task(
+    action: str,
+    task: str,
+    cwd: Path,
+    force: bool = False,
+) -> tuple[Path, Path, bool]:
+    """Archive eligible work or restore an archived task directory."""
+    active_root = accord_root_for(cwd)
+    archive_root = accord_archive_root_for(cwd)
+    if action == "archive":
+        source_root, destination_root = active_root, archive_root
+    else:
+        source_root, destination_root = archive_root, active_root
+
+    source = task_directory(source_root, task)
+    destination = task_directory(destination_root, task)
+    if source is None or destination is None:
+        raise ArchiveError(f"{task!r}: task ID must be one path-safe name")
+
+    forced_incomplete = False
+    if action == "archive":
+        try:
+            validate_completed(source, task)
+        except IncompleteWorkWarning:
+            if not force:
+                raise
+            forced_incomplete = True
+    else:
+        validate_safe_task(source, task)
+    try:
+        unsafe_destination = symlink_component_below(
+            accord_home(), destination_root
+        )
+        if unsafe_destination is not None:
+            raise ArchiveError(
+                f"{task!r}: destination storage contains a symlink at "
+                f"{unsafe_destination}"
+            )
+        if destination.exists() or destination.is_symlink():
+            raise ArchiveError(
+                f"{task!r}: destination already exists; nothing was moved"
+            )
+        destination_root.mkdir(parents=True, exist_ok=True)
+        unsafe_destination = symlink_component_below(
+            accord_home(), destination_root
+        )
+        if unsafe_destination is not None:
+            raise ArchiveError(
+                f"{task!r}: destination storage contains a symlink at "
+                f"{unsafe_destination}"
+            )
+        rename_without_replace(source, destination)
+    except ArchiveError:
+        raise
+    except OSError as error:
+        raise ArchiveError(f"{task!r}: could not be moved: {error}") from error
+    return source, destination, forced_incomplete
+
+
+def parse_command(argv: list[str]) -> tuple[str, str, bool] | None:
+    """Parse the small stable command surface without accepting stray flags."""
+    if not argv or argv[0] not in {"archive", "restore"}:
+        return None
+    action = argv[0]
+    arguments = argv[1:]
+    force = False
+    if action == "archive" and arguments.count("--force") == 1:
+        force = True
+        arguments = [argument for argument in arguments if argument != "--force"]
+    if len(arguments) != 1 or "--force" in arguments:
+        return None
+    return action, arguments[0], force
+
+
+def main(argv: list[str]) -> int:
+    command = parse_command(argv)
+    if command is None:
+        stream = (
+            sys.stdout
+            if argv and argv[0] in {"-h", "--help"}
+            else sys.stderr
+        )
+        print(__doc__.strip(), file=stream)
+        return 0 if stream is sys.stdout else 2
+
+    action, task, force = command
+    try:
+        _, destination, forced_incomplete = move_task(
+            action,
+            task,
+            Path.cwd(),
+            force,
+        )
+    except IncompleteWorkWarning:
+        print(
+            f"WARNING: {task!r} is not complete; nothing was archived.",
+            file=sys.stderr,
+        )
+        return 2
+    except ArchiveError as error:
+        print(f"cannot {action} Accord work: {error}", file=sys.stderr)
+        return 2
+
+    if forced_incomplete:
+        print(
+            f"WARNING: {task!r} is not complete; "
+            "archived because --force was provided.",
+            file=sys.stderr,
+        )
+    verb = "Archived" if action == "archive" else "Restored"
+    print(f"{verb} {task!r}: {destination}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

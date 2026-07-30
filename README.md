@@ -63,7 +63,7 @@ plugins/accord/                installable plugin root
   templates/                   agreement, report, and learning-note templates
   spec/                        record and check-in specifications
   bin/                         stable user-facing command launcher
-  tools/                       location, validate, render, serve, and install-launcher
+  tools/                       location, archive, validate, render, serve, and install-launcher
 tests/                         framework, hook, and tool behavior tests
 ```
 
@@ -96,6 +96,15 @@ The project key is derived from the project root, so two projects with the same
 directory name keep separate records. The path stays stable while the project
 remains at that root.
 
+Completed work may move intact to:
+
+```text
+~/.accord/archive/projects/{project-key}/{task}/
+```
+
+Archived work keeps the same internal layout. It leaves routine session context
+without leaving the historical record.
+
 `plugins/accord/tools/validate` checks a record against the shared schema.
 `plugins/accord/tools/render` creates an offline HTML timeline with a sibling
 asset directory. Serve the generated directory locally rather than opening its
@@ -123,15 +132,32 @@ when you want to see new events. Use `accord serve --task TASK` to open one
 record directly by task ID, `accord serve --no-open` to print the URL without
 opening a browser, and `Ctrl-C` to stop the server. The server reads records
 but does not change them.
+
+Use `accord archive TASK` to move completed work out of routine discovery.
+Archiving happens only through this explicit command. Recording completion
+never moves work by itself. An attempt to archive work that does not end in a
+recorded completion prints a deterministic `WARNING` and moves nothing. Accord
+accepts `accord archive --force TASK` as an explicit override. Forced archival
+prints `WARNING: 'TASK' is not complete; archived because --force was
+provided.` and moves the incomplete task without changing or completing its
+record. The flag does not bypass invalid-record, unsafe-path, or
+destination-collision refusals. Use
+`accord serve --archived` to list and inspect archived work. Use
+`accord restore TASK` to return the task directory to the active project store.
+Restoration reverses storage placement; it does not reopen completed work.
+Forced-archived incomplete work must be restored before it resumes. Archive and
+restore move the whole directory without rewriting its record.
+
 The bundled `tools/serve` remains available as the implementation entry point
 for maintainers and direct plugin inspection.
 
 The plugin bundles two read-only lifecycle hooks through
 `plugins/accord/hooks/hooks.json`, shared by Claude Code and Codex.
-`SessionStart` supplies a factual index of Accord records after startup, resume,
-or compaction. `PostToolUse` validates records after a shell or file-editing tool
-names a path in `~/.accord`. The hooks do not decide which agreement covers the
-current work, infer events, or write to the record.
+`SessionStart` supplies a factual index of active records after startup,
+resume, or compaction. Archived work is omitted from that routine context.
+`PostToolUse` validates active and archived records after a shell or
+file-editing tool names a path in `~/.accord`. The hooks do not decide which
+agreement covers the current work, infer events, or write to the record.
 
 ## Development
 

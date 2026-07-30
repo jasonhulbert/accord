@@ -146,7 +146,14 @@ class HookTests(unittest.TestCase):
                     "",
                 ]
             )
-            self.make_accord(root, home, contents)
+            log = self.make_accord(root, home, contents)
+            archive_root = (
+                home
+                / ".accord"
+                / "archive"
+                / "projects"
+                / log.parents[1].name
+            )
 
             result = self.run_hook(
                 SESSION_START,
@@ -157,6 +164,8 @@ class HookTests(unittest.TestCase):
                 },
                 home,
             )
+            still_active = log.is_file()
+            archived_automatically = (archive_root / "rate-limit").exists()
 
         self.assertEqual(result.returncode, 0)
         self.assertIn("completion=recorded", result.stdout)
@@ -165,6 +174,43 @@ class HookTests(unittest.TestCase):
             result.stdout,
         )
         self.assertIn("Begin a new agreement for later work", result.stdout)
+        self.assertTrue(still_active)
+        self.assertFalse(archived_automatically)
+
+    def test_session_start_excludes_archived_history_from_routine_context(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            home = root / "home"
+            home.mkdir()
+            active_log = self.make_accord(
+                root,
+                home,
+                json.dumps(event("completion")) + "\n",
+            )
+            archive_root = (
+                home
+                / ".accord"
+                / "archive"
+                / "projects"
+                / active_log.parents[1].name
+            )
+            archived_task = archive_root / "rate-limit"
+            archived_task.parent.mkdir(parents=True)
+            active_log.parent.rename(archived_task)
+
+            result = self.run_hook(
+                SESSION_START,
+                {
+                    "hook_event_name": "SessionStart",
+                    "source": "startup",
+                    "cwd": str(root),
+                },
+                home,
+            )
+
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stdout, "")
+        self.assertEqual(result.stderr, "")
 
     def test_session_start_surfaces_invalid_history_without_blocking_startup(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -231,6 +277,39 @@ class HookTests(unittest.TestCase):
         self.assertEqual(result.stdout, "")
         self.assertEqual(result.stderr, "")
 
+    def test_recording_completion_does_not_archive_work_automatically(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            home = root / "home"
+            home.mkdir()
+            log = self.make_accord(
+                root,
+                home,
+                json.dumps(event("completion")) + "\n",
+            )
+            archive_root = (
+                home
+                / ".accord"
+                / "archive"
+                / "projects"
+                / log.parents[1].name
+            )
+
+            result = self.run_hook(
+                POST_TOOL_USE,
+                {
+                    "hook_event_name": "PostToolUse",
+                    "tool_name": "Write",
+                    "tool_input": {"file_path": str(log)},
+                    "cwd": str(root),
+                },
+                home,
+            )
+
+            self.assertEqual(result.returncode, 0)
+            self.assertTrue(log.is_file())
+            self.assertFalse((archive_root / "rate-limit").exists())
+
     def test_post_tool_use_checks_history_after_a_related_document_edit(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -275,6 +354,72 @@ class HookTests(unittest.TestCase):
         self.assertIn("invalid JSON", result.stderr)
         self.assertIn("~/.accord/projects/", result.stderr)
         self.assertIn("rate-limit/record.jsonl", result.stderr)
+
+    def test_post_tool_use_still_surfaces_invalid_archived_history_when_touched(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            home = root / "home"
+            home.mkdir()
+            active_log = self.make_accord(root, home, json.dumps(event()) + "\n")
+            archive_root = (
+                home
+                / ".accord"
+                / "archive"
+                / "projects"
+                / active_log.parents[1].name
+            )
+            archived_task = archive_root / "rate-limit"
+            archived_task.parent.mkdir(parents=True)
+            active_log.parent.rename(archived_task)
+            archived_log = archived_task / "record.jsonl"
+            archived_log.write_text("not-json\n")
+
+            result = self.run_hook(
+                POST_TOOL_USE,
+                {
+                    "hook_event_name": "PostToolUse",
+                    "tool_name": "Edit",
+                    "tool_input": {"file_path": str(archived_log)},
+                    "cwd": str(root),
+                },
+                home,
+            )
+
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("record validation failed", result.stderr)
+        self.assertIn("archive/projects/", result.stderr)
+
+    def test_active_record_edits_do_not_rescan_archived_history(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            home = root / "home"
+            home.mkdir()
+            active_log = self.make_accord(root, home, json.dumps(event()) + "\n")
+            archive_root = (
+                home
+                / ".accord"
+                / "archive"
+                / "projects"
+                / active_log.parents[1].name
+            )
+            archived_task = archive_root / "old-work"
+            archived_task.mkdir(parents=True)
+            (archived_task / "record.jsonl").write_text("not-json\n")
+
+            result = self.run_hook(
+                POST_TOOL_USE,
+                {
+                    "hook_event_name": "PostToolUse",
+                    "tool_name": "Write",
+                    "tool_input": {"file_path": str(active_log)},
+                    "cwd": str(root),
+                },
+                home,
+            )
+
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stdout, "")
+        self.assertEqual(result.stderr, "")
 
 
 if __name__ == "__main__":

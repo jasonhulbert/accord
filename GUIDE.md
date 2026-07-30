@@ -184,6 +184,11 @@ Each body of work has a technical task ID used only in paths and interfaces.
 The agreement gives the work room. The record lets that room survive a change
 of session.
 
+Completed work can be archived at
+`~/.accord/archive/projects/{project-key}/{task}/`. The whole task directory
+moves together. Its agreement, record, reports, learning notes, and diagrams
+keep their relationships.
+
 ## Inspect a live record
 
 To inspect active work under Accord, run the user-facing command from the
@@ -206,3 +211,50 @@ explicit refresh action for seeing newly appended events. It binds to localhost,
 opens a browser when possible, and stops when you press `Ctrl-C`.
 Use `accord serve --task TASK` when the task ID is already known. Use
 `accord serve --no-open` when you only need the printed URL.
+
+## Let history recede explicitly
+
+Routine context should keep attention on work that may still change. From the
+project root, move completed work out of the active record list:
+
+```text
+accord archive TASK
+```
+
+Accord moves only a valid task directory whose record ends in `completion`. It
+does not rewrite the record. Completion never triggers archival by itself.
+Only an explicit `accord archive TASK` command moves work. An attempt to
+archive incomplete work prints a deterministic `WARNING` and moves nothing.
+When the user intends to remove incomplete work from routine context anyway,
+they may make that override explicit:
+
+```text
+accord archive --force TASK
+```
+
+Forced archival prints:
+
+```text
+WARNING: 'TASK' is not complete; archived because --force was provided.
+```
+
+It moves the task without changing its record, marking it complete, or closing
+its agreement. The flag does not bypass malformed-record, unsafe-path, or
+collision refusals.
+
+Archived work remains available when history is needed:
+
+```text
+accord serve --archived
+```
+
+Return it to the active project store with:
+
+```text
+accord restore TASK
+```
+
+Restoration reverses storage placement. It does not reopen completed work.
+Forced-archived incomplete work must be restored before it resumes. Restoration
+also refuses collisions. Neither command merges directories or deletes
+evidence.
