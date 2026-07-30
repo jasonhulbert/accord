@@ -25,11 +25,11 @@ capability; it does not import hidden reading instructions.
 
 Run `tools/location` from the target project's root to locate its record store.
 It prints a directory under `~/.accord/projects/`; use that exact directory.
-Only an active agreement can cover the request. A `completion` event closes its
-agreement and record; do not reopen or append to it. Reach a new agreement for
-later work. When the human explicitly resumes work archived with `--force`,
-run `accord restore TASK` first. Never search archives speculatively. History
-may inform counsel, but new records stand alone.
+Only an active agreement can cover the request. A `completion` or `end` event
+closes its agreement and record; do not reopen or append to it. Reach a new
+agreement for later work. When the human explicitly resumes unclosed work
+archived with `--force`, run `accord restore TASK` first. Never search archives
+speculatively. History may inform counsel, but new records stand alone.
 
 For active work, read it together with the record, reports, learning notes, and
 actual work. Wait on an open reserved question. Otherwise orient the human and
@@ -127,6 +127,7 @@ Invoking the `check-in` skill does not make incidental conversation a check-in.
 The human's explicit direction that the work should be recorded as complete
 allows you to append `completion`. Evidence, confidence, silence, and earlier
 authorization do not. Record `end` when the work stops without that approval,
-and preserve unresolved facts plainly in either case.
+and preserve unresolved facts plainly in either case. Both events close the
+agreement and record. Later work requires a new agreement.
 
 Improve Accord at its source, not in an installed copy.

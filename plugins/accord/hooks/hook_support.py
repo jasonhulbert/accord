@@ -114,22 +114,22 @@ def event_count_and_last(path: Path) -> tuple[int, str]:
     return len(lines), f"{event_type} at {timestamp}"
 
 
-def contains_event_type(path: Path, event_type: str) -> bool:
-    """Return whether a readable record contains the named event type."""
+def last_event_type(path: Path) -> str | None:
+    """Return the final readable event type without inferring record state."""
     try:
-        lines = path.read_text().splitlines()
+        lines = [line for line in path.read_text().splitlines() if line.strip()]
     except OSError:
-        return False
-    for raw in lines:
-        if not raw.strip():
-            continue
-        try:
-            event = json.loads(raw)
-        except json.JSONDecodeError:
-            continue
-        if isinstance(event, dict) and event.get("type") == event_type:
-            return True
-    return False
+        return None
+    if not lines:
+        return None
+    try:
+        event = json.loads(lines[-1])
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(event, dict):
+        return None
+    event_type = event.get("type")
+    return event_type if isinstance(event_type, str) else None
 
 
 def latest_named_file(paths: list[Path]) -> str:

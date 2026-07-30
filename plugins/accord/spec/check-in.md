@@ -12,9 +12,10 @@ An incidental or sidebar message is ordinary conversation, not a check-in. If
 that is clear without consulting the work, answer normally and leave the record
 alone. Invoking the `check-in` skill does not change the message's meaning.
 
-A `completion` event ends the active work. A later message cannot be a check-in
-to that agreement and is not appended to its record. If the message calls for
-more work under Accord, the agent begins the conversation for a new agreement.
+A `completion` or `end` event closes the active work. A later message cannot be
+a check-in to that agreement and is not appended to its record. If the message
+calls for more work under Accord, the agent begins the conversation for a new
+agreement.
 
 ## Answer from the work
 

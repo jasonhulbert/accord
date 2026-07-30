@@ -15,7 +15,7 @@ from urllib.request import urlopen
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-INSTALL = REPO_ROOT / "plugins" / "accord" / "tools" / "install-launcher"
+INSTALL = REPO_ROOT / "plugins" / "accord" / "tools" / "install"
 LOCATION = REPO_ROOT / "plugins" / "accord" / "tools" / "location"
 
 
@@ -53,7 +53,7 @@ class CliTests(unittest.TestCase):
         result = subprocess.run(
             [
                 sys.executable,
-                str(plugin_root / "tools" / "install-launcher"),
+                str(plugin_root / "tools" / "install"),
                 "--bin-dir",
                 str(bin_dir),
             ],
@@ -99,8 +99,47 @@ class CliTests(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0)
         self.assertIn("accord serve", result.stdout)
+        self.assertIn("accord list", result.stdout)
         self.assertIn("accord archive", result.stdout)
         self.assertIn("accord restore", result.stdout)
+
+    def test_installed_command_lists_active_and_archived_work_together(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            project, home, store = self.make_project(root)
+            self.write_completed_record(store)
+            launcher = self.install(home, root / "bin")
+            environment = os.environ | {"HOME": str(home)}
+            archived = subprocess.run(
+                [str(launcher), "archive", "rate-limit"],
+                cwd=project,
+                text=True,
+                capture_output=True,
+                env=environment,
+            )
+            ongoing = store / "ongoing-work"
+            ongoing.mkdir(parents=True)
+            ongoing_event = event("Ongoing work remains active.")
+            ongoing_event["task"] = "ongoing-work"
+            (ongoing / "record.jsonl").write_text(
+                json.dumps(ongoing_event) + "\n"
+            )
+
+            result = subprocess.run(
+                [str(launcher), "list"],
+                cwd=project,
+                text=True,
+                capture_output=True,
+                env=environment,
+            )
+
+        self.assertEqual(archived.returncode, 0, archived.stderr)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(
+            result.stdout,
+            "ACTIVE    ongoing-work\n"
+            "ARCHIVED  rate-limit\n",
+        )
 
     def test_installed_command_archives_and_restores_completed_work(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -158,7 +197,7 @@ class CliTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(
                 result.stderr,
-                "WARNING: 'rate-limit' is not complete; "
+                "WARNING: 'rate-limit' does not end in a closing event; "
                 "archived because --force was provided.\n",
             )
             self.assertFalse((store / "rate-limit").exists())

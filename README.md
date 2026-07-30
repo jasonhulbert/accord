@@ -63,7 +63,7 @@ plugins/accord/                installable plugin root
   templates/                   agreement, report, and learning-note templates
   spec/                        record and check-in specifications
   bin/                         stable user-facing command launcher
-  tools/                       location, archive, validate, render, serve, and install-launcher
+  tools/                       location, list, archive, validate, render, serve, and install
 tests/                         framework, hook, and tool behavior tests
 ```
 
@@ -112,12 +112,12 @@ HTML through `file://`. Referenced visual explanations under `diagrams/` render
 Mermaid blocks locally while keeping their source available for inspection.
 `plugins/accord/bin/accord` is the stable user-facing launcher. Plugin hosts
 that expose plugin `bin` commands make `accord` available after installation.
-If your host does not expose it, install the launcher once from the installed
-plugin directory with `tools/install-launcher`. From a source checkout, the
+If your host does not expose it, install the command once from the installed
+plugin directory with `tools/install`. From a source checkout, the
 equivalent is:
 
 ```text
-plugins/accord/tools/install-launcher
+plugins/accord/tools/install
 ```
 
 It places the launcher in the user-local executable directory and reports any
@@ -133,20 +133,27 @@ record directly by task ID, `accord serve --no-open` to print the URL without
 opening a browser, and `Ctrl-C` to stop the server. The server reads records
 but does not change them.
 
-Use `accord archive TASK` to move completed work out of routine discovery.
-Archiving happens only through this explicit command. Recording completion
-never moves work by itself. An attempt to archive work that does not end in a
-recorded completion prints a deterministic `WARNING` and moves nothing. Accord
-accepts `accord archive --force TASK` as an explicit override. Forced archival
-prints `WARNING: 'TASK' is not complete; archived because --force was
-provided.` and moves the incomplete task without changing or completing its
-record. The flag does not bypass invalid-record, unsafe-path, or
+Use `accord list` to see active and archived work for the current project
+together in the terminal. The labels describe where the work is stored.
+Archived work is not necessarily complete: `end` closes work without
+completion, and `archive --force` can move work whose record does not end in a
+closing event. The command remains read-only and reports damaged or unsafe
+storage instead of silently omitting it.
+
+Use `accord archive TASK` to move closed work out of routine discovery.
+Archiving happens only through this explicit command. Recording `completion` or
+`end` never moves work by itself. An attempt to archive work with no closing
+event prints a deterministic `WARNING` and moves nothing. Accord accepts
+`accord archive --force TASK` as an explicit override. Forced archival prints
+`WARNING: 'TASK' does not end in a closing event; archived because --force was
+provided.` and moves the unclosed task without changing or closing its record.
+The flag does not bypass invalid-record, unsafe-path, or
 destination-collision refusals. Use
 `accord serve --archived` to list and inspect archived work. Use
 `accord restore TASK` to return the task directory to the active project store.
-Restoration reverses storage placement; it does not reopen completed work.
-Forced-archived incomplete work must be restored before it resumes. Archive and
-restore move the whole directory without rewriting its record.
+Restoration reverses storage placement; it does not reopen completed or ended
+work. Unclosed work archived with `--force` must be restored before it resumes.
+Archive and restore move the whole directory without rewriting its record.
 
 The bundled `tools/serve` remains available as the implementation entry point
 for maintainers and direct plugin inspection.
