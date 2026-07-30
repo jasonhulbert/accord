@@ -44,7 +44,8 @@ When contributing:
 - `.claude-plugin/`, `.agents/plugins/` — repository marketplace catalogs
   pointing to `./plugins/accord`.
 - `tests/` — contributor-facing contract, hook, and tool behavior tests.
-- `ACCORD_STYLE_GUIDE.md` — accepted voice and style authority.
+- `ACCORD_STYLE_GUIDE.md` — source-maintainer voice and style authority. It is
+  not part of the installable plugin or ordinary Accord work context.
 - `~/.accord/` — per-user Accord records, partitioned by project and kept
   outside project workspaces.
 

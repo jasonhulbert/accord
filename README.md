@@ -43,7 +43,7 @@ the repository root are contributor-facing.
 
 ```text
 GUIDE.md                       practical human-facing guide
-ACCORD_STYLE_GUIDE.md          voice and writing standard
+ACCORD_STYLE_GUIDE.md          source-maintainer voice and writing standard
 package.json                   contributor-only web build dependencies
 web/                           web-view sources and build script
 .claude-plugin/                Claude Code marketplace catalog

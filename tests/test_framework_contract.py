@@ -287,6 +287,28 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertIn("does not replace the plain event summary", record)
         self.assertIn("leaves authority where the agreement placed it", guide)
 
+    def test_operational_skills_keep_maintainer_context_out_of_work(self):
+        skill_paths = (
+            "plugins/accord/skills/accord/SKILL.md",
+            "plugins/accord/skills/check-in/SKILL.md",
+            "plugins/accord/skills/visual-explanation/SKILL.md",
+        )
+        skills = [self.read(path) for path in skill_paths]
+        skill_prose = " ".join(" ".join(skill.split()) for skill in skills)
+        accord = self.prose("plugins/accord/skills/accord/SKILL.md")
+        check_in = self.read("plugins/accord/skills/check-in/SKILL.md")
+        visual = self.prose("plugins/accord/skills/visual-explanation/SKILL.md")
+
+        self.assertIn("plugin provides Accord's operational guidance", accord)
+        self.assertIn("A skill handoff invokes a capability", accord)
+        self.assertIn("invoke the `accord` skill", check_in.lower())
+        self.assertIn("invoke the `accord` skill to establish context", visual)
+        self.assertNotIn("ACCORD_STYLE_GUIDE.md", skill_prose)
+        self.assertNotIn("AGENTS.md", skill_prose)
+        self.assertNotIn("../", skill_prose)
+        self.assertFalse((PLUGIN_ROOT / "ACCORD_STYLE_GUIDE.md").exists())
+        self.assertFalse((PLUGIN_ROOT / "AGENTS.md").exists())
+
     def test_internal_pause_does_not_become_an_approval_gate(self):
         agent = self.read("plugins/accord/creed/agent.md")
         skill = self.read("plugins/accord/skills/accord/SKILL.md")

@@ -5,10 +5,10 @@ description: Use when the user invokes this skill or human input during active w
 
 # Check in
 
-The framework files are at the plugin root, two directories above this file. If
-the creed has not been read in this session, read `creed/agent.md` and
-`creed/human.md`. Read `spec/check-in.md` before treating the message as a
-check-in.
+Use this skill with the target project's agreement, record, reports, learning
+notes, and actual work. If the creeds are not already in hand, read
+`creed/agent.md` and `creed/human.md`. Read `spec/check-in.md` before treating
+the message as a check-in.
 
 For a possible check-in, run `tools/location` from the target project's root.
 Find the active agreement that covers the message. A record with a `completion`
@@ -17,6 +17,8 @@ could cover the message, ask which one. If none does, say so plainly and offer
 to use Accord to reach an agreement for the work. A closed agreement counts as
 none.
 
-For an open question, follow the responsibilities for presenting work in
-`skills/accord/SKILL.md`. Use `templates/report.md` for a durable account or
-when presenting work for review, and point to the work itself.
+For an open question, invoke the `accord` skill for agreement, resumption, and
+review handling. This handoff does not import hidden reading instructions.
+
+Use `templates/report.md` for a durable account or when presenting work for
+review, and point to the work itself.

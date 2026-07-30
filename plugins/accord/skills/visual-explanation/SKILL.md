@@ -8,9 +8,9 @@ description: Show Accord work through Mermaid when the human asks to see a flow,
 A visual explanation gives the human another way to understand the work. It
 turns a flow, relationship, or idea into something grasped at a glance.
 
-Begin from the active agreement, record, and actual work. If they are not
-already in hand, resume through the `accord` skill. A diagram neither reopens
-closed work nor creates a review.
+Begin from the active agreement, record, and work. If absent, invoke the
+`accord` skill to establish context. A diagram neither reopens closed work nor
+creates a review.
 
 ## Let picture and prose work together
 
