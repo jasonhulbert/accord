@@ -41,6 +41,16 @@ def accord_archive_root_for(cwd: Path) -> Path:
     return accord_home() / "archive" / "projects" / project_key(project_root(cwd))
 
 
+def accord_projects_root() -> Path:
+    """Return the global active-project storage root."""
+    return accord_home() / "projects"
+
+
+def accord_archived_projects_root() -> Path:
+    """Return the global archived-project storage root."""
+    return accord_home() / "archive" / "projects"
+
+
 def task_directory(root: Path, task: str) -> Path | None:
     """Resolve a task ID to one direct child without accepting path syntax."""
     if not task or task in {".", ".."} or "/" in task or "\\" in task or "\x00" in task:

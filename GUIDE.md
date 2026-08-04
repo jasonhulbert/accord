@@ -122,6 +122,12 @@ accord restore TASK
 Restoration reverses storage placement. It never merges directories, rewrites
 evidence, or reopens completed work.
 
+## See the work directly
+
+Run `accord serve` to open a read-only terminal view of every Accord project
+for the current user. The view groups active and archived work by stored
+project key. It can refresh when records change, but it never changes them.
+
 ## Keep the relationship capable
 
 - Name why the work matters, not every move.

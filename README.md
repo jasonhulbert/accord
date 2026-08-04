@@ -36,6 +36,7 @@ The available skills are `accord`, `check-in`, and `visual-explanation`.
 The public CLI provides:
 
 - `accord version` — report CLI and agent-protocol compatibility;
+- `accord serve` — open the read-only terminal view of all projects;
 - `accord location` — show the current project's record roots;
 - `accord list` — list active and archived work without choosing an agreement;
 - `accord context TASK` — read one explicitly named agreement and its record;
@@ -44,6 +45,9 @@ The public CLI provides:
 - `accord validate TASK` — validate a stored record;
 - `accord archive TASK` and `accord restore TASK` — move a complete task tree
   without rewriting it.
+
+`accord serve` is global rather than project-scoped. It reads active and
+archived work beneath `~/.accord`, and it never mutates records.
 
 Machine-facing use should pass `--json` and require both a zero exit status and
 the expected response shape.

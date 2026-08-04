@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "Purpose-led human-agent work under a shared agreement and record."
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = ["urwid>=4.0,<5"]
 
 [project.scripts]
 accord = "accord.cli:main"

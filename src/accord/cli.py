@@ -62,6 +62,8 @@ def build_parser() -> argparse.ArgumentParser:
     version = commands.add_parser("version", help="show CLI compatibility")
     version.add_argument("--json", action="store_true")
 
+    commands.add_parser("serve", help="open the read-only terminal work view")
+
     location = commands.add_parser("location", help="show this project's record root")
     location.add_argument("project", nargs="?")
     location.add_argument("--json", action="store_true")
@@ -155,6 +157,7 @@ def version_result() -> dict[str, Any]:
         "record_schema": RECORD_SCHEMA_VERSION,
         "commands": [
             "version",
+            "serve",
             "location",
             "list",
             "context",
@@ -181,6 +184,18 @@ def run(args: argparse.Namespace) -> int:
                 f"record schema {result['record_schema']})"
             )
         return 0
+
+    if args.command == "serve":
+        try:
+            from .tui import run_tui
+        except ModuleNotFoundError as error:
+            if error.name == "urwid":
+                raise WorkError(
+                    "accord serve requires the Urwid dependency; install the "
+                    "standalone package with its declared dependencies"
+                ) from error
+            raise
+        return run_tui()
 
     if args.command == "location":
         project = project_path(args.project)

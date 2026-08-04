@@ -43,9 +43,12 @@ Wait on an open reserved question. Otherwise orient the human and resume the
 work within the agreement. Read `../../spec/check-in.md` when the human speaks
 first.
 
-When the human asks to inspect work in progress under Accord, read its context
-and make the work itself available. A record or report can orient inspection;
-it cannot replace the work.
+When the human asks to inspect work in progress under Accord, use the public
+`accord serve` command when the standalone CLI is installed. It opens a
+read-only terminal view of all active and archived projects, independent of
+the directory from which it was launched. The human can refresh the view from
+the terminal. A record or report can orient inspection; it cannot replace the
+work.
 
 ## Reach agreement
 
