@@ -1,117 +1,81 @@
 # The Accord record
 
-Each body of work under Accord has an append-only record at
-`{store}/{task}/record.jsonl`, where `{store}` is the project directory printed
-by `tools/location` under `~/.accord/projects/`. The agent opens the record
-after the human accepts the agreement; one JSON object occupies each nonblank
-line.
+Each body of work has an append-only `record.jsonl` stored with its agreement
+and durable documents. The standalone CLI resolves the project location,
+validates every event, and performs every mutation. `accord start` stores an
+accepted agreement and opens its record as one operation.
 
 The record describes what happened. It does not score the agent, prescribe the
 next action, or turn earlier experience into a rule.
 
-After work closes, the entire task directory may move to
-`~/.accord/archive/projects/{project-key}/{task}/`. Archival changes routine
-visibility, not the record. It does not add an event, rewrite history, or break
-the relative paths between the record and its documents. A closing event does
-not trigger this move. Archival occurs only through an explicit user action.
-An explicit `--force` override may move work whose record does not end in
-`completion` or `end`. The move does not complete or end the work, close its
-agreement, or add an event to its record. The work remains outside routine
-discovery until an explicit restore returns it to the active project store.
+## Keep evidence readable
 
-## Design
-
-- **Append only.** Corrections are later events with references to what they
-  correct. Previously valid lines do not change.
+- **Append only.** Corrections follow the events they correct. Valid history is
+  never rewritten.
 - **Readable alone.** Every event carries its task ID, actor, time, type, and a
-  plain summary. Records with different task IDs can be combined without a
-  join.
+  plain summary.
 - **Narrative first.** Structured fields support validation and comparison.
-  Context that does not need structure stays in `summary`.
-- **Language is evidence.** The words in a record show what was said and done;
-  they do not define Accord's vocabulary. When a term is ambiguous, the agent
-  reads it against the agreement, surrounding events, and actual work. If an
-  ambiguity affecting purpose, authority, or state cannot be resolved from that
-  evidence, the question returns to the human.
-- **Small vocabulary.** The event set covers the responsibilities in the creed.
-  A material event that fits no specific type is a `note`.
+  Context that needs no structure stays in the summary.
+- **Language is evidence.** Words in a record show what was said and done. They
+  do not define Accord's vocabulary or create authority.
+- **Small vocabulary.** A material event that fits no specific type is a
+  `note`.
 
-## Envelope
+## Name what happened
 
-Every event has:
+Every event names an actor: `human`, `agent`, or `supporting-agent`.
+`investigator` remains valid in stored schema-1 history. New events use the
+current actor names; existing records are not rewritten.
 
-| Field | Required | Meaning |
-|---|---|---|
-| `ts` | yes | ISO 8601 timestamp |
-| `task` | yes | task ID, matching `{task}` in `{store}/{task}/` |
-| `schema` | yes | schema version, currently `"1"` |
-| `type` | yes | one of the twelve event types below |
-| `actor` | yes | `human`, `agent`, or `supporting-agent` |
-| `summary` | yes | plain-language account of what happened |
-| `refs` | no | record-relative paths or event IDs the event points to |
-
-Three types require one additional field: `attempt.outcome`,
-`question.subject`, and `direction.decision`. No other structured payload is
-defined.
-
-## Event types
+The event types mean:
 
 | Type | Meaning |
 |---|---|
 | `start` | The human accepts the agreement and authorizes the work. |
-| `investigation` | A bounded inquiry reports its evidence, inference, and limits. |
-| `attempt` | An attempt at part of the work. `outcome` is `succeeded` or `failed`. |
-| `review` | The work reaches a point where human judgment is reserved before it advances. |
-| `report` | A reference event indexing a report in `refs`. |
-| `question` | A consequential choice returns to the human. `subject` names the judgment sought. |
-| `direction` | The human answers an open question. `decision` carries the answer. |
-| `check-in` | Human input that meets the consequential boundary in `spec/check-in.md`. |
+| `investigation` | A bounded inquiry reports evidence, inference, and limits. |
+| `attempt` | An attempt succeeds or fails. |
+| `review` | Work reaches a point where human judgment is reserved before it advances. |
+| `report` | A reference indexes a durable report. |
+| `question` | A consequential choice returns to the human. |
+| `direction` | The human answers an open question. |
+| `check-in` | Human input meets the boundary in `check-in.md`. |
 | `approach-change` | The approach changes while the purpose remains. |
-| `completion` | The human has explicitly approved recording the work as complete, closing the agreement and record. |
-| `end` | The work ends without completion, closing the agreement and record. |
-| `note` | A factual event that fits no more specific type. |
+| `completion` | The human approves recording the work as complete. |
+| `end` | The work ends without completion. |
+| `note` | A factual event fits no more specific type. |
+
+An `attempt` records whether it succeeded or failed. A `question` names the
+judgment sought. A `direction` carries the human's answer. The CLI validates
+these fields; the agent remains responsible for choosing the event whose
+meaning matches what happened.
 
 Changing the event or actor set changes the shared record contract. It requires
 human agreement, not an implementation choice made in passing.
 
-`investigator` remains valid in stored schema version `"1"` records. New events
-use `supporting-agent`; valid history is not rewritten.
+## Let closure remain closed
 
-A `completion` event follows the human's explicit approval, ordinarily recorded
-as `direction`. The agent's evidence or judgment that the agreement has been
-satisfied is not approval. Validation proves that an event is well formed; the
-preceding record shows whether authority to close was given.
+A `completion` follows the human's explicit judgment, ordinarily recorded as a
+`direction`. The agent's evidence or confidence is not approval.
 
-`completion` and `end` are terminal. No later request reopens the agreement,
-and no later event is appended to that record. Related work receives a new
+`completion` and `end` are terminal. No later request reopens the agreement, and
+no later event is appended to that record. Related work receives a new
 agreement and record.
 
-## Documents and events
+Archive and restore move the complete task directory. They add no event and
+change no record byte. Archival changes routine visibility, not state.
+Restoration does not reopen completed or ended work.
 
-Agreements, reports, and visual explanations are markdown-primary: the document
-carries the conversation and its voice. `start` and `report` point to agreements
-and reports. A visual explanation lives under `diagrams/` and is referenced by
-the event that explains why it exists. It has no event type of its own.
+## Keep documents with their account
 
-Investigations, attempts, reviews, questions, directions, check-ins, approach
-changes, completion, and endings are record-primary. A supporting agent records
-the kind of work it did rather than receiving a separate event type merely
-because the work was delegated.
+Agreements, reports, learning notes, and visual explanations are Markdown. A
+`start` points to the agreement. A `report` points to its report. A visual
+explanation lives under `diagrams/` and is referenced by the event that explains
+why it exists; it has no event type of its own.
 
-A visual explanation lets prose and fenced `mermaid` blocks carry one account.
-Its scope, evidence, and uncertainty keep the picture honest. It does not
-replace the plain event summary or the implementation beneath it.
+References remain within the work they describe. A new agreement, record, or
+report does not point to another work's agreement or reports. It carries the
+context needed to stand on its own.
 
-Learning notes may be referenced by `note` events when the reference matters to
-resumption.
-
-References remain within the work they describe. A path in `refs` resolves from
-that work's task directory, and an event ID identifies an event in that work's
-record. A new agreement, record, or report does not point to another work's
-agreement or reports. It carries the context needed to stand on its own.
-
-## Validation
-
-`tools/validate` checks each nonblank line against `spec/record.schema.json`.
-Validation proves only that an event is well formed. It does not decide whether
-the right events were recorded.
+The CLI validates structure and storage integrity. Validation proves that the
+record is well formed. It cannot decide whether the right event was recorded or
+whether a human judgment was earned.

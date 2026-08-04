@@ -27,26 +27,22 @@ When contributing:
 - Keep the human and agent capable. Do not reduce either to an input source,
   approval mechanism, executor, or tool.
 
-## Repository layout
+## Architecture
 
-- `plugins/accord/` — the installable plugin root for Claude Code and Codex.
-  Only this subtree ships to consuming projects.
-  - `creed/` — `agent.md`, `human.md`, `supporting-agent.md`. Permanent,
-    role-level, and amended rarely.
-  - `skills/` — `accord` and `check-in`. Both reference shared plugin-root
-    resources; never vendor copies into skill folders.
-  - `templates/` — agreement, report, and learning-note contents. Templates
-    name substance, not choreography.
-  - `spec/` — record schema, event example, check-in semantics, and descriptive
-    analysis boundary.
-  - `hooks/` — shared, read-only Claude Code and Codex lifecycle hooks.
-  - `tools/` — record validation and rendering.
-- `.claude-plugin/`, `.agents/plugins/` — repository marketplace catalogs
+Accord has one executable implementation and one thin provider layer.
+
+- `src/accord/` is the standalone Python package. It owns record storage,
+  validation, mutation, context inspection, archive, and restore.
+- `plugins/accord/` is the installable provider plugin. It contains only
+  manifests, metadata, Markdown skills, creeds, templates, and guidance.
+- Skills call the public `accord` CLI. They never invoke bundled scripts, edit
+  JSONL directly, or search provider caches.
+- The schema ships with the CLI. Existing schema-1 records use the same reader
+  as new records and remain in place without migration.
+- `.claude-plugin/` and `.agents/plugins/` are repository marketplace catalogs
   pointing to `./plugins/accord`.
-- `tests/` — contributor-facing contract, hook, and tool behavior tests.
-- `ACCORD_STYLE_GUIDE.md` — source-maintainer voice and style authority. It is
-  not part of the installable plugin or ordinary Accord work context.
-- `~/.accord/` — per-user Accord records, partitioned by project and kept
+- `tests/` contains focused contracts for the framework and standalone CLI.
+- `~/.accord/` contains per-user records partitioned by project and remains
   outside project workspaces.
 
 ## Amendment discipline
@@ -59,6 +55,18 @@ When contributing:
   agreement. They are not incidental implementation decisions.
 - Templates name what a conversation or record contains, never a required
   sequence of steps.
-- The record describes what happened. Analytics over records remain
-  descriptive and feed human judgment; they never generate rules, scores, or
-  instructions that flow back to the agent.
+- The record describes what happened. Analytics over records remain descriptive
+  and feed human judgment; they never generate rules, scores, or instructions
+  that flow back to the agent.
+
+## Verification
+
+Run:
+
+```text
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
+```
+
+Build and install the wheel in isolation when changing packaging. Validate each
+skill and the Codex plugin manifest when changing the provider layer. A passing
+suite must contain no hidden skips.

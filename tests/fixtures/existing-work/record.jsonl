@@ -1,0 +1,4 @@
+{"ts":"2026-07-01T10:00:00Z","task":"existing-work","schema":"1","type":"start","actor":"human","summary":"The human accepted the agreement.","refs":["agreement.md"]}
+{"ts":"2026-07-01T11:00:00Z","task":"existing-work","schema":"1","type":"investigation","actor":"investigator","summary":"Historical evidence was gathered before the supporting-agent actor name was adopted.","refs":["diagrams/current-shape.md"]}
+{"ts":"2026-07-01T12:00:00Z","task":"existing-work","schema":"1","type":"report","actor":"agent","summary":"The agent recorded a durable account.","refs":["reports/progress.md"]}
+{"ts":"2026-07-01T13:00:00Z","task":"existing-work","schema":"1","type":"note","actor":"agent","summary":"A learning note may help another session.","refs":["learning-context.md"]}

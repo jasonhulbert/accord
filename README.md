@@ -1,88 +1,56 @@
 # Accord
 
-A narrative framework for substantial human-in-the-loop AI work.
+Accord is a narrative framework for substantial human-agent work.
 
-The human holds the purpose. Within the agreement, the agent holds the work.
-Changes to purpose, accepted risk, available resources, or judgment the human
-kept return to the human. They reach agreement on the space between them before
-either mistakes motion for progress.
+The human holds the purpose. Within an accepted agreement, the agent holds the
+work. Consequential choices return to the human while implementation remains
+the agent's responsibility. An append-only record lets that understanding
+survive changes of session.
 
-Accord gives a capable agent room to investigate, implement, verify, and adapt
-without turning the human into a passive observer. The human keeps judgment over
-purpose, consequential risk, resources, and the choices that should not be
-delegated. Review happens while the work can still change.
+Accord has two parts:
 
-Accord governs the work. The agreement gives trust a shape by recording the
-work's accepted purpose, bounds, and division of authority. The record
-preserves what happened.
+- a standalone `accord` CLI that owns records, storage, validation, and
+  lifecycle operations;
+- a thin provider plugin containing Markdown skills, creeds, templates, and
+  guidance that teach agents how to use the CLI.
 
-New to the framework? Start with [GUIDE.md](GUIDE.md).
+The plugin contains no executable runtime. The CLI contains no provider logic.
 
-## The operating model
+## Install
 
-- **Creed** (`plugins/accord/creed/`) — the durable point of view for the human,
-  agent, and supporting agent. It states responsibility and authority without
-  prescribing implementation.
-- **Agreement** — the understanding reached for one body of work before it
-  begins: purpose, evidence of success, first approach, resources, risks, room
-  to act, review points, and questions kept by the human.
-- **Record** — an append-only factual account of what happened in the work,
-  letting later sessions resume from evidence instead of memory.
-- **Reports** — durable orientation to work, evidence, failure, uncertainty, and
-  counsel. A report points to the work; it never substitutes for inspection.
-- **Learning notes** — context that may help later judgment. Evidence, not
-  mandates.
-
-The agreement is not handed down. The agent inspects what is known and counsels
-on cost, risk, missing context, unclear authority, and useful review points. The
-human and agent discuss and revise the draft. Work begins only after the human
-has seen and explicitly accepted the agreement.
-
-## Repository layout
-
-Only `plugins/accord/` is installed into consuming projects. The documents at
-the repository root are contributor-facing.
+Install the CLI from this checkout:
 
 ```text
-GUIDE.md                       practical human-facing guide
-ACCORD_STYLE_GUIDE.md          source-maintainer voice and writing standard
-package.json                   contributor-only web build dependencies
-web/                           web-view sources and build script
-.claude-plugin/                Claude Code marketplace catalog
-.agents/plugins/               Codex marketplace catalog
-plugins/accord/                installable plugin root
-  .claude-plugin/              Claude Code manifest
-  .codex-plugin/               Codex manifest
-  skills/
-    accord/SKILL.md            begin or resume substantial work
-    check-in/SKILL.md          consequential human input during active work
-    visual-explanation/SKILL.md
-                               visual accounts of cross-cutting work
-  creed/                       agent.md, human.md, supporting-agent.md
-  hooks/                       shared read-only lifecycle hooks
-  templates/                   agreement, report, and learning-note templates
-  spec/                        record and check-in specifications
-  bin/                         stable user-facing command launcher
-  tools/                       location, list, archive, validate, render, serve, and install
-tests/                         framework, hook, and tool behavior tests
+python3 -m pip install .
+accord version
 ```
 
-## Adoption
+Install `plugins/accord/` through the Claude Code or Codex marketplace catalog
+in this repository. The plugin requires a compatible standalone CLI and fails
+loudly when it is missing.
 
-**Claude Code.** Add this repository as a marketplace and install `accord`
-(`/plugin marketplace add <repo>` then `/plugin install accord`), or load the
-plugin directly during development with
-`claude --plugin-dir <path-to-repo>/plugins/accord`. Its skills are
-`/accord:accord`, `/accord:check-in`, and `/accord:visual-explanation`.
+The available skills are `accord`, `check-in`, and `visual-explanation`.
 
-**Codex.** Add this repository as a plugin marketplace
-(`codex plugin marketplace add <repo>`) and install `accord`.
+## Commands
 
-The plugin needs no target-project configuration. Its records live in the
-user's hidden home store, outside the target project. `tools/location` prints
-the exact directory for a target project. After acceptance, the agent stores
-the agreement and opens the work's record in a directory named by a technical
-task ID:
+The public CLI provides:
+
+- `accord version` — report CLI and agent-protocol compatibility;
+- `accord location` — show the current project's record roots;
+- `accord list` — list active and archived work without choosing an agreement;
+- `accord context TASK` — read one explicitly named agreement and its record;
+- `accord start`, `append`, `document`, and `amend` — validated mutations used
+  by the skills;
+- `accord validate TASK` — validate a stored record;
+- `accord archive TASK` and `accord restore TASK` — move a complete task tree
+  without rewriting it.
+
+Machine-facing use should pass `--json` and require both a zero exit status and
+the expected response shape.
+
+## Records
+
+Records stay outside project workspaces:
 
 ```text
 ~/.accord/projects/{project-key}/{task}/
@@ -90,110 +58,43 @@ task ID:
   record.jsonl
   reports/
   diagrams/
+  learning-*.md
 ```
 
-The project key is derived from the project root, so two projects with the same
-directory name keep separate records. The path stays stable while the project
-remains at that root.
+Archived work lives under
+`~/.accord/archive/projects/{project-key}/{task}/` with the same internal
+layout. Existing schema-1 records are read in place by the same code used for
+new records. There is no migration or legacy reader.
 
-Completed work may move intact to:
+`completion` and `end` close an agreement and record. Archival is a separate,
+explicit change in visibility. Restoring work never reopens a closed agreement.
+
+## Repository layout
 
 ```text
-~/.accord/archive/projects/{project-key}/{task}/
+pyproject.toml                 standalone package metadata
+src/accord/                    CLI, storage, record, and lifecycle code
+plugins/accord/                Markdown-only provider plugin
+  .claude-plugin/              Claude Code metadata
+  .codex-plugin/               Codex metadata
+  skills/                      agent instructions
+  creed/                       durable role responsibilities
+  templates/                   agreement, report, and learning-note contents
+  spec/                        record meaning and check-in guidance
+tests/                         focused framework and CLI contracts
+GUIDE.md                       human-facing use
+ACCORD_STYLE_GUIDE.md          maintainer writing standard
 ```
-
-Archived work keeps the same internal layout. It leaves routine session context
-without leaving the historical record.
-
-`plugins/accord/tools/validate` checks a record against the shared schema.
-`plugins/accord/tools/render` creates an offline HTML timeline with a sibling
-asset directory. Serve the generated directory locally rather than opening its
-HTML through `file://`. Referenced visual explanations under `diagrams/` render
-Mermaid blocks locally while keeping their source available for inspection.
-`plugins/accord/bin/accord` is the stable user-facing launcher. Plugin hosts
-that expose plugin `bin` commands make `accord` available after installation.
-If your host does not expose it, install the command once from the installed
-plugin directory with `tools/install`. From a source checkout, the
-equivalent is:
-
-```text
-plugins/accord/tools/install
-```
-
-It places the launcher in the user-local executable directory and reports any
-`PATH` setup still needed. From any target project root, run:
-
-```text
-accord serve
-```
-
-The command opens the record list in a browser. Use the explicit refresh action
-when you want to see new events. Use `accord serve --task TASK` to open one
-record directly by task ID, `accord serve --no-open` to print the URL without
-opening a browser, and `Ctrl-C` to stop the server. The server reads records
-but does not change them.
-
-Use `accord list` to see active and archived work for the current project
-together in the terminal. The labels describe where the work is stored.
-Archived work is not necessarily complete: `end` closes work without
-completion, and `archive --force` can move work whose record does not end in a
-closing event. The command remains read-only and reports damaged or unsafe
-storage instead of silently omitting it.
-
-Use `accord archive TASK` to move closed work out of routine discovery.
-Archiving happens only through this explicit command. Recording `completion` or
-`end` never moves work by itself. An attempt to archive work with no closing
-event prints a deterministic `WARNING` and moves nothing. Accord accepts
-`accord archive --force TASK` as an explicit override. Forced archival prints
-`WARNING: 'TASK' does not end in a closing event; archived because --force was
-provided.` and moves the unclosed task without changing or closing its record.
-The flag does not bypass invalid-record, unsafe-path, or
-destination-collision refusals. Use
-`accord serve --archived` to list and inspect archived work. Use
-`accord restore TASK` to return the task directory to the active project store.
-Restoration reverses storage placement; it does not reopen completed or ended
-work. Unclosed work archived with `--force` must be restored before it resumes.
-Archive and restore move the whole directory without rewriting its record.
-
-The bundled `tools/serve` remains available as the implementation entry point
-for maintainers and direct plugin inspection.
-
-The plugin bundles two read-only lifecycle hooks through
-`plugins/accord/hooks/hooks.json`, shared by Claude Code and Codex.
-`SessionStart` supplies a factual index of active records after startup,
-resume, or compaction. Archived work is omitted from that routine context.
-`PostToolUse` validates active and archived records after a shell or
-file-editing tool names a path in `~/.accord`. The hooks do not decide which
-agreement covers the current work, infer events, or write to the record.
 
 ## Development
 
-The installable plugin contains a generated web distribution and has no Node
-runtime dependency. Contributors rebuild that distribution from the separate
-HTML, CSS, and JavaScript sources with:
-
-```text
-npm ci
-npm run build:web
-```
-
-`npm run check:web` fails when the checked-in distribution differs from its
-sources or when the pinned Mermaid structure no longer supports Accord's
-flowchart-and-sequence build.
-
-Run the full behavior suite:
+Run the focused suite:
 
 ```text
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
 ```
 
-Validate the Claude Code manifest:
-
-```text
-claude plugin validate ./plugins/accord
-```
-
-The creed carries the point of view. Skills should remain concise. Templates
-name what a conversation or record contains, not a sequence of steps.
-Specifications define structure. Analytics over records remain descriptive and
-must never generate rules, scores, or instructions that flow back to the agent.
+Validate the Codex plugin and its skills with the repository's available plugin
+and skill validators before shipping changes. The creed carries the point of
+view. Code owns mechanics. Neither should compensate for the other by saying
+everything twice.

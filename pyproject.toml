@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "accord-framework"
+dynamic = ["version"]
+description = "Purpose-led human-agent work under a shared agreement and record."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+accord = "accord.cli:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "accord.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+accord = ["resources/*.json"]

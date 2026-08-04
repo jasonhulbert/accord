@@ -5,35 +5,40 @@ description: Show Accord work through Mermaid when the human asks to see a flow,
 
 # Show the work visually
 
-A visual explanation gives the human another way to understand the work. It
-turns a flow, relationship, or idea into something grasped at a glance.
+A visual explanation gives the human another way to understand the work.
 
-Begin from the active agreement, record, and work. If absent, invoke the
-`accord` skill to establish context. A diagram neither reopens closed work nor
-creates a review.
+Invoke the `accord` skill to establish context from the active agreement,
+record, durable documents, and actual work. A diagram neither reopens closed
+work nor creates a review.
 
 ## Let picture and prose work together
 
-Name its question and scope. Use a diagram where seeing helps more than
-reading. Use prose for context, exceptions, uncertainty, and useful
-implementation references. Keep implemented behavior, intent, and inference
-distinct.
+Name the question and scope. Use a diagram where seeing helps more than reading.
+Use prose for context and uncertainty. Keep implemented behavior, intent, and
+inference distinct.
 
-Choose the smallest set that preserves consequential differences. Flowcharts
-suit relationships and decisions. Sequence diagrams suit order and
-responsibility over time. Verify other Mermaid forms in the record view before
-relying on them.
+Choose the smallest set that preserves consequential differences. Use a
+flowchart for relationships and a sequence diagram for order. Keep Mermaid
+source free of configuration, links, and HTML.
 
 ## Keep the picture with the work
 
-Write active work as Markdown under `diagrams/{descriptive-name}.md`, with prose
-around fenced `mermaid` blocks. Reference the account from the existing event
-that explains it. The picture belongs to the narrative, not an event of its
-own.
+Put the completed Markdown in a temporary file and run:
 
-The record view owns theme and safety. Leave configuration, links, images,
-click actions, and HTML out of Mermaid source.
+```text
+accord document TASK diagram --file FILE --name DESCRIPTION.md --json
+```
 
-If the human asks to inspect the account, return through Accord's existing
-review boundary and `accord serve`. Without active Accord work, keep the
-diagram in the conversation.
+Remove the temporary file after success. Use the returned `ref` on the event
+that explains the account:
+
+```text
+accord append TASK TYPE --actor ACTOR --summary SUMMARY --ref REF --json
+```
+
+The picture belongs to the narrative, not an event of its own. It does not
+replace the plain event summary or the implementation beneath it.
+
+If the human asks to inspect the account, make its Markdown and the actual work
+available through Accord's existing review boundary. Without active work, keep
+the diagram in the conversation.

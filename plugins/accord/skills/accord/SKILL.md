@@ -11,123 +11,153 @@ return to them. Reach agreement before beginning.
 
 ## Use the right context
 
-The plugin provides Accord's operational guidance. During Accord work, load it
-and the target project's agreement, record, reports, learning notes, and actual
-work.
+Read `../../creed/agent.md`, `../../creed/human.md`, and
+`../../creed/supporting-agent.md` before acting.
 
-Read the three creeds before acting. On resumption, read the active agreement
-with its record, reports, learning notes, and actual work. Read
-`spec/record.md` before the first event, `spec/check-in.md` when the human
-speaks first, and a template only when writing it. A skill handoff invokes a
-capability; it does not import hidden reading instructions.
+Run `accord version --json` before record work. This skill requires agent
+protocol `"1"`. If the command is unavailable, its output is malformed, or the
+protocol is incompatible, stop and tell the human that the standalone Accord
+CLI must be installed or updated. Do not search plugin caches, invoke bundled
+scripts, or write a record directly as a fallback.
+
+Require a zero exit status and the expected JSON shape from every CLI command.
+On failure, stop and surface the error. Do not act on partial output.
+
+Run `accord list --json` in the target project. The result names active and
+archived storage without deciding which agreement covers the request. Only work
+with `storage: "active"` and `state: "open"` may cover current work. If one may
+apply, run `accord context TASK --json`. When several may apply, ask the human
+which work they mean. A `completion` or `end` event closes its agreement and
+record; do not reopen or append to it. Reach a new agreement for later work.
+History may inform counsel, but it does not lend authority to the new work.
+
+Never inspect archived work speculatively. When the human explicitly asks to
+inspect it, use `accord context TASK --archived --json`. If the human explicitly
+resumes unclosed work, run `accord restore TASK --json`, then read it with
+`accord context TASK --json`. Restoring completed or ended work does not reopen
+its agreement.
+
+On resumption, read it together with the record, reports, learning notes, and
+actual work. Use the diagrams when they help explain what crosses those parts.
+Wait on an open reserved question. Otherwise orient the human and resume the
+work within the agreement. Read `../../spec/check-in.md` when the human speaks
+first.
+
+When the human asks to inspect work in progress under Accord, read its context
+and make the work itself available. A record or report can orient inspection;
+it cannot replace the work.
 
 ## Reach agreement
 
-Run `tools/location` from the target project's root to locate its record store.
-It prints a directory under `~/.accord/projects/`; use that exact directory.
-Only an active agreement can cover the request. A `completion` or `end` event
-closes its agreement and record; do not reopen or append to it. Reach a new
-agreement for later work. When the human explicitly resumes unclosed work
-archived with `--force`, run `accord restore TASK` first. Never search archives
-speculatively. History may inform counsel, but new records stand alone.
-
-For active work, read it together with the record, reports, learning notes, and
-actual work. Wait on an open reserved question. Otherwise orient the human and
-resume the work within the agreement.
-
-When the human asks to inspect work in progress under Accord, use the user-facing
-`accord serve` command from the target root when installed. It opens a read-only
-localhost record view with explicit refresh. If several records exist, let the
-human choose one or pass `--task TASK`; do not silently choose. The bundled
-`tools/serve` is the fallback.
-
-If no agreement covers the work, inspect enough of the project and request to
-offer counsel. Draft from `templates/agreement.md`. Name material risks,
+If no active agreement covers the request, inspect enough of the project to
+offer counsel. Draft from `../../templates/agreement.md`. Name material risks,
 missing resources, unclear authority, and useful review points. Ask only for
-consequential context and recommend where judgment is yours.
+consequential context and recommend where judgment is the human's.
 
-Present the complete draft and counsel to the human. Discuss and revise them
-until both roles can stand behind the purpose, bounds, and division of
-responsibility.
+Present the complete draft and counsel. Discuss and revise them until both
+roles can stand behind the purpose, bounds, and division of responsibility.
 
 ### Acceptance
 
-Invocation authorizes reaching agreement, not work under an agreement the human
-has not seen. Begin only after a subsequent human message explicitly accepts
-the presented agreement. Questions, revisions, and acknowledgments continue the
-dialogue. If intent is unclear, ask whether the agreement is accepted.
+Invocation authorizes reaching agreement, not beginning work. Begin only after
+a subsequent human message explicitly accepts the presented agreement.
+Questions, revisions, and acknowledgments continue the dialogue.
 
-After acceptance, choose a technical task ID and create:
+After acceptance, place the accepted Markdown in a temporary file and run:
 
 ```text
-{store}/{task}/
-  agreement.md
-  record.jsonl
+accord start TASK --agreement FILE --actor human --summary SUMMARY --json
 ```
 
-Write the accepted agreement and open the record with a `start` event that
-references it. The record carries the work forward.
+Remove the temporary file after the command succeeds. The CLI stores the
+agreement and opens its record as one operation.
 
 ## Own the work
 
 Within the agreement, choose and adapt the implementation. Follow evidence
-rather than preserving the first approach, and record a material
-`approach-change`.
+rather than preserving the first approach. Record material events with:
 
-Look actively for bounded parts that supporting agents can carry when delegation
-would improve the work. Give each its purpose, context, bounds, and expected
-return. Examine what comes back and keep responsibility for the course,
-integration, and the completed work. Do not delegate reserved decisions or hide
-a consequential choice.
+```text
+accord append TASK TYPE --actor ACTOR --summary SUMMARY [TYPE FIELDS] --json
+```
+
+Use `--outcome` for an `attempt`, `--subject` for a `question`, and
+`--decision` for a `direction`. Use `--ref` for a stored document. The CLI
+supplies time, task identity, schema version, validation, terminal-state checks,
+locking, and the append. You decide what happened and whether it is material.
+Read `../../spec/record.md` before the first append so each event retains its
+meaning.
+
+Look actively for bounded parts that supporting agents can carry when
+delegation would improve the work. Give each one purpose, context, bounds, and
+an expected return. Examine what comes back and keep responsibility for the
+course, integration, and the completed work. Record the actor who carried the
+work; do not delegate reserved decisions.
 
 Bring a `question` to the human when a choice touches purpose, accepted risk,
 resources, authority, or judgment the agreement kept human. Include evidence
 and counsel. Do not return routine choices. Do not make or foreclose the
 consequential choice before direction arrives.
 
+When the human accepts changed terms, put the accepted amendment in a temporary
+Markdown file and run `accord amend TASK --file FILE --json`. Remove the file
+afterward. Record the event that explains what changed.
+
 ## Present work for review
 
 At an agreed review point, or when the outcome and evidence appear to satisfy
-the agreement, make the work available for inspection. Write a report from
-`templates/report.md` naming the judgment sought, choices still open, what will
-grow harder to change, and the agent's counsel. Append `review`, `report`, and
-`question`, then stop before making or foreclosing the human's choice.
+the agreement, make the work available for inspection. Draft from
+`../../templates/report.md`, then store the report through:
 
-Tell the human which work is ready for review and ask the question kept human.
-When you believe the work is complete, ask explicitly whether it should be
-recorded as complete. Do not name the review as though it were a phase,
-deliverable, or piece of work for the human to approve.
+```text
+accord document TASK report --file FILE --name report-DESCRIPTION.md --json
+```
 
-Read later human messages against the open question. More evidence or a
-follow-up question is a `check-in`; the reserved judgment remains open. A clear
-answer is `direction`; record it and resume.
+Use the returned `ref` when recording the `report` event. Record the `review`,
+`report`, and `question`, then stop before making or foreclosing the human's
+choice.
 
-Direction may continue the work, request revision, change its course, or end it.
-When correction is requested, revise the work without acting beyond the
-unresolved judgment, then report and ask again. Responsibility for
-implementation remains yours.
+Tell the human which work is ready and ask the question kept human. More
+evidence or a follow-up question is a `check-in`; the reserved judgment remains
+open. A clear answer is `direction`; record it and resume. When correction is
+requested, revise the work without acting beyond the unresolved judgment, then
+report and ask again. Responsibility for implementation remains yours.
+
+Do not name the review as though it were a phase, deliverable, or piece of work
+for the human to approve.
 
 An internal pause for testing or reflection is not a review. Authority returns
-to the human where the agreement reserves it, the human requests a review, a
+to the human where the agreement reserves it, the human requests review, a
 consequential question exceeds the agreement, or the agent seeks judgment that
 the work is complete.
 
 ## Keep the record
 
-Append material events to `{store}/{task}/record.jsonl`; never rewrite valid
+Use the CLI for every record event and durable document. Never rewrite valid
 history.
 
-Write durable reports under `{store}/{task}/reports/` and index them with
-`report` events. Write a learning note when another session would otherwise
-have to rediscover an important lesson. Learning notes inform judgment; they do
-not become rules.
+Store learning notes with:
 
-Invoking the `check-in` skill does not make incidental conversation a check-in.
+```text
+accord document TASK learning-note --file FILE --name learning-DESCRIPTION.md --json
+```
+
+Reference them from a `note` event when that reference matters to resumption.
+Learning notes inform judgment; they do not become rules.
 
 The human's explicit direction that the work should be recorded as complete
-allows you to append `completion`. Evidence, confidence, silence, and earlier
-authorization do not. Record `end` when the work stops without that approval,
-and preserve unresolved facts plainly in either case. Both events close the
-agreement and record. Later work requires a new agreement.
+allows a `completion` event. Evidence, confidence, silence, and earlier
+authorization do not. Record `end` when the work stops without that approval.
+Both events close the agreement and record.
+
+Archival changes visibility, not state. Run `accord archive TASK --json` only
+when the human explicitly asks. Do not archive automatically after a closing
+event. Use `--force` for unclosed work only when the human explicitly directs
+that override. Run `accord restore TASK --json` only for explicitly named
+archived work; restoration never rewrites its contents.
+
+When you believe the agreement has been satisfied, ask explicitly whether it
+should be recorded as complete. After the human's `direction`, append the
+`completion` event as the agent carrying the record.
 
 Improve Accord at its source, not in an installed copy.

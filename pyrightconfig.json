@@ -2,12 +2,7 @@
   "typeCheckingMode": "standard",
   "executionEnvironments": [
     {
-      "root": "plugins/accord/hooks",
-      "extraPaths": ["plugins/accord", "plugins/accord/hooks"]
-    },
-    {
-      "root": "plugins/accord/tools",
-      "extraPaths": ["plugins/accord"]
+      "root": "src"
     }
   ]
 }

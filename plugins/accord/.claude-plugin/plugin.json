@@ -1,7 +1,7 @@
 {
   "name": "accord",
-  "description": "A narrative framework for substantial human-agent work: agree on purpose, authority, review, and reserved judgment, then adapt together as evidence changes the work.",
-  "version": "0.1.2",
+  "description": "Markdown skills for purpose-led human-agent work, backed by the standalone Accord CLI.",
+  "version": "0.2.0",
   "author": {
     "name": "jasonhulbert"
   },
